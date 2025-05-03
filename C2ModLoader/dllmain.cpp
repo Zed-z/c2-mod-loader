@@ -14,8 +14,29 @@
 #define LOG_FILE "c2modloader.log"
 #define MOD_FOLDER "mods"
 
+void ClearLog() {
+
+    char modulePath[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), modulePath, MAX_PATH);
+    std::string path(modulePath);
+    size_t pos = path.find_last_of("\\/");
+    std::string logPath = path.substr(0, pos) + "\\" + LOG_FILE;
+
+    std::ofstream log(logPath, std::ios::trunc);
+    if (!log.is_open()) return;
+
+    log.close();
+}
+
 void Log(const std::string& message) {
-    std::ofstream log(LOG_FILE, std::ios::app);
+
+    char modulePath[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), modulePath, MAX_PATH);
+    std::string path(modulePath);
+    size_t pos = path.find_last_of("\\/");
+    std::string logPath = path.substr(0, pos) + "\\" + LOG_FILE;
+
+    std::ofstream log(logPath, std::ios::app);
     if (!log.is_open()) return;
 
     // Get current time
@@ -90,6 +111,7 @@ void LoadMods(const char* folder) {
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH: {
+        ClearLog();
         LoadMods(MOD_FOLDER);
     }
     }
