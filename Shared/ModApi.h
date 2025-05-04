@@ -4,9 +4,13 @@
 
 // Api definition --------------------------------------------------------
 typedef void(*LogFunction)(const std::string&);
+typedef int(*GetAddressFunction)(int);
+typedef void(*SetAddressFunction)(int, int);
 
 struct ModApi {
     LogFunction Log;
+    GetAddressFunction GetAddress;
+    SetAddressFunction SetAddress;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

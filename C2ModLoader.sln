@@ -5,9 +5,11 @@ VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C2ModLoader", "C2ModLoader\C2ModLoader.vcxproj", "{D639514E-9E48-424C-94F3-807752A2627B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModRenderDistanceExtender", "RenderDistanceExtender\ModRenderDistanceExtender.vcxproj", "{E2D654AB-6801-441E-B370-70F5732080F4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderDistanceExtender", "RenderDistanceExtender\ModRenderDistanceExtender.vcxproj", "{E2D654AB-6801-441E-B370-70F5732080F4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloWorld", "HelloWorld\HelloWorld.vcxproj", "{F881200A-9AB1-408A-9E83-C2780558313A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoordRecall", "CoordRecall\CoordRecall.vcxproj", "{CB74C2B3-C8F0-471D-8366-458485310BB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{F881200A-9AB1-408A-9E83-C2780558313A}.Release|x64.Build.0 = Release|x64
 		{F881200A-9AB1-408A-9E83-C2780558313A}.Release|x86.ActiveCfg = Release|Win32
 		{F881200A-9AB1-408A-9E83-C2780558313A}.Release|x86.Build.0 = Release|Win32
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Debug|x64.ActiveCfg = Debug|x64
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Debug|x64.Build.0 = Debug|x64
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Debug|x86.ActiveCfg = Debug|Win32
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Debug|x86.Build.0 = Debug|Win32
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Release|x64.ActiveCfg = Release|x64
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Release|x64.Build.0 = Release|x64
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Release|x86.ActiveCfg = Release|Win32
+		{CB74C2B3-C8F0-471D-8366-458485310BB8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

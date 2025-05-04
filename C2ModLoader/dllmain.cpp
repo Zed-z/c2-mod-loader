@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <chrono>
 #include <ctime>
@@ -52,9 +53,50 @@ void Log(const std::string& message) {
 }
 
 
+int GetAddress(int address) {
+
+    DWORD* addr = reinterpret_cast<DWORD*>(address);
+
+    if (!IsBadWritePtr(addr, sizeof(DWORD))) {
+
+        std::ostringstream stream;
+        stream << "Memory at " << addr << " is " << *addr;
+        Log(stream.str());
+
+        return *addr;
+    }
+    else {
+
+        std::ostringstream stream;
+        stream << "Failed to read " << addr << " (invalid pointer)";
+        Log(stream.str());
+
+        return -1;
+    }
+}
+
+void SetAddress(int address, int value) {
+
+    DWORD* addr = reinterpret_cast<DWORD*>(address);
+
+    if (!IsBadWritePtr(addr, sizeof(DWORD))) {
+        *addr = value;
+
+        std::ostringstream stream;
+        stream << "Memory at " << addr << " patched to " << value;
+        Log(stream.str());
+    }
+    else {
+
+        std::ostringstream stream;
+        stream << "Failed to write to " << addr << " (invalid pointer)";
+        Log(stream.str());
+    }
+}
+
 // API
 ModApi g_ModApi = {
-    Log
+    Log, GetAddress, SetAddress
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
