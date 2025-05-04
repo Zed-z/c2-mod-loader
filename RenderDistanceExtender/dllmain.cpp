@@ -13,30 +13,49 @@ int original_render_distance = 0;
 
 bool is_active = false;
 
+#define MAX_DISTANCE 0x7FFFFFFF
+
+void RenderExtend() {
+
+    original_fog_distance = api->GetAddress(addr_fog_distance);
+    original_render_distance = api->GetAddress(addr_render_distance);
+
+    api->SetAddress(addr_fog_distance, MAX_DISTANCE);
+    api->SetAddress(addr_render_distance, MAX_DISTANCE);
+
+    is_active = true;
+}
+
+void RenderRevert() {
+    api->SetAddress(addr_fog_distance, original_fog_distance);
+    api->SetAddress(addr_render_distance, original_render_distance);
+
+    is_active = false;
+}
+
 DWORD WINAPI PatchThread(LPVOID) {
     while (true) {
+
+        // Render distance changed failsafe
+        if (is_active && api->GetAddress(addr_render_distance) != MAX_DISTANCE) {
+            RenderExtend();
+            api->Log("Render distance reapplied!");
+        }
+
+        // Toggle
         if (GetAsyncKeyState(VK_F1) & 1) {
 
             // Activate
             if (!is_active) {
-                original_fog_distance = api->GetAddress(addr_fog_distance);
-                original_render_distance = api->GetAddress(addr_render_distance);
-
-                api->SetAddress(addr_fog_distance, 0x7FFFFFFF);
-                api->SetAddress(addr_render_distance, 0x7FFFFFFF);
-
+                RenderExtend();
                 api->Log("Render distance extended!");
             }
 
             // Deactivate
             else {
-                api->SetAddress(addr_fog_distance, original_fog_distance);
-                api->SetAddress(addr_render_distance, original_render_distance);
-
+                RenderRevert();
                 api->Log("Render distance reverted!");
             }
-
-            is_active = !is_active;
         }
         Sleep(50);
     }
