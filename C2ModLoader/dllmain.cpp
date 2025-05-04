@@ -1,4 +1,5 @@
 #define IS_MOD_LOADER
+//#define DEBUG
 #include "ModApi.h"
 
 #include <Windows.h>
@@ -31,12 +32,17 @@ void ClearLog() {
 
 void Log(const std::string& message) {
 
+    // Get log path - ignore directory override
+    // Get module name
     char modulePath[MAX_PATH];
     GetModuleFileNameA(GetModuleHandleA(NULL), modulePath, MAX_PATH);
     std::string path(modulePath);
     size_t pos = path.find_last_of("\\/");
-    std::string logPath = path.substr(0, pos) + "\\" + LOG_FILE;
 
+    std::string logPath = path.substr(0, pos) + "\\" + LOG_FILE;
+    std::string moduleName = path.substr(pos + 1);
+
+    // Open log
     std::ofstream log(logPath, std::ios::app);
     if (!log.is_open()) return;
 
@@ -47,8 +53,9 @@ void Log(const std::string& message) {
     localtime_s(&timeInfo, &now_c);
 
     // Format and write the timestamp and message
-    log << "[" << std::put_time(&timeInfo, "%Y-%m-%d %H:%M:%S") << "] " << message << std::endl;
+    log << "[" << std::put_time(&timeInfo, "%Y-%m-%d %H:%M:%S") << "] [" << moduleName << "]\t" << message << std::endl;
 
+    // Close log
     log.close();
 }
 
@@ -59,17 +66,21 @@ int GetAddress(int address) {
 
     if (!IsBadWritePtr(addr, sizeof(DWORD))) {
 
+#ifdef DEBUG
         std::ostringstream stream;
         stream << "Memory at " << addr << " is " << *addr;
         Log(stream.str());
+#endif
 
         return *addr;
     }
     else {
 
+#ifdef DEBUG
         std::ostringstream stream;
         stream << "Failed to read " << addr << " (invalid pointer)";
         Log(stream.str());
+#endif
 
         return -1;
     }
@@ -82,15 +93,21 @@ void SetAddress(int address, int value) {
     if (!IsBadWritePtr(addr, sizeof(DWORD))) {
         *addr = value;
 
+#ifdef DEBUG
         std::ostringstream stream;
         stream << "Memory at " << addr << " patched to " << value;
         Log(stream.str());
+#endif
+
     }
     else {
 
+#ifdef DEBUG
         std::ostringstream stream;
         stream << "Failed to write to " << addr << " (invalid pointer)";
         Log(stream.str());
+#endif
+
     }
 }
 
