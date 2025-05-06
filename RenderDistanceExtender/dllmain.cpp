@@ -5,11 +5,8 @@
 
 ModApi* api = nullptr;
 
-int addr_fog_distance = 0x4B7B48;
-int original_fog_distance = 0;
-
-int addr_render_distance = 0x4B7B18;
-int original_render_distance = 0;
+uintptr_t addr_fog_distance, addr_render_distance;
+int original_fog_distance, original_render_distance;
 
 bool is_active = false;
 
@@ -17,18 +14,19 @@ bool is_active = false;
 
 void RenderExtend() {
 
-    original_fog_distance = api->GetAddress(addr_fog_distance);
-    original_render_distance = api->GetAddress(addr_render_distance);
+    original_fog_distance = api->AddressGetInt(addr_fog_distance);
+    original_render_distance = api->AddressGetInt(addr_render_distance);
 
-    api->SetAddress(addr_fog_distance, MAX_DISTANCE);
-    api->SetAddress(addr_render_distance, MAX_DISTANCE);
+    api->AddressSetInt(addr_fog_distance, MAX_DISTANCE);
+    api->AddressSetInt(addr_render_distance, MAX_DISTANCE);
 
     is_active = true;
 }
 
 void RenderRevert() {
-    api->SetAddress(addr_fog_distance, original_fog_distance);
-    api->SetAddress(addr_render_distance, original_render_distance);
+
+    api->AddressSetInt(addr_fog_distance, original_fog_distance);
+    api->AddressSetInt(addr_render_distance, original_render_distance);
 
     is_active = false;
 }
@@ -37,7 +35,7 @@ DWORD WINAPI PatchThread(LPVOID) {
     while (true) {
 
         // Render distance changed failsafe
-        if (is_active && api->GetAddress(addr_render_distance) != MAX_DISTANCE) {
+        if (is_active && api->AddressGetInt(addr_render_distance) != MAX_DISTANCE) {
             RenderExtend();
             api->Log("Render distance reapplied!");
         }
@@ -67,6 +65,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadSharedModApi();
         if (!api) return FALSE;
         
+        addr_fog_distance = api->ResolveAddress({ 0x4B7B48 });
+        addr_render_distance = api->ResolveAddress({ 0x4B7B18 });
+
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);
     }

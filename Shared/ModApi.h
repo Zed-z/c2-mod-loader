@@ -3,14 +3,23 @@
 #include <Windows.h>
 
 // Api definition --------------------------------------------------------
+
+#define MAX_OFFSETS 256
+typedef struct {
+    uintptr_t base;
+    uintptr_t offsets[MAX_OFFSETS];
+} MemoryAddress;
+
 typedef void(*LogFunction)(const std::string&);
-typedef int(*GetAddressFunction)(int);
-typedef void(*SetAddressFunction)(int, int);
+typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress);
+typedef void(*AddressSetIntFunction)(uintptr_t, int);
+typedef int(*AddressGetIntFunction)(uintptr_t);
 
 struct ModApi {
     LogFunction Log;
-    GetAddressFunction GetAddress;
-    SetAddressFunction SetAddress;
+    ResolveAddressFunction ResolveAddress;
+    AddressSetIntFunction AddressSetInt;
+    AddressGetIntFunction AddressGetInt;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

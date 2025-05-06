@@ -14,84 +14,51 @@ struct SavedCoords {
     int z;
     int angle;
 };
-SavedCoords saved_coords[3];
-bool coords_saved[3] = { false,false,false };
-
-uintptr_t ReadPointer(uintptr_t base, const std::vector<uintptr_t>& offsets) {
-    uintptr_t addr = base;
-
-    for (size_t i = 0; i < offsets.size(); ++i) {
-        if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-            api->Log("Bad read at: " + std::to_string(addr));
-            return 0;
-        }
-
-        addr = *(uintptr_t*)addr;
-
-        if (addr == 0) {
-            api->Log("Null pointer during chain at offset index: " + std::to_string(i));
-            return 0;
-        }
-
-        addr += offsets[i];
-    }
-
-    return addr;
-}
-
+SavedCoords saved_coords[0xFF];
+bool coords_saved[0xFF] = { false };
 
 DWORD WINAPI PatchThread(LPVOID) {
     while (true) {
 
-        int keymap[] = {VK_F6, VK_F7, VK_F8};
         bool save = GetAsyncKeyState(VK_F5);
 
-        for (int i = 0; i < 3; i++) {
+        for (int key = 0x00; key < 0xFF; key++) {
+            if (key == VK_F5) continue;
 
-            if (GetAsyncKeyState(keymap[i]) & 1) {
+            if (GetAsyncKeyState(key) & 1) {
 
                 // Save position
                 if (save) {
 
-                    addr_x = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x2C });
-                    addr_y = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x30 });
-                    addr_z = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x34 });
-                    addr_angle = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x24 });
+                    saved_coords[key].x = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x2C } }));
+                    saved_coords[key].y = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x30 } }));
+                    saved_coords[key].z = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x34 } }));
+                    saved_coords[key].angle = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x24 } }));
 
-                    saved_coords[i].x = *(int*)addr_x;
-                    saved_coords[i].y = *(int*)addr_y;
-                    saved_coords[i].z = *(int*)addr_z;
-                    saved_coords[i].angle = *(int*)addr_angle;
-
-                    coords_saved[i] = true;
+                    coords_saved[key] = true;
 
                     std::ostringstream stream;
-                    stream << "Saved position x: " << saved_coords[i].x
-                        << " y: " << saved_coords[i].y
-                        << " z: " << saved_coords[i].z
-                        << " angle: " << saved_coords[i].angle;
+                    stream << "Saved position x: " << saved_coords[key].x
+                        << " y: " << saved_coords[key].y
+                        << " z: " << saved_coords[key].z
+                        << " angle: " << saved_coords[key].angle;
                     api->Log(stream.str());
                 }
 
-                // Recall positin
+                // Recall position
                 else {
-                    if (!coords_saved[i]) continue;
+                    if (!coords_saved[key]) continue;
 
-                    addr_x = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x2C });
-                    addr_y = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x30 });
-                    addr_z = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x34 });
-                    addr_angle = ReadPointer(0x4A8C3C, { 0x14, 0x28, 0x24 });
-
-                    *(int*)addr_x = saved_coords[i].x;
-                    *(int*)addr_y = saved_coords[i].y;
-                    *(int*)addr_z = saved_coords[i].z;
-                    *(int*)addr_angle = saved_coords[i].angle;
+                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x2C } }), saved_coords[key].x);
+                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x30 } }), saved_coords[key].y);
+                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x34 } }), saved_coords[key].z);
+                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x24 } }), saved_coords[key].angle);
 
                     std::ostringstream stream;
-                    stream << "Recalled position x: " << saved_coords[i].x
-                        << " y: " << saved_coords[i].y
-                        << " z: " << saved_coords[i].z
-                        << " angle: " << saved_coords[i].angle;
+                    stream << "Recalled position x: " << saved_coords[key].x
+                        << " y: " << saved_coords[key].y
+                        << " z: " << saved_coords[key].z
+                        << " angle: " << saved_coords[key].angle;
                     api->Log(stream.str());
                 }
 
