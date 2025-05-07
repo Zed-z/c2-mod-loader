@@ -42,7 +42,7 @@ DWORD WINAPI PatchThread(LPVOID) {
 
         // Toggle
         if (GetAsyncKeyState(VK_F1) & 1) {
-
+            
             // Activate
             if (!is_active) {
                 RenderExtend();
@@ -55,6 +55,7 @@ DWORD WINAPI PatchThread(LPVOID) {
                 api->Log("Render distance reverted!");
             }
         }
+
         Sleep(50);
     }
     return 0;
@@ -65,8 +66,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadSharedModApi();
         if (!api) return FALSE;
         
-        addr_fog_distance = api->ResolveAddress({ 0x4B7B48 });
-        addr_render_distance = api->ResolveAddress({ 0x4B7B18 });
+        addr_fog_distance = api->ResolveAddress(ADDR_FOG_DISTANCE);
+        addr_render_distance = api->ResolveAddress(ADDR_RENDER_DISTANCE);
 
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);

@@ -98,11 +98,36 @@ int AddressGetInt(uintptr_t address) {
     return value;
 }
 
+bool PatchBytes(uintptr_t address, const void* bytes, size_t size) {
+    DWORD protect;
+    if (!VirtualProtect((LPVOID)address, size, PAGE_EXECUTE_READWRITE, &protect)) {
+        return false;
+    }
+
+    memcpy((LPVOID)address, bytes, size);
+
+    DWORD temp;
+    VirtualProtect((LPVOID)address, size, protect, &temp);
+    return true;
+}
+
+bool ReadBytes(uintptr_t address, void* outBuffer, size_t size) {
+    DWORD protect;
+    if (!VirtualProtect((LPVOID)address, size, PAGE_EXECUTE_READWRITE, &protect)) {
+        return false;
+    }
+
+    memcpy(outBuffer, (LPVOID)address, size);
+
+    DWORD temp;
+    VirtualProtect((LPVOID)address, size, protect, &temp);
+    return true;
+}
 
 
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, AddressSetInt, AddressGetInt
+    Log, ResolveAddress, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

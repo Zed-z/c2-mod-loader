@@ -6,14 +6,13 @@
 
 ModApi* api = nullptr;
 
-uintptr_t addr_x, addr_y, addr_z, addr_angle;
-
 struct SavedCoords {
     int x;
     int y;
     int z;
     int angle;
 };
+
 SavedCoords saved_coords[0xFF];
 bool coords_saved[0xFF] = { false };
 
@@ -30,10 +29,10 @@ DWORD WINAPI PatchThread(LPVOID) {
                 // Save position
                 if (save) {
 
-                    saved_coords[key].x = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x2C } }));
-                    saved_coords[key].y = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x30 } }));
-                    saved_coords[key].z = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x34 } }));
-                    saved_coords[key].angle = api->AddressGetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x24 } }));
+                    saved_coords[key].x = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_X));
+                    saved_coords[key].y = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_Y));
+                    saved_coords[key].z = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_Z));
+                    saved_coords[key].angle = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE));
 
                     coords_saved[key] = true;
 
@@ -49,10 +48,10 @@ DWORD WINAPI PatchThread(LPVOID) {
                 else {
                     if (!coords_saved[key]) continue;
 
-                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x2C } }), saved_coords[key].x);
-                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x30 } }), saved_coords[key].y);
-                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x34 } }), saved_coords[key].z);
-                    api->AddressSetInt(api->ResolveAddress({ 0x4A8C3C, { 0x14, 0x28, 0x24 } }), saved_coords[key].angle);
+                    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_X), saved_coords[key].x);
+                    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_Y), saved_coords[key].y);
+                    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_Z), saved_coords[key].z);
+                    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE), saved_coords[key].angle);
 
                     std::ostringstream stream;
                     stream << "Recalled position x: " << saved_coords[key].x
