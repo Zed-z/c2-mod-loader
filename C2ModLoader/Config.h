@@ -4,4 +4,4 @@
 #define LOG_FILE "c2modloader.log"
 #define MOD_FOLDER "mods"
 
-#define DEBUG
+//#define DEBUG
