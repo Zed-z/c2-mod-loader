@@ -5,11 +5,18 @@
 
 ModApi* api = nullptr;
 
+// Noclip
 const uintptr_t patchAddress = 0x00489BE5;
 const BYTE originalBytes[5] = { 0xE8, 0x26, 0xA5, 0xF7, 0xFF };
 const BYTE patchBytes[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
+// Disablefalling
+const uintptr_t fallingCode = 0x0047FD9F; // add ecx -28
+const BYTE fallingCodeOriginal[] = { 0x83, 0xC1, 0xE4 };
+const BYTE fallingCodePatch[] = { 0x90, 0x90, 0x90 };
+
 bool noclip_enabled = false;
+int noclip_y = 0;
 
 DWORD WINAPI PatchThread(LPVOID) {
     while (true) {
@@ -18,12 +25,20 @@ DWORD WINAPI PatchThread(LPVOID) {
         if (GetAsyncKeyState(VK_F2) & 1) {
             noclip_enabled = !noclip_enabled;
 
+            auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
+            if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+                continue;
+            }
+            noclip_y = api->AddressGetInt(addr);
+
             if (noclip_enabled) {
                 api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
+                api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
                 api->Log("Noclip enabled!");
             }
             else {
                 api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
+                api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
                 api->Log("Noclip disabled!");
             }
         }
@@ -31,23 +46,24 @@ DWORD WINAPI PatchThread(LPVOID) {
         // Go up and down
         if (noclip_enabled) {
             if (GetAsyncKeyState(VK_PRIOR)) {// Page up
-                auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-                api->AddressSetInt(
-                    addr,
-                    api->AddressGetInt(addr) + 100
-                );
+                noclip_y += 10;
             }
 
             if (GetAsyncKeyState(VK_NEXT) & 1) {// Page down
-                auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-                api->AddressSetInt(
-                    addr,
-                    api->AddressGetInt(addr) - 100
-                );
+                noclip_y -= 10;
             }
+
+            auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
+            if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+                continue;
+            }
+            api->AddressSetInt(
+                addr,
+                noclip_y
+            );
         }
 
-        Sleep(50);
+        Sleep(10);
     }
     return 0;
 }
