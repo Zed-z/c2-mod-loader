@@ -10,10 +10,15 @@ const uintptr_t patchAddress = 0x00489BE5;
 const BYTE originalBytes[5] = { 0xE8, 0x26, 0xA5, 0xF7, 0xFF };
 const BYTE patchBytes[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
-// Disablefalling
-const uintptr_t fallingCode = 0x0047FD9F; // add ecx -28
+// Disable falling
+const uintptr_t fallingCode = 0x0047FD9F; // add ecx, -28
 const BYTE fallingCodeOriginal[] = { 0x83, 0xC1, 0xE4 };
 const BYTE fallingCodePatch[] = { 0x90, 0x90, 0x90 };
+
+// Jump falloff (disable for moon jump)
+const uintptr_t jumpFalloffCode = 0x0047FDCF; // add ecx, -14
+const BYTE jumpFalloffCodeOriginal[] = { 0x83, 0xC1, 0xEC };
+const BYTE jumpFalloffCodePatch[] = { 0x90, 0x90, 0x90 };
 
 bool noclip_enabled = false;
 int noclip_y = 0;
@@ -34,11 +39,13 @@ DWORD WINAPI PatchThread(LPVOID) {
             if (noclip_enabled) {
                 api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
                 api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
+                //api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
                 api->Log("Noclip enabled!");
             }
             else {
                 api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
                 api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
+                //api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
                 api->Log("Noclip disabled!");
             }
         }

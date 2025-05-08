@@ -2,10 +2,11 @@
 #include <Windows.h>
 #include <iostream>
 
+ModApi* api = nullptr;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
-        auto api = LoadSharedModApi();
+        api = LoadSharedModApi();
         if (!api) return FALSE;
         api->Log("Hello world!");
     }
