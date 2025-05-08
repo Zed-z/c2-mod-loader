@@ -21,17 +21,19 @@ typedef struct {
 typedef void(*LogFunction)(const std::string& message);
 
 typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);
+typedef uintptr_t(*FindPatternFunction)(const void* pattern, size_t pattern_size, int occurrence);
 
 typedef void(*AddressSetIntFunction)(uintptr_t address, int value);
 typedef int(*AddressGetIntFunction)(uintptr_t address);
 
 typedef bool(*PatchBytesFunction)(uintptr_t address, const void* bytes, size_t size);
-typedef bool(*ReadBytesFunction)(uintptr_t address, void* outBuffer, size_t size);
+typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t size);
 
 struct ModApi {
     LogFunction Log;
 
     ResolveAddressFunction ResolveAddress;
+    FindPatternFunction FindPattern;
 
     AddressSetIntFunction AddressSetInt;
     AddressGetIntFunction AddressGetInt;

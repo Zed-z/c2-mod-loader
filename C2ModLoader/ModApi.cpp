@@ -13,6 +13,9 @@
 #include <iomanip>
 #include <algorithm>
 
+#include <Psapi.h>
+#pragma comment(lib, "Psapi.lib")
+
 
 void Log(const std::string& message) {
 
@@ -111,23 +114,46 @@ bool PatchBytes(uintptr_t address, const void* bytes, size_t size) {
     return true;
 }
 
-bool ReadBytes(uintptr_t address, void* outBuffer, size_t size) {
+bool ReadBytes(uintptr_t address, void* out_buffer, size_t size) {
     DWORD protect;
     if (!VirtualProtect((LPVOID)address, size, PAGE_EXECUTE_READWRITE, &protect)) {
         return false;
     }
 
-    memcpy(outBuffer, (LPVOID)address, size);
+    memcpy(out_buffer, (LPVOID)address, size);
 
     DWORD temp;
     VirtualProtect((LPVOID)address, size, protect, &temp);
     return true;
 }
 
+uintptr_t FindPattern(const void* pattern, size_t pattern_size, int occurrence) {
+    HMODULE hModule = GetModuleHandle(nullptr);
+    if (!hModule) return 0;
+
+    MODULEINFO modInfo;
+    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo)))
+        return 0;
+
+    uintptr_t start = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
+    uintptr_t end = start + modInfo.SizeOfImage;
+
+    int count = 0;
+
+    for (uintptr_t addr = start; addr <= end - pattern_size; ++addr) {
+        if (memcmp(reinterpret_cast<void*>(addr), pattern, pattern_size) == 0) {
+            if (++count == occurrence)
+                return addr;
+        }
+    }
+
+    return 0;
+}
+
 
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes
+    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
