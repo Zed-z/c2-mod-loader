@@ -29,6 +29,8 @@ typedef int(*AddressGetIntFunction)(uintptr_t address);
 typedef bool(*PatchBytesFunction)(uintptr_t address, const void* bytes, size_t size);
 typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t size);
 
+typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length);
+
 struct ModApi {
     LogFunction Log;
 
@@ -40,6 +42,8 @@ struct ModApi {
 
     PatchBytesFunction PatchBytes;
     ReadBytesFunction ReadBytes;
+
+    InjectCodeFunction InjectCode;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

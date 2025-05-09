@@ -151,9 +151,58 @@ uintptr_t FindPattern(const void* pattern, size_t pattern_size, int occurrence) 
 }
 
 
+#define JMP_SIZE 5 // 1 byte for the instruction, 4 for the address
+
+bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length) {
+
+    // Allocate memory
+    size_t totalSize = code_length + JMP_SIZE;
+    uintptr_t newmem = (uintptr_t)VirtualAlloc(NULL, totalSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (!newmem) {
+        Log("Failed to allocate memory for code injection.");
+        return false;
+    }
+
+    // Insert code
+    memcpy((void*)newmem, code, code_length);
+
+
+    // Add jumpback instruction
+    uintptr_t returnAddress = hook_address + hook_length;
+    uintptr_t jmpReturnOffset = returnAddress - (newmem + code_length + JMP_SIZE);
+
+    BYTE jumpback[] = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
+    *(int32_t*)&jumpback[1] = (int32_t)jmpReturnOffset;
+    memcpy((void*)(newmem + code_length), jumpback, JMP_SIZE);
+
+
+    // Prepare the patch
+    BYTE* patch = new BYTE[hook_length];
+    memset(patch, 0x90, hook_length); // Fill with NOP
+
+    // Calculate the position of the next instructions as an offset
+    int32_t rel_jmp_to_newmem = (int32_t)((uintptr_t)newmem - hook_address - JMP_SIZE);
+
+    BYTE jump[] = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
+    *(int32_t*)&jump[1] = (int32_t)rel_jmp_to_newmem;
+    memcpy(patch, jump, JMP_SIZE);
+
+    // Replace the instruction at the address with the hook
+    DWORD protect;
+    VirtualProtect((LPVOID)hook_address, hook_length, PAGE_EXECUTE_READWRITE, &protect);
+    memcpy((void*)hook_address, patch, hook_length);
+    VirtualProtect((LPVOID)hook_address, hook_length, protect, &protect);
+
+
+    // Cleanup
+    delete[] patch;
+    return true;
+}
+
+
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes
+    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
