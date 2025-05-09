@@ -13,6 +13,7 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 - Your mileage may vary on other versions!
 
 # Installation instructions
+1) Make sure you have [Microsoft Visual C++ Redistributable (x86)](https://aka.ms/vs/17/release/vc_redist.x86.exe) installed
 1) Download [dinput8.dll](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest/dinput-Win32.zip) from ThirteenAG's [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader)
 1) Download the mod loader files from [Releases](https://github.com/Zed-z/c2-mod-loader/releases)
 1) Extract both and place them into the game's directory

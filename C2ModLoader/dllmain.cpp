@@ -31,11 +31,14 @@ void ClearLog() {
 
 // Function to show a popup for each loaded mod
 void ShowModPopup(std::vector<std::string> loadedMods, std::vector<std::string> failedMods) {
+
+    // Successfully loaded
     std::string message = "Loaded mods:";
     for (auto& mod : loadedMods) {
         message += "\n- " + mod;
     }
 
+    // Failed to load
     if (failedMods.size() > 0) {
         message += "\n\nFailed to load:";
         for (auto& mod : failedMods) {
@@ -44,6 +47,7 @@ void ShowModPopup(std::vector<std::string> loadedMods, std::vector<std::string> 
         message += "\nCheck the log for details.";
     }
 
+    // Show message box
     MessageBoxA(NULL, message.c_str(), LOADER_NAME, MB_OK | MB_ICONINFORMATION);
 }
 
