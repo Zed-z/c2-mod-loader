@@ -9,10 +9,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadSharedModApi();
         if (!api) return FALSE;
 
-        // Slot 1
+        // Instead of setting current lives to 5 on game over
+        // Get the live limit (Croc2.exe+2062CC) of the current slot (ecx)
+        // And set the lives to that instead
         BYTE injectedCode[] = {
             0x50,                                     // push eax
-            0xA1, 0xCC, 0x62, 0x60, 0x00,             // mov eax, [Croc2.exe+2062CC] (absolute addr)
+            0x8B, 0x81, 0xCC, 0x42, 0x60, 0x00,       // mov eax, [ecx+Croc2.exe+2062CC]
             0x89, 0x81, 0xD0, 0x42, 0x60, 0x00,       // mov [ecx+Croc2.exe+2042D0], eax
             0x58,                                     // pop eax
         };
