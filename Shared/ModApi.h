@@ -18,6 +18,8 @@ typedef struct {
 #define ADDR_CROC_POS_Z         { 0x4A8C3C, { 0x14, 0x28, 0x34 } }
 #define ADDR_CROC_POS_ANGLE     { 0x4A8C3C, { 0x14, 0x28, 0x24 } }
 
+#define ADDR_CURRENT_SAVE_SLOT  { 0x6220FC }
+
 typedef void(*LogFunction)(const std::string& message);
 
 typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);

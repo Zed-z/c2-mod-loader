@@ -16,21 +16,61 @@
 #include <Psapi.h>
 #pragma comment(lib, "Psapi.lib")
 
+#include <intrin.h>
+#pragma intrinsic(_ReturnAddress)
+
+inline HMODULE GetCallingModule() {
+    HMODULE caller = nullptr;
+    GetModuleHandleExA(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCSTR)_ReturnAddress(),
+        &caller
+    );
+    return caller;
+}
+
+
+struct ModuleFilepath {
+    std::wstring path;       // Full path
+    std::wstring filename;   // Filename only
+    std::wstring directory;  // Directory only
+};
+inline ModuleFilepath GetModuleFilepath(HMODULE module) {
+    wchar_t filePath[MAX_PATH];
+    GetModuleFileNameW(module, filePath, MAX_PATH);
+    std::wstring filePathStr(filePath);
+    
+    size_t lastBackslashpos = filePathStr.find_last_of(L"\\/");
+
+    std::wstring filename = filePathStr.substr(lastBackslashpos + 1);
+    std::wstring directory = filePathStr.substr(0, lastBackslashpos);
+
+    return {
+        filePath, filename, directory
+    };
+}
+
+inline std::wstring ToWString(const std::string& str) {
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), &wstrTo[0], size_needed);
+    return wstrTo;
+}
 
 void Log(const std::string& message) {
 
-    // Get log path - ignore directory override
-    // Get module name
-    char modulePath[MAX_PATH];
-    GetModuleFileNameA(GetModuleHandleA(NULL), modulePath, MAX_PATH);
-    std::string path(modulePath);
-    size_t pos = path.find_last_of("\\/");
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
 
-    std::string logPath = path.substr(0, pos) + "\\" + LOG_FILE;
-    std::string moduleName = path.substr(pos + 1);
+    // Get log path - ignore directory override
+    HMODULE executable = GetModuleHandleA(NULL);
+    ModuleFilepath executableFilepath = GetModuleFilepath(executable);
+    std::wstring logPath = executableFilepath.directory + L"\\" + ToWString(LOG_FILE);
 
     // Open log
-    std::ofstream log(logPath, std::ios::app);
+    std::wofstream log(logPath, std::ios::app);
     if (!log.is_open()) return;
 
     // Get current time
@@ -40,7 +80,7 @@ void Log(const std::string& message) {
     localtime_s(&timeInfo, &now_c);
 
     // Format and write the timestamp and message
-    log << "[" << std::put_time(&timeInfo, "%Y-%m-%d %H:%M:%S") << "] [" << moduleName << "]\t" << message << std::endl;
+    log << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.filename << L"] " << ToWString(message) << std::endl;
 
     // Close log
     log.close();
