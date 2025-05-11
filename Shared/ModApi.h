@@ -35,6 +35,7 @@ typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t siz
 #define INJECT_BEFORE 1
 #define INJECT_AFTER 2
 typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length, int inject_type);
+typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall* func)());
 
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
@@ -52,6 +53,7 @@ struct ModApi {
     ReadBytesFunction ReadBytes;
 
     InjectCodeFunction InjectCode;
+    HookFunctionFunction HookFunction;
 
     ReadIniIntFunction ReadIniInt;
     WriteIniIntFunction WriteIniInt;

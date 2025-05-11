@@ -12,6 +12,8 @@
 #include <ctime>
 #include <iomanip>
 #include <algorithm>
+#include <regex>
+#include <cstdint>
 
 #include <Psapi.h>
 #pragma comment(lib, "Psapi.lib")
@@ -259,7 +261,85 @@ bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t c
     return true;
 }
 
-#include <regex>
+// Allows you to put arbitrary C++ code
+bool HookFunction(uintptr_t target, size_t length, void(__stdcall* func)()) {
+
+    // Target needs to be able to fit a jump
+    if (length < JMP_SIZE) return false;
+
+
+    // Allocate memory for injection
+    // Trampoline: an injected bit of code made just to call a function
+    // Use pushad and pushfd to store CPU state, to prevent weird issues 
+    // original instructions + pushad + pushfd + function call + popfd + popad + jmp back
+    size_t trampoline_size = length + 1 + 1 + JMP_SIZE + 1 + 1 + JMP_SIZE;
+    BYTE* trampoline = (BYTE*)VirtualAlloc(
+        nullptr, trampoline_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_EXECUTE_READWRITE
+    );
+    if (!trampoline) return false;
+
+
+    // Copy original instructions
+    memcpy(trampoline, (void*)target, length);
+
+
+    // Start proper trampoline
+    BYTE* p = trampoline + length;
+
+
+    // Save state
+    *p++ = 0x60;  // pushad
+    *p++ = 0x9C;  // pushfd
+
+
+    // Append function call 
+    p[0] = 0xE8; // CALL <4 byte function address - relative>
+
+    int32_t relative_function = (int32_t)(
+        (uintptr_t)func - ((uintptr_t)p + JMP_SIZE)
+        );
+
+    memcpy(p + 1, &relative_function, 4);
+    p += JMP_SIZE;
+
+
+    // Restore state
+    *p++ = 0x9D;  // popfd
+    *p++ = 0x61;  // popad
+
+
+    // Append JMP back to target + length
+    p[0] = 0xE9; // CALL <4 byte function address - relative>
+
+    int32_t relative_jumpback = (int32_t)(
+        (int64_t)(target + length) - ((uintptr_t)p + JMP_SIZE)
+        );
+
+    memcpy(p + 1, &relative_jumpback, 4);
+
+
+    // Prepare patch
+    BYTE patch[16];
+    memset(patch, 0x90, length); // NOPs
+
+    patch[0] = 0xE9;
+    int32_t relative_trampoline = (int32_t)(
+        (uintptr_t)trampoline - (target + JMP_SIZE)
+        );
+    memcpy(patch + 1, &relative_trampoline, 4);
+
+
+    // Apply patch
+    DWORD old;
+    VirtualProtect((void*)target, length, PAGE_EXECUTE_READWRITE, &old);
+    memcpy((void*)target, patch, length);
+    VirtualProtect((void*)target, length, old, &old);
+
+    return true;
+}
+
 
 int ReadIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
 
@@ -285,7 +365,7 @@ inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, in
 
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, ReadIniInt, WriteIniInt
+    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, HookFunction, ReadIniInt, WriteIniInt
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
