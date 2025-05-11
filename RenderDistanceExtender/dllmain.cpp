@@ -8,19 +8,22 @@ ModApi* api = nullptr;
 uintptr_t addr_fog_distance, addr_render_distance;
 int original_fog_distance, original_render_distance;
 
-bool is_active = false;
-
 #define MAX_DISTANCE 0x7FFFFFFF
+
+bool is_active = false;
+int render_distance = MAX_DISTANCE;
+
 
 void RenderExtend() {
 
     original_fog_distance = api->AddressGetInt(addr_fog_distance);
     original_render_distance = api->AddressGetInt(addr_render_distance);
 
-    api->AddressSetInt(addr_fog_distance, MAX_DISTANCE);
-    api->AddressSetInt(addr_render_distance, MAX_DISTANCE);
+    api->AddressSetInt(addr_fog_distance, render_distance);
+    api->AddressSetInt(addr_render_distance, render_distance);
 
     is_active = true;
+    api->WriteIniInt(L"Config", L"Enabled", is_active);
 }
 
 void RenderRevert() {
@@ -29,13 +32,14 @@ void RenderRevert() {
     api->AddressSetInt(addr_render_distance, original_render_distance);
 
     is_active = false;
+    api->WriteIniInt(L"Config", L"Enabled", is_active);
 }
 
 DWORD WINAPI PatchThread(LPVOID) {
     while (true) {
 
         // Render distance changed failsafe
-        if (is_active && api->AddressGetInt(addr_render_distance) != MAX_DISTANCE) {
+        if (is_active && api->AddressGetInt(addr_render_distance) != render_distance) {
             RenderExtend();
             api->Log("Render distance reapplied!");
         }
@@ -68,6 +72,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         
         addr_fog_distance = api->ResolveAddress(ADDR_FOG_DISTANCE);
         addr_render_distance = api->ResolveAddress(ADDR_RENDER_DISTANCE);
+
+        is_active = api->ReadIniInt(L"Config", L"Enabled", 1);
+        api->WriteIniInt(L"Config", L"Enabled", is_active);
+
+        render_distance = api->ReadIniInt(L"Config", L"Enabled", MAX_DISTANCE);
+        api->WriteIniInt(L"Config", L"Enabled", render_distance);
 
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);

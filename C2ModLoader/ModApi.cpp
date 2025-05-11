@@ -239,10 +239,33 @@ bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t c
     return true;
 }
 
+#include <regex>
+
+int ReadIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(moduleFilepath.path, std::wregex(L".asi$"), L".ini");
+
+    return GetPrivateProfileIntW(section.c_str(), key.c_str(), default_value, iniPath.c_str());
+}
+
+inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(moduleFilepath.path, std::wregex(L".asi$"), L".ini");
+
+    wchar_t valueStr[16];
+    _itow_s(value, valueStr, 10);
+    return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+}
 
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode
+    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, ReadIniInt, WriteIniInt
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

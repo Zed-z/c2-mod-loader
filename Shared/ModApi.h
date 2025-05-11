@@ -33,6 +33,9 @@ typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t siz
 
 typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length);
 
+typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
+typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
+
 struct ModApi {
     LogFunction Log;
 
@@ -46,6 +49,9 @@ struct ModApi {
     ReadBytesFunction ReadBytes;
 
     InjectCodeFunction InjectCode;
+
+    ReadIniIntFunction ReadIniInt;
+    WriteIniIntFunction WriteIniInt;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();
