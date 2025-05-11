@@ -31,7 +31,10 @@ typedef int(*AddressGetIntFunction)(uintptr_t address);
 typedef bool(*PatchBytesFunction)(uintptr_t address, const void* bytes, size_t size);
 typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t size);
 
-typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length);
+#define INJECT_REPLACE 0
+#define INJECT_BEFORE 1
+#define INJECT_AFTER 2
+typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length, int inject_type);
 
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);

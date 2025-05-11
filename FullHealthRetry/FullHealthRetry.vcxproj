@@ -30,6 +30,7 @@
     <ProjectGuid>{5551a8eb-2829-4099-a6ad-3547b58c5f38}</ProjectGuid>
     <RootNamespace>FullHealthRetry</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>HealthTweaks</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

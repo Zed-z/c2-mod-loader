@@ -193,27 +193,47 @@ uintptr_t FindPattern(const void* pattern, size_t pattern_size, int occurrence) 
 
 #define JMP_SIZE 5 // 1 byte for the instruction, 4 for the address
 
-bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length) {
+bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length, int inject_type) {
 
     // Allocate memory
     size_t totalSize = code_length + JMP_SIZE;
+    if (inject_type != INJECT_REPLACE) {
+        totalSize += hook_length;
+    }
+
     uintptr_t newmem = (uintptr_t)VirtualAlloc(NULL, totalSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!newmem) {
         Log("Failed to allocate memory for code injection.");
         return false;
     }
 
+
     // Insert code
-    memcpy((void*)newmem, code, code_length);
+    switch (inject_type) {
+    case INJECT_BEFORE: {
+        memcpy((void*)newmem, code, code_length);
+        memcpy((void*)(newmem + code_length), (void*)hook_address, hook_length);
+        break;
+    }
+    case INJECT_REPLACE: {
+        memcpy((void*)newmem, code, code_length);
+        break;
+    }
+    case INJECT_AFTER: {
+        memcpy((void*)newmem, (void*)hook_address, hook_length);
+        memcpy((void*)(newmem + hook_length), code, code_length);
+        break;
+    }
+    }
 
 
     // Add jumpback instruction
     uintptr_t returnAddress = hook_address + hook_length;
-    uintptr_t jmpReturnOffset = returnAddress - (newmem + code_length + JMP_SIZE);
+    uintptr_t jmpReturnOffset = returnAddress - (newmem + totalSize);
 
     BYTE jumpback[] = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
     *(int32_t*)&jumpback[1] = (int32_t)jmpReturnOffset;
-    memcpy((void*)(newmem + code_length), jumpback, JMP_SIZE);
+    memcpy((void*)(newmem + totalSize - JMP_SIZE), jumpback, JMP_SIZE);
 
 
     // Prepare the patch
