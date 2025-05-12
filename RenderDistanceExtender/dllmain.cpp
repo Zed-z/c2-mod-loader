@@ -21,48 +21,53 @@ void RenderApply() {
     int fogOffset = base_render_distance - base_fog_distance;
     api->AddressSetInt(addr_fog_distance, base_render_distance * multiplier - fogOffset);
     api->AddressSetInt(addr_render_distance, base_render_distance * multiplier);
-    
+
 }
 
-DWORD WINAPI PatchThread(LPVOID) {
-    while (true) {
+DWORD WINAPI HotkeyThread(LPVOID) {
+    RegisterHotKey(NULL, 1, 0, VK_F1);
+    RegisterHotKey(NULL, 2, 0, VK_OEM_MINUS);
+    RegisterHotKey(NULL, 3, 0, VK_OEM_PLUS);
 
-        bool toggleKey = GetAsyncKeyState(VK_F1) & 1;
-        bool minusHeld = GetAsyncKeyState(VK_OEM_MINUS) & 1;
-        bool plusHeld = GetAsyncKeyState(VK_OEM_PLUS) & 1;
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (msg.message == WM_HOTKEY) {
+            switch (msg.wParam) {
+            case 1: // F1
 
-        // Change render distance
-        if (is_active) {
-            if (minusHeld && render_multiplier > 1) {
-                render_multiplier--;
+                is_active = !is_active;
+                api->WriteIniInt(L"Config", L"Enabled", is_active);
                 RenderApply();
-                api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-                api->Log("Render distance decreased to: x" + std::to_string(render_multiplier));
-            }
-            if (plusHeld && render_multiplier < RENDER_MULTIPLER_LIMIT) {
-                render_multiplier++;
-                RenderApply();
-                api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-                api->Log("Render distance increased to: x" + std::to_string(render_multiplier));
+
+                if (is_active) {
+                    api->Log("Render distance extended!");
+                }
+                else {
+                    api->Log("Render distance reverted!");
+                }
+                break;
+
+            case 2: // Minus
+
+                if (is_active && render_multiplier > 1) {
+                    render_multiplier--;
+                    RenderApply();
+                    api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
+                    api->Log("Render distance decreased to: x" + std::to_string(render_multiplier));
+                }
+                break;
+
+            case 3: // Plus
+
+                if (is_active && render_multiplier < RENDER_MULTIPLER_LIMIT) {
+                    render_multiplier++;
+                    RenderApply();
+                    api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
+                    api->Log("Render distance increased to: x" + std::to_string(render_multiplier));
+                }
+                break;
             }
         }
-
-        // Toggle
-        if (toggleKey) {
-
-            is_active = !is_active;
-            api->WriteIniInt(L"Config", L"Enabled", is_active);
-            RenderApply();
-
-            if (is_active) {
-                api->Log("Render distance extended!");
-            }
-            else {
-                api->Log("Render distance reverted!");
-            }
-        }
-
-        Sleep(10);
     }
     return 0;
 }
@@ -110,7 +115,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
 
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);
+        CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
     }
     return TRUE;
 }
