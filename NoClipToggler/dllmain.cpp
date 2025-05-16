@@ -45,14 +45,14 @@ DWORD WINAPI PatchThread(LPVOID) {
                 api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
                 api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
                 api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
-                api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
+                //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
                 api->Log("Noclip enabled!");
             }
             else {
                 api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
                 api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
                 api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
-                api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
+                //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
                 api->Log("Noclip disabled!");
             }
         }
