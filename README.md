@@ -22,12 +22,14 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 1) EXTRA: Unpack the provided example mods into the `mods/` folder after installation
 
 # Mod development
+1) Install `imgui:x86-windows-static` and `minhook:x86-windows-static` with vcpkg
 1) Create a `Dynamic-Link Library (DLL)` Project in Visual Studio
 1) Select the `Release x86` launch configuration
 1) Configure the project (`Right Click Project > Properties`):
 	- `Advanced > Target File Extension`: .asi
 	- `C/C++ > Code Generation > Runtime Library`: Multi-threaded DLL (/MD)
 	- `C/C++ > Precompiled Headers > Precompiled Header`: Not Using Precompiled Headers
+	- `vcpkg > Use Static Libraries`: Yes
 	- Include the `ModApi.h` header file
 		- If using the provided Visual Studio solution:
 			- `C/C++ > General > Additional Include Directories`: ..\Shared\
@@ -53,6 +55,9 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 1) Build the project
 1) You now have an `.asi` file, congratulations!
 1) Put it in `mods/` to use
+
+# Third-Party Code
+This project includes code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
 
 # Special thanks
 - Thanks to ThirteenAG for developing Ultimate ASI Loader (donate [here](https://ko-fi.com/thirteenag))
