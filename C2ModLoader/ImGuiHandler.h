@@ -3,5 +3,6 @@
 #include "imgui.h"
 
 extern ImGuiTextBuffer logBuffer;
+extern bool showLog;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);

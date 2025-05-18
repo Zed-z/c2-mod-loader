@@ -24,7 +24,7 @@ void RenderApply() {
 
 }
 
-DWORD WINAPI HotkeyThread(LPVOID) {
+static DWORD WINAPI HotkeyThread(LPVOID) {
     RegisterHotKey(NULL, 1, 0, VK_F1);
     RegisterHotKey(NULL, 2, 0, VK_OEM_MINUS);
     RegisterHotKey(NULL, 3, 0, VK_OEM_PLUS);

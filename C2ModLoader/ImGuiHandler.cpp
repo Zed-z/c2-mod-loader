@@ -10,7 +10,13 @@
 #include "imgui_impl_dx11.h"
 
 static ModApi* api;
+
 ImGuiTextBuffer logBuffer;
+bool showLog;
+
+static int width = 1000;
+static int height = 300;
+static int margin = 10;
 
 // Globals for hook & ImGui state -------------------------------------------------------
 typedef HRESULT(__stdcall* PresentFn)(IDXGISwapChain*, UINT, UINT);
@@ -78,18 +84,19 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
 void ImGuiDraw() {
     ImGuiIO& io = ImGui::GetIO();
 
-    ImGui::Begin("Console Log");
-    int width = 800; int height = 200; int margin = 10;
+    if (showLog) {
+        ImGui::Begin("Console Log");
 
-    ImGui::SetWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5, io.DisplaySize.y - height - margin));
-    ImGui::SetWindowSize(ImVec2((float)width, (float)height));
+        ImGui::SetWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5, io.DisplaySize.y - height - margin));
+        ImGui::SetWindowSize(ImVec2((float)width, (float)height));
 
-    ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    ImGui::TextUnformatted(logBuffer.begin());
-    ImGui::SetScrollHereY(1.0f);
+        ImGui::TextUnformatted(logBuffer.begin());
+        ImGui::SetScrollHereY(1.0f);
 
-    ImGui::EndChild();
+        ImGui::EndChild();
+    }
 
     ImGui::End();
 }

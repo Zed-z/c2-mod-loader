@@ -97,6 +97,31 @@ void LoadMods(const char* folder) {
     ShowModPopup(loadedMods, failedMods);
 }
 
+
+
+
+static DWORD WINAPI HotkeyThread(LPVOID) {
+    RegisterHotKey(NULL, 1, 0, VK_TAB);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (msg.message == WM_HOTKEY) {
+            switch (msg.wParam) {
+            case 1: // TAB
+
+                showLog = !showLog;
+                api->WriteIniInt(L"Config", L"ShowLog", (int)showLog);
+
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH: {
@@ -104,8 +129,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         ClearLog();
         LoadMods(MOD_FOLDER);
 
+        // Config
+        showLog = (bool)(api->ReadIniInt(L"Config", L"ShowLog", false));
+        api->WriteIniInt(L"Config", L"ShowLog", (int)showLog);
+
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, ImGuiInitThread, api, 0, nullptr);
+        CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
     }
     }
     return TRUE;
