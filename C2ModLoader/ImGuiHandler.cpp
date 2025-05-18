@@ -1,6 +1,6 @@
-// ImGuiHook.asi
-
+#pragma once
 #include "ModApi.h"
+#include "ImGuiHandler.h"
 #include <Windows.h>
 #include <d3d11.h>
 #include <dxgi.h>
@@ -10,6 +10,7 @@
 #include "imgui_impl_dx11.h"
 
 static ModApi* api;
+ImGuiTextBuffer logBuffer;
 
 // Globals for hook & ImGui state -------------------------------------------------------
 typedef HRESULT(__stdcall* PresentFn)(IDXGISwapChain*, UINT, UINT);
@@ -73,16 +74,22 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
     }
 }
 
-// 
+// Display custom GUI
 void ImGuiDraw() {
-    ImGui::Begin("ImGui");
-    ImGui::SetWindowSize(ImVec2((float)300, (float)200));
+    ImGuiIO& io = ImGui::GetIO();
 
-    ImGui::Text("This is an ImGui overlay.");
+    ImGui::Begin("Console Log");
+    int width = 800; int height = 200; int margin = 10;
 
-    char text[256] = "";
-    sprintf_s(text, "Render Distance: %d", api->AddressGetInt(ADDR_RENDER_DISTANCE));
-    ImGui::Text(text);
+    ImGui::SetWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5, io.DisplaySize.y - height - margin));
+    ImGui::SetWindowSize(ImVec2((float)width, (float)height));
+
+    ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+
+    ImGui::TextUnformatted(logBuffer.begin());
+    ImGui::SetScrollHereY(1.0f);
+
+    ImGui::EndChild();
 
     ImGui::End();
 }
@@ -121,8 +128,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
 }
 
 // Thread to wait for d3d11.dll, create a dummy device to locate Present, then hook it
-static DWORD WINAPI InitThread(LPVOID)
+DWORD WINAPI ImGuiInitThread(LPVOID lpParam)
 {
+    api = (ModApi*)lpParam;
+
     // Wait for dgVoodoo (D3D11) to load
     int attemptCount = 0;
     while (!GetModuleHandleA("d3d11.dll")) {
@@ -180,18 +189,4 @@ static DWORD WINAPI InitThread(LPVOID)
     }
 
     return 0;
-}
-
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID)
-{
-    if (reason == DLL_PROCESS_ATTACH)
-    {
-        api = LoadSharedModApi();
-        if (!api) return FALSE;
-
-        DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, 0, InitThread, nullptr, 0, nullptr);
-    }
-    return TRUE;
 }

@@ -1,6 +1,7 @@
 #define IS_MOD_LOADER
 #include "ModApi.h"
 #include "Config.h"
+#include "ImGuiHandler.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -102,6 +103,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         api = GetModApi();
         ClearLog();
         LoadMods(MOD_FOLDER);
+
+        DisableThreadLibraryCalls(hModule);
+        CreateThread(nullptr, 0, ImGuiInitThread, api, 0, nullptr);
     }
     }
     return TRUE;

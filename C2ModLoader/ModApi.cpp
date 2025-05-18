@@ -1,6 +1,7 @@
 #define IS_MOD_LOADER
 #include "ModApi.h"
 #include "Config.h"
+#include "ImGuiHandler.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -59,6 +60,13 @@ inline std::wstring ToWString(const std::string& str) {
     MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), &wstrTo[0], size_needed);
     return wstrTo;
 }
+std::string WStringToUtf8(const std::wstring& wstr) {
+    if (wstr.empty()) return std::string();
+    int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), nullptr, 0, nullptr, nullptr);
+    std::string strTo(sizeNeeded, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], sizeNeeded, nullptr, nullptr);
+    return strTo;
+}
 
 void Log(const std::string& message) {
 
@@ -82,7 +90,12 @@ void Log(const std::string& message) {
     localtime_s(&timeInfo, &now_c);
 
     // Format and write the timestamp and message
-    log << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.filename << L"] " << ToWString(message) << std::endl;
+    std::wstringstream msg;
+    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.filename << L"] " << ToWString(message) << std::endl;
+
+    // Write the log to file and buffer
+    log << msg.str();
+    logBuffer.appendf("%s\n", WStringToUtf8(msg.str()).c_str());
 
     // Close log
     log.close();

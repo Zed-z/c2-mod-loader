@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusicRestorer", "MusicResto
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthTweaks", "FullHealthRetry\FullHealthRetry.vcxproj", "{5551A8EB-2829-4099-A6AD-3547B58C5F38}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGuiTest", "ImGuiTest\ImGuiTest.vcxproj", "{3666DD94-6A3D-4A04-9012-2C84D2A99156}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MouseCaptureRemover", "MouseCaptureRemover\MouseCaptureRemover.vcxproj", "{5CC6E863-71D0-4324-A28A-10B513AB5B83}"
 EndProject
 Global
@@ -85,14 +83,6 @@ Global
 		{5551A8EB-2829-4099-A6AD-3547B58C5F38}.Release|x64.Build.0 = Release|x64
 		{5551A8EB-2829-4099-A6AD-3547B58C5F38}.Release|x86.ActiveCfg = Release|Win32
 		{5551A8EB-2829-4099-A6AD-3547B58C5F38}.Release|x86.Build.0 = Release|Win32
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Debug|x64.ActiveCfg = Debug|x64
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Debug|x64.Build.0 = Debug|x64
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Debug|x86.ActiveCfg = Debug|Win32
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Debug|x86.Build.0 = Debug|Win32
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Release|x64.ActiveCfg = Release|x64
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Release|x64.Build.0 = Release|x64
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Release|x86.ActiveCfg = Release|Win32
-		{3666DD94-6A3D-4A04-9012-2C84D2A99156}.Release|x86.Build.0 = Release|Win32
 		{5CC6E863-71D0-4324-A28A-10B513AB5B83}.Debug|x64.ActiveCfg = Debug|x64
 		{5CC6E863-71D0-4324-A28A-10B513AB5B83}.Debug|x64.Build.0 = Debug|x64
 		{5CC6E863-71D0-4324-A28A-10B513AB5B83}.Debug|x86.ActiveCfg = Debug|Win32

@@ -76,6 +76,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -102,7 +105,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\Shared\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Shared\imgui;..\Shared\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,6 +113,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;minhook.x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,12 +152,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\Shared\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ImGuiHandler.cpp" />
     <ClCompile Include="ModApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Shared\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="..\Shared\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\Shared\ModApi.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="ImGuiHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

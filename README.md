@@ -3,9 +3,7 @@ ASI Mod Loader for Croc 2
 
 Will automatically load `.asi` files from the `mods/` folder.
 
-Doesn't interfere with [dgVoodoo2](https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/), in fact you're encouraged to use it!
-
-Additionally, provides a lightweight API for mod developers, check this [header file](https://github.com/Zed-z/c2-mod-loader/blob/main/Shared/ModApi.h).
+Additionally, provides a lightweight API for mod developers.
 
 # Compatible versions
 - Tested on the US PC version.
@@ -18,8 +16,12 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 1) Download the mod loader files from [Releases](https://github.com/Zed-z/c2-mod-loader/releases)
 1) Extract both and place them into the game's directory
 1) You're done, the game will now load mods from the `mods/` folder!
-	- The folder will be created at first startup after installing the mod loader
 1) EXTRA: Unpack the provided example mods into the `mods/` folder after installation
+
+# Recommended: Custom GUI support
+In order to display custom GUIs, the mod loader needs the game to have [dgVoodoo2](https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/) applied.
+
+Without it, the mod loader will continue to function, but you will not see a custom GUI overlay.
 
 # Mod development
 1) Install `imgui:x86-windows-static` and `minhook:x86-windows-static` with vcpkg
@@ -30,7 +32,7 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 	- `C/C++ > Code Generation > Runtime Library`: Multi-threaded DLL (/MD)
 	- `C/C++ > Precompiled Headers > Precompiled Header`: Not Using Precompiled Headers
 	- `vcpkg > Use Static Libraries`: Yes
-	- Include the `ModApi.h` header file
+	- Include the `ModApi.h` [header file](https://github.com/Zed-z/c2-mod-loader/blob/main/Shared/ModApi.h)
 		- If using the provided Visual Studio solution:
 			- `C/C++ > General > Additional Include Directories`: ..\Shared\
 			- `Right Click "Headers" > Add > Existing Item`: ..\Shared\ModApi.h
@@ -56,8 +58,16 @@ Additionally, provides a lightweight API for mod developers, check this [header 
 1) You now have an `.asi` file, congratulations!
 1) Put it in `mods/` to use
 
+# Third-Party Libraries
+This project uses the following libraries:
+
+- [Dear ImGui](https://github.com/ocornut/imgui) - Copyright (c) 2014-2025 Omar Cornut
+- [MinHook](https://github.com/TsudaKageyu/minhook) - Copyright (c) 2009-2017 Tsuda Kageyu
+
+Licenses for the above mentioned libraries are included in `LICENSES/`.
+
 # Third-Party Code
-This project includes code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
+- This project includes implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
 
 # Special thanks
 - Thanks to ThirteenAG for developing Ultimate ASI Loader (donate [here](https://ko-fi.com/thirteenag))
