@@ -37,6 +37,7 @@ inline HMODULE GetCallingModule() {
 struct ModuleFilepath {
     std::wstring path;       // Full path
     std::wstring filename;   // Filename only
+    std::wstring name;       // Filename without extension
     std::wstring directory;  // Directory only
 };
 inline ModuleFilepath GetModuleFilepath(HMODULE module) {
@@ -44,13 +45,19 @@ inline ModuleFilepath GetModuleFilepath(HMODULE module) {
     GetModuleFileNameW(module, filePath, MAX_PATH);
     std::wstring filePathStr(filePath);
     
-    size_t lastBackslashpos = filePathStr.find_last_of(L"\\/");
+    size_t lastBackslashPos = filePathStr.find_last_of(L"\\/");
 
-    std::wstring filename = filePathStr.substr(lastBackslashpos + 1);
-    std::wstring directory = filePathStr.substr(0, lastBackslashpos);
+    std::wstring filename = filePathStr.substr(lastBackslashPos + 1);
+    std::wstring directory = filePathStr.substr(0, lastBackslashPos);
+
+    size_t extensionPos = filename.find(L".asi");
+    std::wstring name = filename;
+    if (extensionPos != std::wstring::npos) {
+        name = filename.substr(0, extensionPos);
+    }
 
     return {
-        filePath, filename, directory
+        filePath, filename, name, directory
     };
 }
 
@@ -91,7 +98,7 @@ void Log(const std::string& message) {
 
     // Format and write the timestamp and message
     std::wstringstream msg;
-    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.filename << L"] " << ToWString(message) << std::endl;
+    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.name << L"] " << ToWString(message) << std::endl;
 
     // Write the log to file and buffer
     log << msg.str();
