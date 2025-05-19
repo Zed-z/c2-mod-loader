@@ -1,16 +1,22 @@
 #pragma once
 #include "ModApi.h"
 #include "ImGuiHandler.h"
+
 #include <Windows.h>
+
 #include <d3d11.h>
 #include <dxgi.h>
+
 #include "MinHook.h"
+
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+
 static ModApi* api;
 
+// Variables for GUI
 ImGuiTextBuffer logBuffer;
 bool showLog;
 
@@ -18,18 +24,19 @@ static int width = 1000;
 static int height = 300;
 static int margin = 10;
 
-// Globals for hook & ImGui state -------------------------------------------------------
-typedef HRESULT(__stdcall* PresentFn)(IDXGISwapChain*, UINT, UINT);
-static PresentFn        oPresent = nullptr;
+// Globals for hook & ImGui state
+typedef HRESULT(__stdcall* PresentFunction)(IDXGISwapChain*, UINT, UINT);
+static PresentFunction oPresent = nullptr;
+
 static IDXGISwapChain* g_SwapChain = nullptr;
 static ID3D11Device* g_Device = nullptr;
 static ID3D11DeviceContext* g_Context = nullptr;
 static ID3D11RenderTargetView* g_RenderTargetView = nullptr;
-static HWND             g_hWnd = nullptr;
-static bool             g_ImguiInitialized = false;
+static HWND g_hWnd = nullptr;
 
-// Helper functions -------------------------------------------------------
+static bool g_ImguiInitialized = false;
 
+// Helper function to create render target
 static void CreateRenderTarget(IDXGISwapChain* pSwap)
 {
     if (g_RenderTargetView) {
@@ -41,6 +48,20 @@ static void CreateRenderTarget(IDXGISwapChain* pSwap)
         g_Device->CreateRenderTargetView(bb, nullptr, &g_RenderTargetView);
         bb->Release();
     }
+}
+
+// WndProc hook for ImGui input
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+WNDPROC oWndProc = nullptr;
+
+LRESULT CALLBACK WndProcHook(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) {
+        return TRUE; // ImGui consumed the input
+    }
+
+    // Pass the input to the game otherwises
+    return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
 }
 
 // This runs in the Present hook whenever we see a new swap-chain
@@ -74,6 +95,10 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             ImGui_ImplWin32_Init(g_hWnd);
             ImGui_ImplDX11_Init(g_Device, g_Context);
 
+            if (g_hWnd && !oWndProc) {
+                oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
+            }
+
             g_SwapChain = pSwap;
             g_ImguiInitialized = true;
         }
@@ -87,8 +112,8 @@ void ImGuiDraw() {
     if (showLog) {
         ImGui::Begin("Console Log");
 
-        ImGui::SetWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5, io.DisplaySize.y - height - margin));
-        ImGui::SetWindowSize(ImVec2((float)width, (float)height));
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5f, io.DisplaySize.y - height - margin), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2((float)width, (float)height), ImGuiCond_Once);
 
         ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
@@ -96,25 +121,15 @@ void ImGuiDraw() {
         ImGui::SetScrollHereY(1.0f);
 
         ImGui::EndChild();
+
+        ImGui::End();
     }
-
-    ImGui::End();
 }
-
-/*
-LRESULT CALLBACK WndProcHook(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-        return true; // ImGui consumed the message
-
-    return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
-}*/
-
 
 // Hook Present()
 // re-init if needed
 // render ImGui each frame
-static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
-{
+static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags) {
     InitOrRestoreImGui(pSwap);
 
     // Start the ImGui frame
@@ -135,8 +150,9 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
 }
 
 // Thread to wait for d3d11.dll, create a dummy device to locate Present, then hook it
-DWORD WINAPI ImGuiInitThread(LPVOID lpParam)
-{
+DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
+
+    // Get api pointer from main thread
     api = (ModApi*)lpParam;
 
     // Wait for dgVoodoo (D3D11) to load
@@ -175,6 +191,7 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam)
     ID3D11DeviceContext* dctx = nullptr;
     IDXGISwapChain* dswap = nullptr;
     D3D_FEATURE_LEVEL fl;
+
     if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(
         nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0,
         nullptr, 0, D3D11_SDK_VERSION,
