@@ -383,9 +383,29 @@ inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, in
     return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
 }
 
+
+std::string GameVersions[] = { "UNKNOWN", "US", "EU" };
+
+int GetGameVersion() {
+
+    char path[MAX_PATH];
+    GetModuleFileNameA(nullptr, path, MAX_PATH);
+
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (!file) return GAMEVER_UNKNOWN;
+
+    std::streamsize size = file.tellg();
+    file.close();
+
+    if (size == 0xB4000) return GAMEVER_US;
+    if (size == 0xBD000) return GAMEVER_EU;
+    return GAMEVER_UNKNOWN;
+}
+
+
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, HookFunction, ReadIniInt, WriteIniInt
+    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, HookFunction, ReadIniInt, WriteIniInt, GetGameVersion
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

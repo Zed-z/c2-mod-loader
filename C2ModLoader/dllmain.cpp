@@ -2,6 +2,7 @@
 #include "ModApi.h"
 #include "Config.h"
 #include "ImGuiHandler.h"
+#include "MouseCaptureRemover.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -28,7 +29,6 @@ void ClearLog() {
 
     log.close();
 }
-
 
 // Function to show a popup for each loaded mod
 void ShowModPopup(std::vector<std::string> loadedMods, std::vector<std::string> failedMods) {
@@ -97,9 +97,7 @@ void LoadMods(const char* folder) {
     ShowModPopup(loadedMods, failedMods);
 }
 
-
-
-
+// Keyboard input thread
 static DWORD WINAPI HotkeyThread(LPVOID) {
     RegisterHotKey(NULL, 1, 0, VK_TAB);
 
@@ -119,22 +117,30 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
     return 0;
 }
 
-
-
-
+// Entry point
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH: {
         api = GetModApi();
         ClearLog();
+
+        api->Log("Game version: " + GameVersions[api->GetGameVersion()]);
+
         LoadMods(MOD_FOLDER);
 
         // Config
         showLog = (bool)(api->ReadIniInt(L"Config", L"ShowLog", false));
         api->WriteIniInt(L"Config", L"ShowLog", (int)showLog);
 
+        freeMouse = (bool)(api->ReadIniInt(L"Mouse", L"FreeMouse", true));
+        api->WriteIniInt(L"Mouse", L"FreeMouse", (int)freeMouse);
+
+        logHooks = (bool)(api->ReadIniInt(L"Mouse", L"LogHooks", false));
+        api->WriteIniInt(L"Mouse", L"LogHooks", (int)logHooks);
+
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, ImGuiInitThread, api, 0, nullptr);
+        CreateThread(nullptr, 0, MouseInitThread, api, 0, nullptr);
         CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
     }
     }

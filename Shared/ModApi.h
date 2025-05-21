@@ -40,6 +40,12 @@ typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdc
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
 
+#define GAMEVER_UNKNOWN 0
+#define GAMEVER_US 1
+#define GAMEVER_EU 2
+extern std::string GameVersions[]; // Use this to get game versions as strings for logging/display
+typedef int(*GetGameVersionFunction)();
+
 struct ModApi {
     LogFunction Log;
 
@@ -57,6 +63,8 @@ struct ModApi {
 
     ReadIniIntFunction ReadIniInt;
     WriteIniIntFunction WriteIniInt;
+
+    GetGameVersionFunction GetGameVersion;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

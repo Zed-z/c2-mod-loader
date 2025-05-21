@@ -70,5 +70,9 @@ Licenses for the above mentioned libraries are included in `LICENSES/`.
 - This project includes implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
 
 # Special thanks
-- Thanks to ThirteenAG for developing Ultimate ASI Loader (donate [here](https://ko-fi.com/thirteenag))
-- Thanks to Dege for developing dgVoodoo2 (donate [here](https://dege.freeweb.hu/))
+- Thanks to ThirteenAG for developing Ultimate ASI Loader (support [here](https://ko-fi.com/thirteenag))
+- Thanks to Dege for developing dgVoodoo2 (support [here](https://dege.freeweb.hu/))
+- Thanks to ocornut for developing Dear ImGui (support [here](https://github.com/ocornut/imgui/wiki/Funding))
+- Thanks to TsudaKageyu for developing Minhook (support [here](https://github.com/TsudaKageyu))
+- Thanks to Thermospore, hdc0, limbus, Ray and Rartrin from the Croc & Stuff Discord server for valuable insight about the game!
+- Thanks to Argonaut Games for developing Croc 2!
