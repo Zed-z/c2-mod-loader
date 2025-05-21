@@ -16,6 +16,9 @@
 
 ModApi* api;
 
+bool loaderEnabled = true;
+bool guiEnabled = true;
+
 void ClearLog() {
 
     char modulePath[MAX_PATH];
@@ -108,7 +111,7 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
             case 1: // TAB
 
                 showLog = !showLog;
-                api->WriteIniInt(L"Config", L"ShowLog", (int)showLog);
+                api->WriteIniInt(L"GUI", L"ShowLog", (int)showLog);
 
                 break;
             }
@@ -124,13 +127,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         api = GetModApi();
         ClearLog();
 
-        api->Log("Game version: " + GameVersions[api->GetGameVersion()]);
-
-        LoadMods(MOD_FOLDER);
-
         // Config
-        showLog = (bool)(api->ReadIniInt(L"Config", L"ShowLog", false));
-        api->WriteIniInt(L"Config", L"ShowLog", (int)showLog);
+        loaderEnabled = (bool)(api->ReadIniInt(L"Config", L"LoaderEnabled", true));
+        api->WriteIniInt(L"Config", L"LoaderEnabled", (int)loaderEnabled);
+
+        guiEnabled = (bool)(api->ReadIniInt(L"GUI", L"GuiEnabled", true));
+        api->WriteIniInt(L"GUI", L"GuiEnabled", (int)guiEnabled);
+
+        showLog = (bool)(api->ReadIniInt(L"GUI", L"ShowLog", false));
+        api->WriteIniInt(L"GUI", L"ShowLog", (int)showLog);
 
         freeMouse = (bool)(api->ReadIniInt(L"Mouse", L"FreeMouse", true));
         api->WriteIniInt(L"Mouse", L"FreeMouse", (int)freeMouse);
@@ -138,9 +143,28 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         logHooks = (bool)(api->ReadIniInt(L"Mouse", L"LogHooks", false));
         api->WriteIniInt(L"Mouse", L"LogHooks", (int)logHooks);
 
+        api->Log("Game version: " + GameVersions[api->GetGameVersion()]);
+
+        // Quit if loader disabled
+        if (!loaderEnabled) {
+            api->Log("Loader disabled, quitting!");
+            return TRUE;
+        }
+
+        // Load mods
+        LoadMods(MOD_FOLDER);
+
+        // Call other components
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, 0, ImGuiInitThread, api, 0, nullptr);
-        CreateThread(nullptr, 0, MouseInitThread, api, 0, nullptr);
+
+        if (guiEnabled) {
+            CreateThread(nullptr, 0, ImGuiInitThread, api, 0, nullptr);
+        }
+
+        if (freeMouse) {
+            CreateThread(nullptr, 0, MouseInitThread, api, 0, nullptr);
+        }
+
         CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
     }
     }
