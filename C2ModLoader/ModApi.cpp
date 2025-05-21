@@ -384,7 +384,7 @@ inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, in
 }
 
 
-std::string GameVersions[] = { "UNKNOWN", "US", "EU" };
+std::string GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
 
 int GetGameVersion() {
 
@@ -399,6 +399,7 @@ int GetGameVersion() {
 
     if (size == 0xB4000) return GAMEVER_US;
     if (size == 0xBD000) return GAMEVER_EU;
+    if (size == 0xB3000) return GAMEVER_DEMO;
     return GAMEVER_UNKNOWN;
 }
 

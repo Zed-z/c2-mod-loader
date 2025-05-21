@@ -43,6 +43,7 @@ typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstri
 #define GAMEVER_UNKNOWN 0
 #define GAMEVER_US 1
 #define GAMEVER_EU 2
+#define GAMEVER_DEMO 3
 extern std::string GameVersions[]; // Use this to get game versions as strings for logging/display
 typedef int(*GetGameVersionFunction)();
 
