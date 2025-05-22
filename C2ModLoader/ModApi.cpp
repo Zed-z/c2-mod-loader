@@ -2,6 +2,7 @@
 #include "ModApi.h"
 #include "Config.h"
 #include "ImGuiHandler.h"
+#include "Utils.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -34,57 +35,16 @@ inline HMODULE GetCallingModule() {
 }
 
 
-struct ModuleFilepath {
-    std::wstring path;       // Full path
-    std::wstring filename;   // Filename only
-    std::wstring name;       // Filename without extension
-    std::wstring directory;  // Directory only
-};
-inline ModuleFilepath GetModuleFilepath(HMODULE module) {
-    wchar_t filePath[MAX_PATH];
-    GetModuleFileNameW(module, filePath, MAX_PATH);
-    std::wstring filePathStr(filePath);
-    
-    size_t lastBackslashPos = filePathStr.find_last_of(L"\\/");
-
-    std::wstring filename = filePathStr.substr(lastBackslashPos + 1);
-    std::wstring directory = filePathStr.substr(0, lastBackslashPos);
-
-    size_t extensionPos = filename.find(L".asi");
-    std::wstring name = filename;
-    if (extensionPos != std::wstring::npos) {
-        name = filename.substr(0, extensionPos);
-    }
-
-    return {
-        filePath, filename, name, directory
-    };
-}
-
-inline std::wstring ToWString(const std::string& str) {
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0);
-    std::wstring wstrTo(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), &wstrTo[0], size_needed);
-    return wstrTo;
-}
-std::string WStringToUtf8(const std::wstring& wstr) {
-    if (wstr.empty()) return std::string();
-    int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), nullptr, 0, nullptr, nullptr);
-    std::string strTo(sizeNeeded, 0);
-    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], sizeNeeded, nullptr, nullptr);
-    return strTo;
-}
-
 void Log(const std::string& message) {
 
     // Get module path
     HMODULE caller = GetCallingModule();
-    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
+    PathInfo pathInfo = GetModuleFilepath(caller);
 
     // Get log path - ignore directory override
     HMODULE executable = GetModuleHandleA(NULL);
-    ModuleFilepath executableFilepath = GetModuleFilepath(executable);
-    std::wstring logPath = executableFilepath.directory + L"\\" + ToWString(LOG_FILE);
+    PathInfo executableFilepath = GetModuleFilepath(executable);
+    std::wstring logPath = executableFilepath.directory + L"\\" + StringToWString(LOG_FILE);
 
     // Open log
     std::wofstream log(logPath, std::ios::app);
@@ -98,11 +58,11 @@ void Log(const std::string& message) {
 
     // Format and write the timestamp and message
     std::wstringstream msg;
-    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << moduleFilepath.name << L"] " << ToWString(message) << std::endl;
+    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << pathInfo.name << L"] " << StringToWString(message) << std::endl;
 
     // Write the log to file and buffer
     log << msg.str();
-    logBuffer.appendf("%s\n", WStringToUtf8(msg.str()).c_str());
+    logBuffer.appendf("%s\n", WStringToString(msg.str()).c_str());
 
     // Close log
     log.close();
@@ -365,8 +325,8 @@ int ReadIniInt(const std::wstring& section, const std::wstring& key, int default
 
     // Get module path
     HMODULE caller = GetCallingModule();
-    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(moduleFilepath.path, std::wregex(L".asi$"), L".ini");
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
 
     return GetPrivateProfileIntW(section.c_str(), key.c_str(), default_value, iniPath.c_str());
 }
@@ -375,8 +335,8 @@ inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, in
 
     // Get module path
     HMODULE caller = GetCallingModule();
-    ModuleFilepath moduleFilepath = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(moduleFilepath.path, std::wregex(L".asi$"), L".ini");
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
 
     wchar_t valueStr[16];
     _itow_s(value, valueStr, 10);

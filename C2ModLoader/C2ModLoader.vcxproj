@@ -118,10 +118,11 @@
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)LICENSES\*" "$(OutDir)" /E /Y /I
 copy /Y "$(SolutionDir)LICENSE.txt" "$(OutDir)"
-
 copy /Y "$(SolutionDir)README.md" "$(OutDir)"
+copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)"
 
-copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)"</Command>
+mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPath)";2
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -174,6 +175,10 @@ copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)"</Command>
     <ClInclude Include="Config.h" />
     <ClInclude Include="ImGuiHandler.h" />
     <ClInclude Include="MouseCaptureRemover.h" />
+    <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="C2ModLoader.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

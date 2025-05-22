@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "ImGuiHandler.h"
 #include "MouseCaptureRemover.h"
+#include "Utils.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -34,68 +35,72 @@ void ClearLog() {
 }
 
 // Function to show a popup for each loaded mod
-void ShowModPopup(std::vector<std::string> loadedMods, std::vector<std::string> failedMods) {
+void ShowModPopup(std::vector<std::wstring> loadedMods, std::vector<std::wstring> failedMods) {
 
     // Successfully loaded
-    std::string message = "Loaded mods:";
+    std::wstring message = L"Loaded mods:";
     for (auto& mod : loadedMods) {
-        message += "\n- " + mod;
+        message += L"\n- " + mod;
     }
 
     // Failed to load
     if (failedMods.size() > 0) {
-        message += "\n\nFailed to load:";
+        message += L"\n\nFailed to load:";
         for (auto& mod : failedMods) {
-            message += "\n- " + mod;
+            message += L"\n- " + mod;
         }
-        message += "\nCheck the log for details.";
+        message += L"\nCheck the log for details.";
     }
 
     // Show message box
-    MessageBoxA(NULL, message.c_str(), LOADER_NAME, MB_OK | MB_ICONINFORMATION);
+    if (failedMods.size() > 0) {
+        MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
+    }
 }
 
 // Function to load all .asi mods from the mods folder
-void LoadMods(const char* folder) {
+std::vector<std::wstring> GetMods(std::wstring folder) {
+
+    std::vector<std::wstring> mods;
 
     // Get mod files
-    std::wstring modFolder = std::wstring(folder, folder + strlen(folder)) + L"\\*.asi";
-    WIN32_FIND_DATA findFileData;
+    std::wstring modFolder = folder + L"\\*.asi";
+    WIN32_FIND_DATAW findFileData;
     HANDLE hFind = FindFirstFile(modFolder.c_str(), &findFileData);
 
     // No files found
-    if (hFind == INVALID_HANDLE_VALUE) {
-        return;
-    }
+    if (hFind == INVALID_HANDLE_VALUE) return mods;
 
-    std::vector<std::string> loadedMods;
-    std::vector<std::string> failedMods;
-
-    // Load mod files
+    // Add mod files
     do {
         if (!(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-            // Convert the wide string (wchar_t*) to a std::string
             std::wstring wideModName(findFileData.cFileName);
-            std::string modFileName(wideModName.begin(), wideModName.end());
-            std::string modPath = std::string(folder) + "\\" + modFileName;
-
-            // Load the .asi file
-            HMODULE mod = LoadLibraryA(modPath.c_str());
-            if (!mod) {
-                // Mod failed to load
-                DWORD err = GetLastError();
-                api->Log("Failed to load mod: " + modPath + " with error code: " + std::to_string(err));
-                failedMods.push_back(modFileName);
-            }
-            else {
-                // Log and show popup for each loaded mod
-                api->Log("Loaded mod: " + modPath);
-                loadedMods.push_back(modFileName);
-            }     
+            std::wstring modPath = folder + L"\\" + wideModName;
+            mods.push_back(modPath);
         }
-    } while (FindNextFile(hFind, &findFileData) != 0);
+    } while (FindNextFileW(hFind, &findFileData) != 0);
 
     FindClose(hFind);
+    return mods;
+}
+
+void LoadMods(std::vector<std::wstring> mods) {
+
+    std::vector<std::wstring> loadedMods;
+    std::vector<std::wstring> failedMods;
+
+    for (std::wstring mod : mods) {
+        HMODULE loaded = LoadLibraryW(mod.c_str());
+        if (loaded) {
+            api->Log("Loaded mod: " + WStringToString(mod));
+            loadedMods.push_back(mod);
+        }
+        else {
+            DWORD err = GetLastError();
+            api->Log("Failed to load mod: " + WStringToString(mod) + " with error code: " + std::to_string(err));
+            failedMods.push_back(mod);
+        }
+    }
 
     ShowModPopup(loadedMods, failedMods);
 }
@@ -119,6 +124,161 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
     }
     return 0;
 }
+
+
+std::vector<std::wstring> g_allMods;
+std::vector<std::wstring> g_selectedMods;
+std::vector<HWND> g_checkboxes;
+HWND g_listView = nullptr;
+static bool g_userConfirmed = false;
+
+#include <CommCtrl.h>
+#pragma comment(lib, "Comctl32.lib")
+
+LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_CREATE: {
+
+        HINSTANCE hInstance = (HINSTANCE)((LPCREATESTRUCT)lParam)->lpCreateParams;
+        INITCOMMONCONTROLSEX icex = { sizeof(icex) };
+        icex.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES;
+        InitCommonControlsEx(&icex);
+
+        HFONT hFont = CreateFontW(
+            -11, 0, 0, 0, FW_NORMAL,
+            FALSE, FALSE, FALSE,
+            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+
+        g_listView = CreateWindowExW(0, WC_LISTVIEWW, L"",
+            WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE,
+            10, 10, 360, 300,
+            hwnd, (HMENU)1001, GetModuleHandle(nullptr), nullptr);
+
+        ListView_SetExtendedListViewStyle(g_listView, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+
+        RECT rc;
+        GetClientRect(g_listView, &rc);
+        int listViewWidth = rc.right - rc.left;
+
+        LVCOLUMNW col = { 0 };
+        col.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+        
+        // Column 0: Mod Name
+        col.pszText = (LPWSTR)L"Mod Name";
+        col.cx = 150;
+        col.iSubItem = 0;
+        ListView_InsertColumn(g_listView, 0, &col);
+
+        // Column 1: File Path
+        col.pszText = (LPWSTR)L"File Path";
+        col.cx = 200;
+        col.iSubItem = 1;
+        ListView_InsertColumn(g_listView, 1, &col);
+
+        g_allMods = GetMods(MOD_FOLDER_L);
+        for (size_t i = 0; i < g_allMods.size(); ++i) {
+
+            PathInfo modInfo = GetPathInfo(g_allMods[i]);
+
+            LVITEMW item = {};
+            item.mask = LVIF_TEXT;
+            item.iItem = (int)i;
+            item.pszText = const_cast<LPWSTR>(modInfo.name.c_str());
+
+            ListView_InsertItem(g_listView, &item);
+
+            // Set second column (file path)
+            ListView_SetItemText(g_listView, (int)i, 1, const_cast<LPWSTR>(modInfo.path.c_str()));
+
+            ListView_SetCheckState(g_listView, (int)i, TRUE);
+
+        }
+        SendMessageW(g_listView, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+        HWND hwndLaunch = CreateWindowExW(0, WC_BUTTONW, L"Launch Game",
+            WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+            80, 320, 100, 30, hwnd, (HMENU)1, hInstance, nullptr);
+
+        SendMessageW(hwndLaunch, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+        break;
+    }
+
+    case WM_COMMAND:
+        // Launch button
+        if (LOWORD(wParam) == 1) {
+            g_selectedMods.clear();
+            for (int i = 0; i < ListView_GetItemCount(g_listView); ++i) {
+                if (ListView_GetCheckState(g_listView, i)) {
+                    g_selectedMods.push_back(g_allMods[i]);
+                }
+            }
+            g_userConfirmed = true;
+            PostQuitMessage(0);
+        }
+        break;
+
+    // Close window button
+    case WM_CLOSE:
+        g_userConfirmed = false;
+        PostQuitMessage(0);
+        break;
+    }
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
+
+    // Windo
+    const wchar_t CLASS_NAME[] = L"ModConfigListView";
+    WNDCLASS wc = {};
+    wc.lpfnWndProc = ConfigWndProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = CLASS_NAME;
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    RegisterClass(&wc);
+
+
+    // Create window
+    HWND hwnd = CreateWindowEx(
+        WS_EX_APPWINDOW, // Treat as main window, for taskbar icon
+        CLASS_NAME, LOADER_NAME_L,
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+        CW_USEDEFAULT, CW_USEDEFAULT, 400, 400,
+        nullptr, nullptr, hInstance, hInstance);
+
+    if (!hwnd) return false;
+
+
+    // Change the window's icon
+    HICON hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+    WCHAR exePath[MAX_PATH];
+    if (GetModuleFileNameW(nullptr, exePath, MAX_PATH)) {
+        hIcon = ExtractIconW(nullptr, exePath, 0);
+    }
+
+    if (hIcon) {
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    }
+
+
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+    UpdateWindow(hwnd);
+
+
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    DestroyWindow(hwnd);
+    return g_userConfirmed;
+}
+
 
 // Entry point
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
@@ -152,7 +312,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         }
 
         // Load mods
-        LoadMods(MOD_FOLDER);
+        if (!ShowBlockingConfigWindow(hModule)) {
+            api->Log("Exiting modloader.");
+            ExitProcess(0);
+        }
+        LoadMods(g_selectedMods);
 
         // Call other components
         DisableThreadLibraryCalls(hModule);
