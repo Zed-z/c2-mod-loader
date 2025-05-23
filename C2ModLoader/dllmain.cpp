@@ -135,6 +135,23 @@ static bool g_userConfirmed = false;
 #include <CommCtrl.h>
 #pragma comment(lib, "Comctl32.lib")
 
+#include <Shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+
+static DWORD WINAPI OpenNotepad(LPVOID lParam) {
+    wchar_t* path = (wchar_t*)lParam;
+    std::wstring pathStr(path);
+    api->Log("Opening " + WStringToString(pathStr));
+
+    if (PathFileExistsW(path)) {
+        std::wstring cmd = L"notepad.exe " + pathStr;
+        _wsystem(cmd.c_str());
+    }
+
+    delete[] path;
+    return TRUE;
+}
+
 LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_CREATE: {
@@ -145,14 +162,14 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         InitCommonControlsEx(&icex);
 
         HFONT hFont = CreateFontW(
-            -11, 0, 0, 0, FW_NORMAL,
+            -16, 0, 0, 0, FW_NORMAL,
             FALSE, FALSE, FALSE,
             DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
             DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
 
         g_listView = CreateWindowExW(0, WC_LISTVIEWW, L"",
             WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE,
-            10, 10, 360, 300,
+            10, 10, 640-10, 300,
             hwnd, (HMENU)1001, GetModuleHandle(nullptr), nullptr);
 
         ListView_SetExtendedListViewStyle(g_listView, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
@@ -163,18 +180,23 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         LVCOLUMNW col = { 0 };
         col.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-        
+
         // Column 0: Mod Name
         col.pszText = (LPWSTR)L"Mod Name";
-        col.cx = 150;
+        col.cx = 200;
         col.iSubItem = 0;
         ListView_InsertColumn(g_listView, 0, &col);
 
         // Column 1: File Path
         col.pszText = (LPWSTR)L"File Path";
-        col.cx = 200;
+        col.cx = 320;
         col.iSubItem = 1;
         ListView_InsertColumn(g_listView, 1, &col);
+
+        // Column 2: Configure
+        col.cx = 100 - GetSystemMetrics(SM_CXVSCROLL);;
+        col.pszText = (LPWSTR)L"Configure";
+        ListView_InsertColumn(g_listView, 2, &col);
 
         g_allMods = GetMods(MOD_FOLDER_L);
         for (size_t i = 0; i < g_allMods.size(); ++i) {
@@ -190,6 +212,19 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
             // Set second column (file path)
             ListView_SetItemText(g_listView, (int)i, 1, const_cast<LPWSTR>(modInfo.path.c_str()));
+
+            // Set third column (ini)
+            std::wstring iniPath = modInfo.path;
+            iniPath.replace(iniPath.length() - 4, 4, L".ini");
+
+            if (PathFileExistsW(iniPath.c_str())) {
+                LVITEMW item = {};
+                item.iItem = i;
+                item.iSubItem = 2;
+                item.mask = LVIF_TEXT;
+                item.pszText = (LPWSTR)L"[Edit]";
+                ListView_SetItem(g_listView, &item);
+            }
 
             ListView_SetCheckState(g_listView, (int)i, TRUE);
 
@@ -219,7 +254,35 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         }
         break;
 
-    // Close window button
+        // Press list item
+    case WM_NOTIFY:
+        if (((LPNMHDR)lParam)->idFrom == 1001 && ((LPNMHDR)lParam)->code == NM_CLICK) {
+            LPNMITEMACTIVATE nmItem = (LPNMITEMACTIVATE)lParam;
+
+            // Configure column
+            if (nmItem->iItem >= 0 && nmItem->iSubItem == 2) {
+
+                std::wstring modPath = g_allMods[nmItem->iItem];
+                std::wstring iniPath = modPath;
+                iniPath.replace(iniPath.length() - 4, 4, L".ini");
+
+                api->Log("path: " + WStringToString(iniPath) + " exists? " + std::to_string(PathFileExistsW(iniPath.c_str())));
+
+                /*size_t len = (iniPath.length() + 1);
+                wchar_t* iniPathChar = new wchar_t[len];
+                wcsncpy_s(iniPathChar, len, iniPath.c_str(), len - 1);
+
+                CreateThread(nullptr, 0, OpenNotepad, (LPVOID)iniPathChar, 0, nullptr);*/
+
+                if (PathFileExistsW(iniPath.c_str())) {
+                    std::wstring cmd = L"notepad.exe " + iniPath;
+                    _wsystem(cmd.c_str());
+                }
+            }
+        }
+        break;
+
+        // Close window button
     case WM_CLOSE:
         g_userConfirmed = false;
         PostQuitMessage(0);
@@ -246,7 +309,7 @@ bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
         WS_EX_APPWINDOW, // Treat as main window, for taskbar icon
         CLASS_NAME, LOADER_NAME_L,
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, 400, 400,
+        CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
         nullptr, nullptr, hInstance, hInstance);
 
     if (!hwnd) return false;
