@@ -1,5 +1,7 @@
 #pragma once
 #include <Windows.h>
+#include <string>
+#include <vector>
 
 
 inline std::wstring StringToWString(const std::string& str) {
@@ -48,4 +50,56 @@ inline PathInfo GetModuleFilepath(HMODULE module) {
     GetModuleFileNameW(module, filePath, MAX_PATH);
     std::wstring filePathStr(filePath);
     return GetPathInfo(filePathStr);
+}
+
+
+#pragma comment(lib, "Version.lib")
+struct FileVersionInfo {
+    std::wstring fileVersion;
+    std::wstring productVersion;
+    std::wstring companyName;
+    std::wstring productName;
+    std::wstring fileDescription;
+};
+
+inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
+    FileVersionInfo info;
+
+    // Get size, return early if needed
+    DWORD sizeHandle;
+    DWORD size = GetFileVersionInfoSizeW(filename.c_str(), &sizeHandle);
+    if (size == 0) {
+        return info;
+    }
+
+    // Get data, return early if needed
+    std::vector<BYTE> data(size);
+    if (!GetFileVersionInfoW(filename.c_str(), 0, size, data.data())) {
+        return info;
+    }
+
+    // English + Unicode
+    const wchar_t* langCode = L"040904B0";
+
+    // Lambda to query values
+    auto queryValue = [&](const wchar_t* key) -> std::wstring {
+        wchar_t query[100];
+        swprintf(query, 100, L"\\StringFileInfo\\%s\\%s", langCode, key);
+
+        LPVOID value = nullptr;
+        UINT size = 0;
+        if (VerQueryValueW(data.data(), query, &value, &size) && value) {
+            return std::wstring((wchar_t*)value);
+        }
+
+        return L"";
+    };
+
+    // Fill in fields and return the struct
+    info.fileVersion = queryValue(L"FileVersion");
+    info.productVersion = queryValue(L"ProductVersion");
+    info.companyName = queryValue(L"CompanyName");
+    info.productName = queryValue(L"ProductName");
+    info.fileDescription = queryValue(L"FileDescription");
+    return info;
 }

@@ -148,6 +148,9 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\ModApi.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MusicRestorer.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

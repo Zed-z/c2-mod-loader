@@ -127,6 +127,9 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 
 
 std::vector<std::wstring> g_allMods;
+std::vector<PathInfo> g_allModPaths;
+std::vector<FileVersionInfo> g_allModInfo;
+
 std::vector<std::wstring> g_selectedMods;
 std::vector<HWND> g_checkboxes;
 HWND g_listView = nullptr;
@@ -151,6 +154,13 @@ static DWORD WINAPI OpenNotepad(LPVOID lParam) {
     delete[] path;
     return TRUE;
 }
+
+#define COL_MOD_NAME 0
+#define COL_VERSION 1
+#define COL_AUTHOR 2
+#define COL_DESCRIPTION 3
+#define COL_FILE_PATH 4
+#define COL_CONFIGURE 5
 
 LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
@@ -178,49 +188,87 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         GetClientRect(g_listView, &rc);
         int listViewWidth = rc.right - rc.left;
 
+        // Define columns ------------------------------------------------------------------------------------------------
+
         LVCOLUMNW col = { 0 };
         col.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 
-        // Column 0: Mod Name
+        // Column: Mod Name
         col.pszText = (LPWSTR)L"Mod Name";
         col.cx = 200;
-        col.iSubItem = 0;
-        ListView_InsertColumn(g_listView, 0, &col);
+        col.iSubItem = COL_MOD_NAME;
+        ListView_InsertColumn(g_listView, COL_MOD_NAME, &col);
 
-        // Column 1: File Path
+        // Column: Version
+        col.pszText = (LPWSTR)L"Version";
+        col.cx = 100;
+        col.iSubItem = COL_VERSION;
+        ListView_InsertColumn(g_listView, COL_VERSION, &col);
+
+        // Column: Author
+        col.pszText = (LPWSTR)L"Author";
+        col.cx = 200;
+        col.iSubItem = COL_AUTHOR;
+        ListView_InsertColumn(g_listView, COL_AUTHOR, &col);
+
+        // Column: Description
+        col.pszText = (LPWSTR)L"Description";
+        col.cx = 400;
+        col.iSubItem = COL_DESCRIPTION;
+        ListView_InsertColumn(g_listView, COL_DESCRIPTION, &col);
+
+        // Column: File Path
         col.pszText = (LPWSTR)L"File Path";
         col.cx = 320;
-        col.iSubItem = 1;
-        ListView_InsertColumn(g_listView, 1, &col);
+        col.iSubItem = COL_FILE_PATH;
+        ListView_InsertColumn(g_listView, COL_FILE_PATH, &col);
 
-        // Column 2: Configure
+        // Column: Configure
         col.cx = 100 - GetSystemMetrics(SM_CXVSCROLL);;
         col.pszText = (LPWSTR)L"Configure";
-        ListView_InsertColumn(g_listView, 2, &col);
+        ListView_InsertColumn(g_listView, COL_CONFIGURE, &col);
+
+        // ---------------------------------------------------------------------------------------------------------------
+
 
         g_allMods = GetMods(MOD_FOLDER_L);
         for (size_t i = 0; i < g_allMods.size(); ++i) {
 
-            PathInfo modInfo = GetPathInfo(g_allMods[i]);
+            PathInfo pathInfo = GetPathInfo(g_allMods[i]);
+            g_allModPaths.push_back(pathInfo);
+
+            FileVersionInfo modInfo = GetFileVersionInfo(g_allMods[i]);
+            g_allModInfo.push_back(modInfo);
 
             LVITEMW item = {};
             item.mask = LVIF_TEXT;
             item.iItem = (int)i;
-            item.pszText = const_cast<LPWSTR>(modInfo.name.c_str());
+            item.pszText = modInfo.productName.length() > 0
+                ? const_cast<LPWSTR>(modInfo.productName.c_str())
+                : const_cast<LPWSTR>(pathInfo.name.c_str());
 
             ListView_InsertItem(g_listView, &item);
 
-            // Set second column (file path)
-            ListView_SetItemText(g_listView, (int)i, 1, const_cast<LPWSTR>(modInfo.path.c_str()));
+            // Column: Version
+            ListView_SetItemText(g_listView, (int)i, COL_VERSION, const_cast<LPWSTR>(modInfo.fileVersion.c_str()));
 
-            // Set third column (ini)
-            std::wstring iniPath = modInfo.path;
+            // Column: Author
+            ListView_SetItemText(g_listView, (int)i, COL_AUTHOR, const_cast<LPWSTR>(modInfo.companyName.c_str()));
+
+            // Column: Description
+            ListView_SetItemText(g_listView, (int)i, COL_DESCRIPTION, const_cast<LPWSTR>(modInfo.fileDescription.c_str()));
+
+            // Column: File Path
+            ListView_SetItemText(g_listView, (int)i, COL_FILE_PATH, const_cast<LPWSTR>(pathInfo.path.c_str()));
+
+            // Column: Configure
+            std::wstring iniPath = pathInfo.path;
             iniPath.replace(iniPath.length() - 4, 4, L".ini");
 
             if (PathFileExistsW(iniPath.c_str())) {
                 LVITEMW item = {};
                 item.iItem = i;
-                item.iSubItem = 2;
+                item.iSubItem = COL_CONFIGURE;
                 item.mask = LVIF_TEXT;
                 item.pszText = (LPWSTR)L"[Edit]";
                 ListView_SetItem(g_listView, &item);
@@ -233,7 +281,7 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         HWND hwndLaunch = CreateWindowExW(0, WC_BUTTONW, L"Launch Game",
             WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-            80, 320, 100, 30, hwnd, (HMENU)1, hInstance, nullptr);
+            80, 320, 200, 60, hwnd, (HMENU)1, hInstance, nullptr);
 
         SendMessageW(hwndLaunch, WM_SETFONT, (WPARAM)hFont, TRUE);
 
@@ -260,7 +308,7 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
             LPNMITEMACTIVATE nmItem = (LPNMITEMACTIVATE)lParam;
 
             // Configure column
-            if (nmItem->iItem >= 0 && nmItem->iSubItem == 2) {
+            if (nmItem->iItem >= 0 && nmItem->iSubItem == COL_CONFIGURE) {
 
                 std::wstring modPath = g_allMods[nmItem->iItem];
                 std::wstring iniPath = modPath;

@@ -180,6 +180,9 @@ mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPa
   <ItemGroup>
     <Manifest Include="C2ModLoader.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C2ModLoader.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
