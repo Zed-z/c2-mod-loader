@@ -126,11 +126,47 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 }
 
 
+
+void LoadDisabledMods(std::vector<std::wstring>& disabledMods) {
+
+    disabledMods.clear();
+
+    constexpr int disabledModsStringLength = 65536;
+    wchar_t disabledModsWchar[disabledModsStringLength];
+    api->ReadIniString(L"Config", L"DisabledMods", L"", disabledModsWchar, disabledModsStringLength);
+    std::wstring disabledModsStr(disabledModsWchar);
+
+    std::wstring token;
+    std::vector<std::wstring> parts;
+    std::wstringstream wss(disabledModsStr);
+    while (std::getline(wss, token, L'|')) {
+        disabledMods.push_back(token);
+    }
+}
+
+void SaveDisabledMods(std::vector<std::wstring> disabledMods) {
+
+    std::wstring disabledModsStr;
+
+    for (int i = 0; i < disabledMods.size(); i++) {
+        disabledModsStr += disabledMods[i];
+        if (i < disabledMods.size() - 1) {
+            disabledModsStr += L"|";
+        }
+    }
+
+    api->WriteIniString(L"Config", L"DisabledMods", disabledModsStr.c_str());
+
+}
+
+
+
 std::vector<std::wstring> g_allMods;
 std::vector<PathInfo> g_allModPaths;
 std::vector<FileVersionInfo> g_allModInfo;
 
 std::vector<std::wstring> g_selectedMods;
+std::vector<std::wstring> g_disabledMods;
 std::vector<HWND> g_checkboxes;
 HWND g_listView = nullptr;
 static bool g_userConfirmed = false;
@@ -166,13 +202,16 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
     switch (msg) {
     case WM_CREATE: {
 
+        // Load disabled mods
+        LoadDisabledMods(g_disabledMods);
+
         HINSTANCE hInstance = (HINSTANCE)((LPCREATESTRUCT)lParam)->lpCreateParams;
         INITCOMMONCONTROLSEX icex = { sizeof(icex) };
         icex.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES;
         InitCommonControlsEx(&icex);
 
         HFONT hFont = CreateFontW(
-            -16, 0, 0, 0, FW_NORMAL,
+            -14, 0, 0, 0, FW_NORMAL,
             FALSE, FALSE, FALSE,
             DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
             DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
@@ -234,10 +273,12 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         g_allMods = GetMods(MOD_FOLDER_L);
         for (size_t i = 0; i < g_allMods.size(); ++i) {
 
-            PathInfo pathInfo = GetPathInfo(g_allMods[i]);
+            std::wstring mod = g_allMods[i];
+
+            PathInfo pathInfo = GetPathInfo(mod);
             g_allModPaths.push_back(pathInfo);
 
-            FileVersionInfo modInfo = GetFileVersionInfo(g_allMods[i]);
+            FileVersionInfo modInfo = GetFileVersionInfo(mod);
             g_allModInfo.push_back(modInfo);
 
             LVITEMW item = {};
@@ -274,7 +315,13 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
                 ListView_SetItem(g_listView, &item);
             }
 
-            ListView_SetCheckState(g_listView, (int)i, TRUE);
+            // Select if not marked as disabled
+            if (std::find(g_disabledMods.begin(), g_disabledMods.end(), pathInfo.path) != g_disabledMods.end()) {
+                ListView_SetCheckState(g_listView, (int)i, FALSE);
+            }
+            else {
+                ListView_SetCheckState(g_listView, (int)i, TRUE);
+            }
 
         }
         SendMessageW(g_listView, WM_SETFONT, (WPARAM)hFont, TRUE);
@@ -292,12 +339,17 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         // Launch button
         if (LOWORD(wParam) == 1) {
             g_selectedMods.clear();
+            g_disabledMods.clear();
             for (int i = 0; i < ListView_GetItemCount(g_listView); ++i) {
                 if (ListView_GetCheckState(g_listView, i)) {
                     g_selectedMods.push_back(g_allMods[i]);
                 }
+                else {
+                    g_disabledMods.push_back(g_allMods[i]);
+                }
             }
             g_userConfirmed = true;
+            SaveDisabledMods(g_disabledMods);
             PostQuitMessage(0);
         }
         break;
@@ -332,7 +384,18 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         // Close window button
     case WM_CLOSE:
+        g_selectedMods.clear();
+        g_disabledMods.clear();
+        for (int i = 0; i < ListView_GetItemCount(g_listView); ++i) {
+            if (ListView_GetCheckState(g_listView, i)) {
+                g_selectedMods.push_back(g_allMods[i]);
+            }
+            else {
+                g_disabledMods.push_back(g_allMods[i]);
+            }
+        }
         g_userConfirmed = false;
+        SaveDisabledMods(g_disabledMods);
         PostQuitMessage(0);
         break;
     }
@@ -342,7 +405,7 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
 
-    // Windo
+    // Window
     const wchar_t CLASS_NAME[] = L"ModConfigListView";
     WNDCLASS wc = {};
     wc.lpfnWndProc = ConfigWndProc;
@@ -399,20 +462,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         ClearLog();
 
         // Config
-        loaderEnabled = (bool)(api->ReadIniInt(L"Config", L"LoaderEnabled", true));
-        api->WriteIniInt(L"Config", L"LoaderEnabled", (int)loaderEnabled);
+        loaderEnabled = api->ReadIniBool(L"Config", L"LoaderEnabled", true);
+        api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
 
-        guiEnabled = (bool)(api->ReadIniInt(L"GUI", L"GuiEnabled", true));
-        api->WriteIniInt(L"GUI", L"GuiEnabled", (int)guiEnabled);
+        guiEnabled = api->ReadIniBool(L"GUI", L"GuiEnabled", true);
+        api->WriteIniBool(L"GUI", L"GuiEnabled", guiEnabled);
 
-        showLog = (bool)(api->ReadIniInt(L"GUI", L"ShowLog", false));
-        api->WriteIniInt(L"GUI", L"ShowLog", (int)showLog);
+        showLog = api->ReadIniBool(L"GUI", L"ShowLog", false);
+        api->WriteIniBool(L"GUI", L"ShowLog", showLog);
 
-        freeMouse = (bool)(api->ReadIniInt(L"Mouse", L"FreeMouse", true));
-        api->WriteIniInt(L"Mouse", L"FreeMouse", (int)freeMouse);
+        freeMouse = api->ReadIniBool(L"Mouse", L"FreeMouse", true);
+        api->WriteIniBool(L"Mouse", L"FreeMouse", freeMouse);
 
-        logHooks = (bool)(api->ReadIniInt(L"Mouse", L"LogHooks", false));
-        api->WriteIniInt(L"Mouse", L"LogHooks", (int)logHooks);
+        logHooks = api->ReadIniBool(L"Mouse", L"LogHooks", false);
+        api->WriteIniBool(L"Mouse", L"LogHooks", logHooks);
 
         api->Log("Game version: " + GameVersions[api->GetGameVersion()]);
 

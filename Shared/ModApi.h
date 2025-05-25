@@ -39,6 +39,11 @@ typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdc
 
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
+typedef bool(*ReadIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool default_value);
+typedef bool(*WriteIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool value);
+typedef void(*ReadIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
+typedef bool(*WriteIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* value);
+
 
 #define GAMEVER_UNKNOWN 0
 #define GAMEVER_US 1
@@ -64,6 +69,10 @@ struct ModApi {
 
     ReadIniIntFunction ReadIniInt;
     WriteIniIntFunction WriteIniInt;
+    ReadIniBoolFunction ReadIniBool;
+    WriteIniBoolFunction WriteIniBool;
+    ReadIniStringFunction ReadIniString;
+    WriteIniStringFunction WriteIniString;
 
     GetGameVersionFunction GetGameVersion;
 };

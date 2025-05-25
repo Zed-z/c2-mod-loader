@@ -331,7 +331,7 @@ int ReadIniInt(const std::wstring& section, const std::wstring& key, int default
     return GetPrivateProfileIntW(section.c_str(), key.c_str(), default_value, iniPath.c_str());
 }
 
-inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value) {
+bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value) {
 
     // Get module path
     HMODULE caller = GetCallingModule();
@@ -342,6 +342,49 @@ inline bool WriteIniInt(const std::wstring& section, const std::wstring& key, in
     _itow_s(value, valueStr, 10);
     return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
 }
+
+bool ReadIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
+
+    return (bool)GetPrivateProfileIntW(section.c_str(), key.c_str(), (int)default_value, iniPath.c_str());
+}
+
+bool WriteIniBool(const std::wstring& section, const std::wstring& key, bool value) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
+
+    wchar_t valueStr[16];
+    _itow_s((int)value, valueStr, 10);
+    return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+}
+
+void ReadIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
+
+    GetPrivateProfileStringW(section.c_str(), key.c_str(), default_value, buffer, buffer_size, iniPath.c_str());
+}
+
+bool WriteIniString(const std::wstring& section, const std::wstring& key, const wchar_t* value) {
+
+    // Get module path
+    HMODULE caller = GetCallingModule();
+    PathInfo PathInfo = GetModuleFilepath(caller);
+    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
+
+    return WritePrivateProfileStringW(section.c_str(), key.c_str(), value, iniPath.c_str()) != 0;
+}
+
 
 
 std::string GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
@@ -366,7 +409,22 @@ int GetGameVersion() {
 
 // API
 ModApi g_ModApi = {
-    Log, ResolveAddress, FindPattern, AddressSetInt, AddressGetInt, PatchBytes, ReadBytes, InjectCode, HookFunction, ReadIniInt, WriteIniInt, GetGameVersion
+    Log,
+    ResolveAddress,
+    FindPattern,
+    AddressSetInt,
+    AddressGetInt,
+    PatchBytes,
+    ReadBytes,
+    InjectCode,
+    HookFunction,
+    ReadIniInt,
+    WriteIniInt,
+    ReadIniBool,
+    WriteIniBool,
+    ReadIniString,
+    WriteIniString,
+    GetGameVersion
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
