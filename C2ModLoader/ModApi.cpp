@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "ImGuiHandler.h"
 #include "Utils.h"
+#include "Resource.h"
 
 #include <Windows.h>
 #include <fstream>

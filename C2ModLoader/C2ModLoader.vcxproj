@@ -175,6 +175,7 @@ mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPa
     <ClInclude Include="Config.h" />
     <ClInclude Include="ImGuiHandler.h" />
     <ClInclude Include="MouseCaptureRemover.h" />
+    <ClInclude Include="Resource.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

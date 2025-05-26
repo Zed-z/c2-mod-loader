@@ -4,6 +4,7 @@
 #include "ImGuiHandler.h"
 #include "MouseCaptureRemover.h"
 #include "Utils.h"
+#include "Resource.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -338,6 +339,16 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
     }
 
     case WM_COMMAND:
+
+        // About window
+        if (LOWORD(wParam) == ID_HELP_ABOUT) {
+            std::wstring message = L"About " LOADER_NAME_L L":\n\n"
+				L"Version: " LOADER_VERSION_L L"\n\n"
+				LOADER_DESCRIPTION_L L"\n\n"
+                L"Created by: " AUTHOR_NAME_L "\n\n";
+            MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
+        }
+
         // Launch button
         if (LOWORD(wParam) == 1) {
             g_selectedMods.clear();
@@ -464,7 +475,11 @@ bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rc.right - rc.left, rc.bottom - rc.top,
-        nullptr, nullptr, hInstance, hInstance);
+        nullptr,
+        LoadMenu(hInstance, MAKEINTRESOURCE(MENU_BAR)),
+        hInstance,
+        hInstance
+    );
 
     if (!hwnd) return false;
 
