@@ -18,6 +18,7 @@
 ModApi* api;
 
 bool loaderEnabled = true;
+bool skipLauncher = false;
 bool guiEnabled = true;
 
 void ClearLog() {
@@ -127,28 +128,28 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 
 
 
-void LoadDisabledMods(std::vector<std::wstring>& disabledMods) {
+static std::vector<std::wstring> GetDisabledMods() {  
+    std::vector<std::wstring> disabledMods;  
 
-    disabledMods.clear();
+    constexpr int disabledModsStringLength = 65536;  
+    std::unique_ptr<wchar_t[]> disabledModsWchar = std::make_unique<wchar_t[]>(disabledModsStringLength);  
+    api->ReadIniString(L"Config", L"DisabledMods", L"", disabledModsWchar.get(), disabledModsStringLength);  
+    std::wstring disabledModsStr(disabledModsWchar.get());  
 
-    constexpr int disabledModsStringLength = 65536;
-    wchar_t disabledModsWchar[disabledModsStringLength];
-    api->ReadIniString(L"Config", L"DisabledMods", L"", disabledModsWchar, disabledModsStringLength);
-    std::wstring disabledModsStr(disabledModsWchar);
+    std::wstring token;  
+    std::wstringstream wss(disabledModsStr);  
+    while (std::getline(wss, token, L'|')) {  
+        disabledMods.push_back(token);  
+    }  
 
-    std::wstring token;
-    std::vector<std::wstring> parts;
-    std::wstringstream wss(disabledModsStr);
-    while (std::getline(wss, token, L'|')) {
-        disabledMods.push_back(token);
-    }
+    return disabledMods;  
 }
 
 void SaveDisabledMods(std::vector<std::wstring> disabledMods) {
 
     std::wstring disabledModsStr;
 
-    for (int i = 0; i < disabledMods.size(); i++) {
+    for (unsigned int i = 0; i < disabledMods.size(); i++) {
         disabledModsStr += disabledMods[i];
         if (i < disabledMods.size() - 1) {
             disabledModsStr += L"|";
@@ -177,19 +178,20 @@ static bool g_userConfirmed = false;
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
-static DWORD WINAPI OpenNotepad(LPVOID lParam) {
-    wchar_t* path = (wchar_t*)lParam;
-    std::wstring pathStr(path);
-    api->Log("Opening " + WStringToString(pathStr));
-
-    if (PathFileExistsW(path)) {
-        std::wstring cmd = L"notepad.exe " + pathStr;
+void OpenNotepad(std::wstring path) {
+    if (PathFileExistsW(path.c_str())) {
+        std::wstring cmd = L"notepad.exe " + path;
         _wsystem(cmd.c_str());
     }
-
-    delete[] path;
-    return TRUE;
 }
+
+constexpr int launcher_window_width = 1280;
+constexpr int launcher_window_height = 460;
+constexpr int launcher_listview_height = 380;
+constexpr int launcher_margin = 10;
+
+constexpr int launcher_launch_button_width = 200;
+constexpr int launcher_launch_button_height = 60;
 
 #define COL_MOD_NAME 0
 #define COL_VERSION 1
@@ -201,9 +203,6 @@ static DWORD WINAPI OpenNotepad(LPVOID lParam) {
 LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_CREATE: {
-
-        // Load disabled mods
-        LoadDisabledMods(g_disabledMods);
 
         HINSTANCE hInstance = (HINSTANCE)((LPCREATESTRUCT)lParam)->lpCreateParams;
         INITCOMMONCONTROLSEX icex = { sizeof(icex) };
@@ -218,10 +217,11 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         g_listView = CreateWindowExW(0, WC_LISTVIEWW, L"",
             WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE,
-            10, 10, 640-10, 300,
+            launcher_margin, launcher_margin, launcher_window_width - launcher_margin, launcher_listview_height,
             hwnd, (HMENU)1001, GetModuleHandle(nullptr), nullptr);
 
-        ListView_SetExtendedListViewStyle(g_listView, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+        ListView_SetExtendedListViewStyle(g_listView,
+            LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_INFOTIP);
 
         RECT rc;
         GetClientRect(g_listView, &rc);
@@ -240,37 +240,35 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         // Column: Version
         col.pszText = (LPWSTR)L"Version";
-        col.cx = 100;
+        col.cx = 60;
         col.iSubItem = COL_VERSION;
         ListView_InsertColumn(g_listView, COL_VERSION, &col);
 
         // Column: Author
         col.pszText = (LPWSTR)L"Author";
-        col.cx = 200;
+        col.cx = 120;
         col.iSubItem = COL_AUTHOR;
         ListView_InsertColumn(g_listView, COL_AUTHOR, &col);
 
         // Column: Description
         col.pszText = (LPWSTR)L"Description";
-        col.cx = 400;
+        col.cx = 600;
         col.iSubItem = COL_DESCRIPTION;
         ListView_InsertColumn(g_listView, COL_DESCRIPTION, &col);
 
         // Column: File Path
         col.pszText = (LPWSTR)L"File Path";
-        col.cx = 320;
+        col.cx = 200;
         col.iSubItem = COL_FILE_PATH;
         ListView_InsertColumn(g_listView, COL_FILE_PATH, &col);
 
         // Column: Configure
-        col.cx = 100 - GetSystemMetrics(SM_CXVSCROLL);;
-        col.pszText = (LPWSTR)L"Configure";
+        col.cx = 80 - GetSystemMetrics(SM_CXVSCROLL);;
+        col.pszText = (LPWSTR)L"Config";
         ListView_InsertColumn(g_listView, COL_CONFIGURE, &col);
 
         // ---------------------------------------------------------------------------------------------------------------
 
-
-        g_allMods = GetMods(MOD_FOLDER_L);
         for (size_t i = 0; i < g_allMods.size(); ++i) {
 
             std::wstring mod = g_allMods[i];
@@ -328,7 +326,11 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         HWND hwndLaunch = CreateWindowExW(0, WC_BUTTONW, L"Launch Game",
             WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-            80, 320, 200, 60, hwnd, (HMENU)1, hInstance, nullptr);
+            launcher_window_width / 2 - launcher_launch_button_width / 2,
+            launcher_window_height - launcher_launch_button_height - launcher_margin,
+            launcher_launch_button_width,
+            launcher_launch_button_height,
+            hwnd, (HMENU)1, hInstance, nullptr);
 
         SendMessageW(hwndLaunch, WM_SETFONT, (WPARAM)hFont, TRUE);
 
@@ -354,8 +356,18 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         }
         break;
 
+    case WM_NOTIFY: {
+
+        // Prevent list view column resizing
+        NMHDR* nmhdr = (NMHDR*)lParam;
+        HWND hHeader = ListView_GetHeader(g_listView);
+        if (nmhdr->hwndFrom == hHeader) {
+            if (nmhdr->code == HDN_BEGINTRACKW || nmhdr->code == HDN_BEGINTRACKA) {
+                return TRUE; // Block resizing
+            }
+        }
+
         // Press list item
-    case WM_NOTIFY:
         if (((LPNMHDR)lParam)->idFrom == 1001 && ((LPNMHDR)lParam)->code == NM_CLICK) {
             LPNMITEMACTIVATE nmItem = (LPNMITEMACTIVATE)lParam;
 
@@ -366,21 +378,48 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
                 std::wstring iniPath = modPath;
                 iniPath.replace(iniPath.length() - 4, 4, L".ini");
 
-                api->Log("path: " + WStringToString(iniPath) + " exists? " + std::to_string(PathFileExistsW(iniPath.c_str())));
-
-                /*size_t len = (iniPath.length() + 1);
-                wchar_t* iniPathChar = new wchar_t[len];
-                wcsncpy_s(iniPathChar, len, iniPath.c_str(), len - 1);
-
-                CreateThread(nullptr, 0, OpenNotepad, (LPVOID)iniPathChar, 0, nullptr);*/
-
-                if (PathFileExistsW(iniPath.c_str())) {
-                    std::wstring cmd = L"notepad.exe " + iniPath;
-                    _wsystem(cmd.c_str());
-                }
+				OpenNotepad(iniPath);
             }
         }
+
+        // List view column tooltips
+        if (((LPNMHDR)lParam)->idFrom == 1001) {
+            if (((LPNMHDR)lParam)->code == LVN_GETINFOTIP) {
+                NMLVGETINFOTIP* pInfoTip = (NMLVGETINFOTIP*)lParam;
+                int row = pInfoTip->iItem;
+                int col = pInfoTip->iSubItem;
+
+                // Provide the full text for the hovered cell
+                std::wstring tipText;
+                switch (col) {
+                case COL_MOD_NAME:
+                    tipText = g_allModInfo[row].productName.length() > 0
+                        ? g_allModInfo[row].productName
+                        : g_allModPaths[row].name;
+                    break;
+                case COL_VERSION:
+                    tipText = g_allModInfo[row].fileVersion;
+                    break;
+                case COL_AUTHOR:
+                    tipText = g_allModInfo[row].companyName;
+                    break;
+                case COL_DESCRIPTION:
+                    tipText = g_allModInfo[row].fileDescription;
+                    break;
+                case COL_FILE_PATH:
+                    tipText = g_allModPaths[row].path;
+                    break;
+                default:
+                    tipText = L"";
+                }
+
+                // Copy to the tooltip buffer
+                wcsncpy_s(pInfoTip->pszText, pInfoTip->cchTextMax, tipText.c_str(), _TRUNCATE);
+            }
+        }
+
         break;
+    }
 
         // Close window button
     case WM_CLOSE:
@@ -406,7 +445,7 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
 
     // Window
-    const wchar_t CLASS_NAME[] = L"ModConfigListView";
+    const wchar_t CLASS_NAME[] = L"C2ModLoaderLauncher";
     WNDCLASS wc = {};
     wc.lpfnWndProc = ConfigWndProc;
     wc.hInstance = hInstance;
@@ -416,11 +455,15 @@ bool ShowBlockingConfigWindow(HINSTANCE hInstance) {
 
 
     // Create window
+    RECT rc = { 0, 0, launcher_window_width, launcher_window_height };
+    AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE);
+
     HWND hwnd = CreateWindowEx(
         WS_EX_APPWINDOW, // Treat as main window, for taskbar icon
         CLASS_NAME, LOADER_NAME_L,
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        rc.right - rc.left, rc.bottom - rc.top,
         nullptr, nullptr, hInstance, hInstance);
 
     if (!hwnd) return false;
@@ -465,6 +508,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         loaderEnabled = api->ReadIniBool(L"Config", L"LoaderEnabled", true);
         api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
 
+        skipLauncher = api->ReadIniBool(L"Config", L"SkipLauncher", false);
+        api->WriteIniBool(L"Config", L"SkipLauncher", skipLauncher);
+
         guiEnabled = api->ReadIniBool(L"GUI", L"GuiEnabled", true);
         api->WriteIniBool(L"GUI", L"GuiEnabled", guiEnabled);
 
@@ -485,12 +531,32 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             return TRUE;
         }
 
-        // Load mods
-        if (!ShowBlockingConfigWindow(hModule)) {
-            api->Log("Exiting modloader.");
-            ExitProcess(0);
+        // Initialize mod lists
+        g_allMods = GetMods(MOD_FOLDER_L);
+        g_disabledMods = GetDisabledMods();
+
+        // Show launcher window
+        if (!skipLauncher) {
+
+            if (!ShowBlockingConfigWindow(hModule)) {
+                api->Log("Exiting modloader.");
+                ExitProcess(0);
+            }
+            
+            // Load mods
+            LoadMods(g_selectedMods);
         }
-        LoadMods(g_selectedMods);
+        else {
+
+            // Load mods
+            g_selectedMods.clear();
+            for (auto mod : g_allMods) {
+                if (std::find(g_disabledMods.begin(), g_disabledMods.end(), mod) == g_disabledMods.end()) {
+                    g_selectedMods.push_back(mod);
+                }
+            }
+            LoadMods(g_selectedMods);
+        }
 
         // Call other components
         DisableThreadLibraryCalls(hModule);
