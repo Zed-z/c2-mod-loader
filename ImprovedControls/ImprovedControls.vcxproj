@@ -144,6 +144,9 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\ModApi.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ImprovedControls.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
