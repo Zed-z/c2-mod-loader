@@ -4,7 +4,7 @@
 #include <fstream>
 #include "MinHook.h"
 
-static ModApi* api = nullptr;
+extern ModApi* api;
 
 bool freeMouse;
 bool logHooks;
@@ -90,9 +90,6 @@ DWORD WINAPI InitHooks(LPVOID lpParam) {
     https://pastebin.com/6xms0KcG
 */
 DWORD WINAPI MouseInitThread(LPVOID lpParam) {
-
-    // Get api pointer from main thread
-    api = (ModApi*)lpParam;
 
     int gameVersion = api->GetGameVersion();
 

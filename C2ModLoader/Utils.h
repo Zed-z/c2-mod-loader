@@ -2,6 +2,12 @@
 #include <Windows.h>
 #include <string>
 #include <vector>
+#include <fstream>
+
+#include "Resource.h"
+
+#include <Shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
 
 
 inline std::wstring StringToWString(const std::string& str) {
@@ -114,4 +120,27 @@ inline HMODULE GetCallingModule() {
         &caller
     );
     return caller;
+}
+
+
+inline void ClearLog() {
+
+    wchar_t modulePath[MAX_PATH];
+    GetModuleFileNameW(GetModuleHandleA(NULL), modulePath, MAX_PATH);
+    std::wstring path(modulePath);
+    size_t pos = path.find_last_of(L"\\/");
+    std::wstring logPath = path.substr(0, pos) + L"\\" + LOG_FILE_L;
+
+    std::wofstream log(logPath, std::ios::trunc);
+    if (!log.is_open()) return;
+
+    log.close();
+}
+
+
+inline void OpenNotepad(std::wstring path) {
+    if (PathFileExistsW(path.c_str())) {
+        std::wstring cmd = L"notepad.exe " + path;
+        _wsystem(cmd.c_str());
+    }
 }

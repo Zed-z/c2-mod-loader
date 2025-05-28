@@ -14,7 +14,7 @@
 #include "imgui_impl_dx11.h"
 
 
-static ModApi* api;
+extern ModApi* api;
 
 // Variables for GUI
 ImGuiTextBuffer logBuffer;
@@ -151,9 +151,6 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
 
 // Thread to wait for d3d11.dll, create a dummy device to locate Present, then hook it
 DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
-
-    // Get api pointer from main thread
-    api = (ModApi*)lpParam;
 
     // Wait for dgVoodoo (D3D11) to load
     int attemptCount = 0;
