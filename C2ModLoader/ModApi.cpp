@@ -24,17 +24,6 @@
 #include <intrin.h>
 #pragma intrinsic(_ReturnAddress)
 
-inline HMODULE GetCallingModule() {
-    HMODULE caller = nullptr;
-    GetModuleHandleExA(
-        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-        (LPCSTR)_ReturnAddress(),
-        &caller
-    );
-    return caller;
-}
-
 
 void Log(const std::string& message) {
 

@@ -15,6 +15,7 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <regex>
 
 ModApi* api;
 
@@ -347,6 +348,11 @@ LRESULT CALLBACK ConfigWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 				LOADER_DESCRIPTION_L L"\n\n"
                 L"Created by: " AUTHOR_NAME_L "\n\n";
             MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
+        }
+
+        // Open settings
+        if (LOWORD(wParam) == ID_FILE_SETTINGS) {
+            OpenNotepad(CONFIG_FILE_L);
         }
 
         // Launch button

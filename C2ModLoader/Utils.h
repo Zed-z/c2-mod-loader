@@ -103,3 +103,15 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
     info.fileDescription = queryValue(L"FileDescription");
     return info;
 }
+
+
+inline HMODULE GetCallingModule() {
+    HMODULE caller = nullptr;
+    GetModuleHandleExA(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCSTR)_ReturnAddress(),
+        &caller
+    );
+    return caller;
+}

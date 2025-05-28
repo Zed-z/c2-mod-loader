@@ -15,8 +15,12 @@
 #define LOG_FILE "C2ModLoader.log"
 #define LOG_FILE_L L"C2ModLoader.log"
 
+#define CONFIG_FILE "C2ModLoader.ini"
+#define CONFIG_FILE_L L"C2ModLoader.ini"
+
 #define MOD_FOLDER "mods"
 #define MOD_FOLDER_L L"mods"
 
 #define MENU_BAR 100
-#define ID_HELP_ABOUT 9001
+#define ID_FILE_SETTINGS 9001
+#define ID_HELP_ABOUT 9002
