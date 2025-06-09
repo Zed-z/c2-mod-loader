@@ -101,6 +101,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             LoadMods(mods);
         }
 
+        // Initialize API
+        ApiSetup();
+
         // Call other components
         DisableThreadLibraryCalls(hModule);
 

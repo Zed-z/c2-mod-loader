@@ -20,3 +20,9 @@ void SaveDisabledMods(std::vector<Mod> disabledMods);
 
 std::vector<Mod> GetMods();
 void LoadMods(std::vector<Mod> mods);
+
+
+extern std::vector<void(__stdcall*)()> physicsCallbacks;
+void __stdcall RunPhysicsHooks();
+
+void ApiSetup();

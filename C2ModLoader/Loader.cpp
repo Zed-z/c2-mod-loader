@@ -118,3 +118,27 @@ void LoadMods(std::vector<Mod> mods) {
         MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONERROR);
     }
 }
+
+
+
+
+
+std::vector<void(__stdcall*)()> physicsCallbacks;
+
+void __stdcall RunPhysicsHooks() {
+    for (auto& callback : physicsCallbacks) {
+        callback();
+    }
+}
+
+void ApiSetup() {
+
+    // Hook physics callbacks
+    /*
+        Croc2.exe+4A591 - 39 1D 0CA24A00        - cmp [Croc2.exe+AA20C],ebx { (1) }
+    */
+    uintptr_t hookAddr = 0x0044A591;
+    size_t hookLength = 6;
+
+    api->HookFunction(hookAddr, hookLength, RunPhysicsHooks);
+}

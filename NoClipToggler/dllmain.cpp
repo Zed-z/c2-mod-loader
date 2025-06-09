@@ -28,58 +28,59 @@ const BYTE fallTimerCodePatch[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 bool noclip_enabled = false;
 int noclip_y = 0;
 
-DWORD WINAPI PatchThread(LPVOID) {
-    while (true) {
+Inputs inputs, prevInputs;
 
-        // Toggle
-        if (GetAsyncKeyState(VK_F2) & 1) {
-            noclip_enabled = !noclip_enabled;
+void __stdcall PhysicsLoop() {
 
-            auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-            if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-                continue;
-            }
-            noclip_y = api->AddressGetInt(addr);
+    prevInputs = inputs;
+    inputs = api->GetInputs();
 
-            if (noclip_enabled) {
-                api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
-                api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
-                api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
-                //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
-                api->Log("Noclip enabled!");
-            }
-            else {
-                api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
-                api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
-                api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
-                //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
-                api->Log("Noclip disabled!");
-            }
+    // Toggle
+    if (inputs.stepLeft && inputs.stepRight && !prevInputs.attack && inputs.attack) {
+        noclip_enabled = !noclip_enabled;
+
+        auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
+        if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+            return;
         }
+        noclip_y = api->AddressGetInt(addr);
 
-        // Go up and down
         if (noclip_enabled) {
-            if (GetAsyncKeyState(VK_PRIOR)) {// Page up
-                noclip_y += 50;
-            }
+            api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
+            api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
+            api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
+            //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
+            api->Log("Noclip enabled!");
+        }
+        else {
+            api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
+            api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
+            api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
+            //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
+            api->Log("Noclip disabled!");
+        }
+    }
 
-            if (GetAsyncKeyState(VK_NEXT) & 1) {// Page down
-                noclip_y -= 100;
-            }
-
-            auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-            if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-                continue;
-            }
-            api->AddressSetInt(
-                addr,
-                noclip_y
-            );
+    // Go up and down
+    if (noclip_enabled) {
+        if (inputs.stepRight) {// Page up
+            noclip_y += 100;
         }
 
-        Sleep(10);
+        if (inputs.stepLeft) {// Page down
+            noclip_y -= 100;
+        }
+
+        auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
+        if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+            return;
+        }
+        api->AddressSetInt(
+            addr,
+            noclip_y
+        );
     }
-    return 0;
+
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
@@ -87,8 +88,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadSharedModApi();
         if (!api) return FALSE;
 
+		api->HookPhysics(PhysicsLoop);
+
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);
     }
     return TRUE;
 }

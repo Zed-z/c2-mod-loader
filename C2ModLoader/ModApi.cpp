@@ -4,6 +4,7 @@
 #include "ImGuiHandler.h"
 #include "Utils.h"
 #include "Resource.h"
+#include "Loader.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -310,6 +311,11 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall* func)()) {
     return true;
 }
 
+bool HookPhysics(void(__stdcall* func)()) {
+    physicsCallbacks.push_back(func);
+    return true;
+}
+
 
 int ReadIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
 
@@ -397,6 +403,42 @@ int GetGameVersion() {
 }
 
 
+Inputs GetInputs() {
+
+    // Get inputs
+    int input = AddressGetInt(ADDR_INPUTS);
+
+    Inputs result;
+    result.raw = input;
+
+    result.pause = input & 8;
+
+    result.up = input & 16;
+    result.right = input & 32;
+    result.down = input & 64;
+    result.left = input & 128;
+
+    result.invLeft = input & 256;
+    result.invRight = input & 512;
+
+    result.stepLeft = input & 1024;
+    result.stepRight = input & 2048;
+
+    result.invUse = input & 4096;
+    result.flip = input & 8192;
+
+    result.jump = input & 16384;
+    result.attack = input & 32768;
+
+    result.effectiveUp = input & 65536;
+    result.effectiveDown = input & 131072;
+    result.effectiveLeft = input & 262144;
+    result.effectiveRight = input & 524288;
+
+    return result;
+}
+
+
 // API
 ModApi g_ModApi = {
     Log,
@@ -408,13 +450,15 @@ ModApi g_ModApi = {
     ReadBytes,
     InjectCode,
     HookFunction,
+    HookPhysics,
     ReadIniInt,
     WriteIniInt,
     ReadIniBool,
     WriteIniBool,
     ReadIniString,
     WriteIniString,
-    GetGameVersion
+    GetGameVersion,
+    GetInputs
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <Windows.h>
+#include <bitset>
 
 // Api definition --------------------------------------------------------
 
@@ -20,6 +21,8 @@ typedef struct {
 
 #define ADDR_CURRENT_SAVE_SLOT  { 0x6220FC }
 
+#define ADDR_INPUTS 0x52A590
+
 typedef void(*LogFunction)(const std::string& message);
 
 typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);
@@ -36,6 +39,7 @@ typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t siz
 #define INJECT_AFTER 2
 typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length, int inject_type);
 typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall* func)());
+typedef bool(*HookPhysicsFunction)(void(__stdcall* func)());
 
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
@@ -52,6 +56,34 @@ typedef bool(*WriteIniStringFunction)(const std::wstring& section, const std::ws
 extern std::string GameVersions[]; // Use this to get game versions as strings for logging/display
 typedef int(*GetGameVersionFunction)();
 
+
+struct Inputs {
+    uint32_t raw;
+
+    bool pause;
+
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+
+    bool effectiveUp;
+    bool effectiveDown;
+    bool effectiveLeft;
+    bool effectiveRight;
+
+    bool flip;
+    bool stepLeft;
+    bool stepRight;
+    bool jump;
+    bool attack;
+    bool invLeft;
+    bool invUse;
+    bool invRight;
+};
+typedef Inputs(*GetInputsFunction)();
+
+
 struct ModApi {
     LogFunction Log;
 
@@ -66,6 +98,7 @@ struct ModApi {
 
     InjectCodeFunction InjectCode;
     HookFunctionFunction HookFunction;
+    HookPhysicsFunction HookPhysics;
 
     ReadIniIntFunction ReadIniInt;
     WriteIniIntFunction WriteIniInt;
@@ -75,6 +108,7 @@ struct ModApi {
     WriteIniStringFunction WriteIniString;
 
     GetGameVersionFunction GetGameVersion;
+    GetInputsFunction GetInputs;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();
