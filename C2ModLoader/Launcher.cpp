@@ -30,20 +30,19 @@ static bool g_userConfirmed = false;
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
-constexpr int launcher_window_width = 1280;
-constexpr int launcher_window_height = 460;
-constexpr int launcher_listview_height = 380;
 constexpr int launcher_margin = 10;
 
-constexpr int launcher_launch_button_width = 200;
-constexpr int launcher_launch_button_height = 60;
+constexpr int launcher_launch_button_width = 180;
+constexpr int launcher_launch_button_height = 50;
+
+constexpr int launcher_window_width = 460;
+constexpr int launcher_window_height = 360;
+constexpr int launcher_listview_height = launcher_window_height - launcher_launch_button_height - launcher_margin * 3;
 
 #define COL_MOD_NAME 0
 #define COL_VERSION 1
 #define COL_AUTHOR 2
-#define COL_DESCRIPTION 3
-#define COL_FILE_PATH 4
-#define COL_CONFIGURE 5
+#define COL_CONFIGURE 3
 
 LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
@@ -78,7 +77,7 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         col.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 
         // Column: Mod Name
-        col.pszText = (LPWSTR)L"Mod Name";
+        col.pszText = (LPWSTR)L"Mod (Click for more info)";
         col.cx = 200;
         col.iSubItem = COL_MOD_NAME;
         ListView_InsertColumn(g_listView, COL_MOD_NAME, &col);
@@ -94,18 +93,6 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         col.cx = 120;
         col.iSubItem = COL_AUTHOR;
         ListView_InsertColumn(g_listView, COL_AUTHOR, &col);
-
-        // Column: Description
-        col.pszText = (LPWSTR)L"Description";
-        col.cx = 600;
-        col.iSubItem = COL_DESCRIPTION;
-        ListView_InsertColumn(g_listView, COL_DESCRIPTION, &col);
-
-        // Column: File Path
-        col.pszText = (LPWSTR)L"File Path";
-        col.cx = 200;
-        col.iSubItem = COL_FILE_PATH;
-        ListView_InsertColumn(g_listView, COL_FILE_PATH, &col);
 
         // Column: Configure
         col.cx = 80 - GetSystemMetrics(SM_CXVSCROLL);;
@@ -131,12 +118,6 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             // Column: Author
             ListView_SetItemText(g_listView, (int)i, COL_AUTHOR, const_cast<LPWSTR>(mod.info.companyName.c_str()));
 
-            // Column: Description
-            ListView_SetItemText(g_listView, (int)i, COL_DESCRIPTION, const_cast<LPWSTR>(mod.info.fileDescription.c_str()));
-
-            // Column: File Path
-            ListView_SetItemText(g_listView, (int)i, COL_FILE_PATH, const_cast<LPWSTR>(mod.path.path.c_str()));
-
             // Column: Configure
             std::wstring iniPath = mod.path.path;
             iniPath.replace(iniPath.length() - 4, 4, L".ini");
@@ -160,8 +141,8 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
             launcher_window_width / 2 - launcher_launch_button_width / 2,
             launcher_window_height - launcher_launch_button_height - launcher_margin,
-            launcher_launch_button_width,
-            launcher_launch_button_height,
+            launcher_launch_button_width - launcher_margin * 2,
+            launcher_launch_button_height - launcher_margin * 2,
             hwnd, (HMENU)1, hInstance, nullptr);
 
         SendMessageW(hwndLaunch, WM_SETFONT, (WPARAM)hFont, TRUE);
@@ -225,6 +206,18 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
                 iniPath.replace(iniPath.length() - 4, 4, L".ini");
                 OpenNotepad(iniPath);
             }
+
+            // Name column
+            if (nmItem->iItem >= 0 && nmItem->iSubItem == COL_MOD_NAME) {
+				Mod& mod = mods[nmItem->iItem];
+
+                std::wstring message = L"About " + mod.info.productName + L":\n\n"
+                    L"Version: " + mod.info.fileVersion + L"\n\n" +
+                    mod.info.fileDescription + L"\n\n"
+                    L"Created by: " + mod.info.companyName + L"\n\n"
+                    L"File location: " + mod.path.path + L"\n\n";
+                MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
+            }
         }
 
         // List view column tooltips
@@ -245,12 +238,6 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
                     break;
                 case COL_AUTHOR:
                     tipText = mods[row].info.companyName;
-                    break;
-                case COL_DESCRIPTION:
-                    tipText = mods[row].info.fileDescription;
-                    break;
-                case COL_FILE_PATH:
-                    tipText = mods[row].path.path;
                     break;
                 default:
                     tipText = L"";
