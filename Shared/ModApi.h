@@ -20,6 +20,7 @@ typedef struct {
 #define ADDR_CROC_POS_ANGLE     { 0x4A8C3C, { 0x14, 0x28, 0x24 } }
 
 #define ADDR_CURRENT_SAVE_SLOT  { 0x6220FC }
+#define ADDR_SAVE_SLOT_OFFSET   0x2000
 
 #define ADDR_INPUTS 0x52A590
 

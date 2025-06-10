@@ -12,11 +12,11 @@ bool limbusMode = false;
 
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
-std::string ControlSchemeNames[] = { "Type 1", "Type 2" };
+std::string ControlSchemeNames[] = { "Type 2", "Type 1" };
 
-#define CONTROL_SCHEME_1 0x52A5F4
-#define CONTROL_SCHEME_2 0x60438C
-#define CONTROL_SCHEME_3 0x52AE64
+#define CONTROL_SCHEME_SLOT 0x60438C
+#define CONTROL_SCHEME_COPY1 0x52A5F4
+#define CONTROL_SCHEME_COPY2 0x52AE64
 
 #define ANALOG_STRENGTH 0x52A54C
 
@@ -46,14 +46,17 @@ std::string InputsString(Inputs inputs) {
     return oss.str();
 }
 
+
 int GetControlScheme() {
-    return api->AddressGetInt(CONTROL_SCHEME_1);
+    int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
+    return api->AddressGetInt(CONTROL_SCHEME_SLOT + saveSlotOffset);
 }
 
 void SetControlScheme(int scheme) {
-    api->AddressSetInt(CONTROL_SCHEME_1, scheme);
-    api->AddressSetInt(CONTROL_SCHEME_2, scheme);
-    api->AddressSetInt(CONTROL_SCHEME_3, scheme);
+    int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
+    api->AddressSetInt(CONTROL_SCHEME_SLOT + saveSlotOffset, scheme);
+    api->AddressSetInt(CONTROL_SCHEME_COPY1 + saveSlotOffset, scheme);
+    api->AddressSetInt(CONTROL_SCHEME_COPY2 + saveSlotOffset, scheme);
 }
 
 void __stdcall PhysicsStep() {
@@ -141,6 +144,12 @@ void __stdcall PhysicsStep() {
             }
         }
     }
+
+	// Max stick strength
+	/*int analogStrength = api->AddressGetInt(ANALOG_STRENGTH);
+    if (analogStrength > 0 && analogStrength <= 180) {
+		api->AddressSetInt(ANALOG_STRENGTH, 180);
+    }*/
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
