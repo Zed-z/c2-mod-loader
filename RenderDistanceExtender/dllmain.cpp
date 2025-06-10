@@ -41,9 +41,11 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 
                 if (is_active) {
                     api->Log("Render distance extended!");
+                    api->ShowToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
                 }
                 else {
                     api->Log("Render distance reverted!");
+                    api->ShowToast("Render distance reverted!");
                 }
                 break;
 
@@ -54,6 +56,7 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
                     RenderApply();
                     api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
                     api->Log("Render distance decreased to: x" + std::to_string(render_multiplier));
+                    api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
                 }
                 break;
 
@@ -64,6 +67,7 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
                     RenderApply();
                     api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
                     api->Log("Render distance increased to: x" + std::to_string(render_multiplier));
+                    api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
                 }
                 break;
             }
@@ -87,7 +91,7 @@ void __stdcall OnDistancesWritten() {
     base_fog_distance = *(int*)(base + 0xB7B48);
     base_render_distance = *(int*)(base + 0xB7B18);
 
-    api->Log("Render distance changed!");
+    api->Log("Render distance changed to: " + std::to_string(base_render_distance));
 
     // Reapply change
     RenderApply();

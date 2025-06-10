@@ -42,6 +42,7 @@ DWORD WINAPI PatchThread(LPVOID) {
                         << " z: " << saved_coords[key].z
                         << " angle: " << saved_coords[key].angle;
                     api->Log(stream.str());
+                    api->ShowToast(stream.str());
                 }
 
                 // Recall position
@@ -59,6 +60,7 @@ DWORD WINAPI PatchThread(LPVOID) {
                         << " z: " << saved_coords[key].z
                         << " angle: " << saved_coords[key].angle;
                     api->Log(stream.str());
+                    api->ShowToast(stream.str());
                 }
 
             }

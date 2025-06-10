@@ -51,6 +51,7 @@ void __stdcall PhysicsLoop() {
             api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
             //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
             api->Log("Noclip enabled!");
+            api->ShowToast("Noclip enabled!");
         }
         else {
             api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
@@ -58,6 +59,7 @@ void __stdcall PhysicsLoop() {
             api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
             //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
             api->Log("Noclip disabled!");
+            api->ShowToast("Noclip disabled!");
         }
     }
 

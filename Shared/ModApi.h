@@ -58,6 +58,9 @@ extern std::string GameVersions[]; // Use this to get game versions as strings f
 typedef int(*GetGameVersionFunction)();
 
 
+typedef void(*ShowToastFunction)(const std::string& message);
+
+
 struct Inputs {
     uint32_t raw;
 
@@ -110,6 +113,8 @@ struct ModApi {
 
     GetGameVersionFunction GetGameVersion;
     GetInputsFunction GetInputs;
+
+    ShowToastFunction ShowToast;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

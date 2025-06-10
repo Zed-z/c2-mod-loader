@@ -35,8 +35,8 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
             switch (msg.wParam) {
             case 1: // TAB
 
-                showLog = !showLog;
-                api->WriteIniInt(L"GUI", L"ShowLog", (int)showLog);
+                showGui = !showGui;
+                api->WriteIniInt(L"GUI", L"ShowGui", (int)showGui);
 
                 break;
             }
@@ -61,6 +61,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
         guiEnabled = api->ReadIniBool(L"GUI", L"GuiEnabled", true);
         api->WriteIniBool(L"GUI", L"GuiEnabled", guiEnabled);
+
+        showGui = api->ReadIniBool(L"GUI", L"ShowGui", false);
+        api->WriteIniBool(L"GUI", L"ShowGui", showGui);
 
         showLog = api->ReadIniBool(L"GUI", L"ShowLog", false);
         api->WriteIniBool(L"GUI", L"ShowLog", showLog);

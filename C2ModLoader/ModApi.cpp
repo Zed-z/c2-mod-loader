@@ -438,6 +438,10 @@ Inputs GetInputs() {
     return result;
 }
 
+void ShowToast(const std::string& message) {
+    ImGuiShowToast(message);
+}
+
 
 // API
 ModApi g_ModApi = {
@@ -458,7 +462,8 @@ ModApi g_ModApi = {
     ReadIniString,
     WriteIniString,
     GetGameVersion,
-    GetInputs
+    GetInputs,
+    ShowToast
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

@@ -18,6 +18,9 @@ extern ModApi* api;
 
 // Variables for GUI
 ImGuiTextBuffer logBuffer;
+ImFont* toastFont = nullptr;
+
+bool showGui;
 bool showLog;
 
 static int width = 1000;
@@ -95,6 +98,14 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             ImGui_ImplWin32_Init(g_hWnd);
             ImGui_ImplDX11_Init(g_Device, g_Context);
 
+            // Set fonts
+            ImGuiIO& io = ImGui::GetIO();
+            io.Fonts->AddFontDefault();
+            io.FontDefault = io.Fonts->Fonts.back();
+
+            toastFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 32.0f);
+            
+
             if (g_hWnd && !oWndProc) {
                 oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
             }
@@ -105,26 +116,6 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
     }
 }
 
-// Display custom GUI
-void ImGuiDraw() {
-    ImGuiIO& io = ImGui::GetIO();
-
-    if (showLog) {
-        ImGui::Begin("Console Log");
-
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5f, io.DisplaySize.y - height - margin), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2((float)width, (float)height), ImGuiCond_Once);
-
-        ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-
-        ImGui::TextUnformatted(logBuffer.begin());
-        ImGui::SetScrollHereY(1.0f);
-
-        ImGui::EndChild();
-
-        ImGui::End();
-    }
-}
 
 // Hook Present()
 // re-init if needed
@@ -210,4 +201,111 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
     }
 
     return 0;
+}
+
+
+
+
+std::vector<Toast> g_ToastQueue;
+
+void ImGuiShowToast(const std::string& message, float duration) {
+    g_ToastQueue.push_back({ message, duration });
+}
+
+void RenderToasts() {
+
+    ImGuiIO& io = ImGui::GetIO();
+
+	float toastWidth = 330.0f;
+	float toastMargin = 10.0f;
+
+    float margin = 20.0f;
+    float padding = 20.0f;
+
+    float originX = io.DisplaySize.x - toastWidth - margin;
+    float originY = margin;
+    
+
+    for (size_t i = 0; i < g_ToastQueue.size(); ) {
+        Toast& toast = g_ToastQueue[i];
+        toast.timeRemaining -= io.DeltaTime;
+
+        // Fade out in the last 0.5 seconds
+        float alpha = 1.0f;
+        if (toast.timeRemaining < 0.5f)
+            alpha = toast.timeRemaining / 0.5f;
+
+        ImGui::SetNextWindowBgAlpha(alpha * 0.85f);
+        ImGui::SetNextWindowPos(ImVec2(originX, originY), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(toastWidth, 0), ImGuiCond_Always);
+
+        ImGuiWindowFlags flags =
+            ImGuiWindowFlags_NoDecoration
+            | ImGuiWindowFlags_AlwaysAutoResize
+            | ImGuiWindowFlags_NoSavedSettings
+            | ImGuiWindowFlags_NoFocusOnAppearing
+            | ImGuiWindowFlags_NoNav
+            | ImGuiWindowFlags_NoMove;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
+        ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
+
+        // Text with wrapping
+        ImGui::PushFont(toastFont);
+        ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
+        ImGui::TextUnformatted(toast.message.c_str());
+        ImGui::PopTextWrapPos();
+		ImGui::PopFont();
+
+        float toastHeight = ImGui::GetWindowSize().y;
+        ImGui::End();
+        ImGui::PopStyleVar();
+
+		// Add offset based on toast height
+        originY += toastHeight + toastMargin;
+
+        // Erase toast if needed
+        if (toast.timeRemaining <= 0.0f) {
+            g_ToastQueue.erase(g_ToastQueue.begin() + i);
+        }
+        else {
+            i++;
+        }
+    }
+}
+
+// Display custom GUI
+void ImGuiDraw() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (showGui) {
+        if (showLog) {
+            ImGui::Begin("Console Log");
+
+            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5f, io.DisplaySize.y - height - margin), ImGuiCond_Once);
+            ImGui::SetNextWindowSize(ImVec2((float)width, (float)height), ImGuiCond_Once);
+
+            ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+
+            ImGui::TextUnformatted(logBuffer.begin());
+            ImGui::SetScrollHereY(1.0f);
+
+            ImGui::EndChild();
+
+            ImGui::End();
+        }
+
+        // Main menu bar
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("Mod Loader")) {
+                ImGui::MenuItem("Show Log", nullptr, &showLog);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+    }
+    
+    // Toast notifications
+    RenderToasts();
+
 }
