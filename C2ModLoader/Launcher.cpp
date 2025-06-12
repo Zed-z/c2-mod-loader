@@ -39,10 +39,11 @@ constexpr int launcher_window_width = 460;
 constexpr int launcher_window_height = 360;
 constexpr int launcher_listview_height = launcher_window_height - launcher_launch_button_height - launcher_margin * 3;
 
-#define COL_MOD_NAME 0
-#define COL_VERSION 1
-#define COL_AUTHOR 2
-#define COL_CONFIGURE 3
+#define COL_CHECKBOX 0 // Dummy column for checkboxes so that they don't trigger the popup menu
+#define COL_MOD_NAME 1
+#define COL_VERSION 2
+#define COL_AUTHOR 3
+#define COL_CONFIGURE 4
 
 LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
@@ -77,8 +78,13 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         col.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 
         // Column: Mod Name
+        col.pszText = (LPWSTR)L"";
+        col.cx = 20;
+        col.iSubItem = COL_CHECKBOX;
+        ListView_InsertColumn(g_listView, COL_CHECKBOX, &col);
+
         col.pszText = (LPWSTR)L"Mod (Click for more info)";
-        col.cx = 200;
+        col.cx = 180;
         col.iSubItem = COL_MOD_NAME;
         ListView_InsertColumn(g_listView, COL_MOD_NAME, &col);
 
@@ -90,7 +96,7 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 
         // Column: Author
         col.pszText = (LPWSTR)L"Author";
-        col.cx = 120;
+        col.cx = 110;
         col.iSubItem = COL_AUTHOR;
         ListView_InsertColumn(g_listView, COL_AUTHOR, &col);
 
@@ -107,10 +113,13 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             LVITEMW item = {};
             item.mask = LVIF_TEXT;
             item.iItem = (int)i;
-            std::wstring modName = mod.getName();
-            item.pszText = const_cast<LPWSTR>(modName.c_str());
+            item.pszText = const_cast<LPWSTR>(L"");
 
             ListView_InsertItem(g_listView, &item);
+
+            // Column: Version
+            std::wstring modName = mod.getName();
+            ListView_SetItemText(g_listView, (int)i, COL_MOD_NAME, const_cast<LPWSTR>(modName.c_str()));
 
             // Column: Version
             ListView_SetItemText(g_listView, (int)i, COL_VERSION, const_cast<LPWSTR>(mod.info.fileVersion.c_str()));
@@ -230,6 +239,9 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
                 // Provide the full text for the hovered cell
                 std::wstring tipText;
                 switch (col) {
+                case COL_CHECKBOX:
+                    tipText = L"";
+                    break;
                 case COL_MOD_NAME:
                     tipText = mods[row].getName();
                     break;
