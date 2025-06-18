@@ -275,6 +275,13 @@ void RenderToasts() {
 }
 
 // Display custom GUI
+std::vector<MenuAction> menuActions;
+
+bool ImGuiRegisterMenuAction(const std::string& category, const std::string& label, MenuActionCallback callback) {
+    menuActions.push_back({ category, label, callback });
+    return true;
+}
+
 void ImGuiDraw() {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -299,6 +306,17 @@ void ImGuiDraw() {
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Mod Loader")) {
                 ImGui::MenuItem("Show Log", nullptr, &showLog);
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Mods")) {
+                for (const auto& action : menuActions) {
+                    if (ImGui::BeginMenu(action.category.c_str())) {
+                        if (ImGui::MenuItem(action.label.c_str())) {
+                            if (action.callback) action.callback();
+                        }
+                        ImGui::EndMenu();
+                    }
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();

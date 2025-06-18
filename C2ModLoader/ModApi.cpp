@@ -442,6 +442,14 @@ void ShowToast(const std::string& message) {
     ImGuiShowToast(message);
 }
 
+bool RegisterMenuAction(const std::string& label, MenuActionCallback callback) {
+    Mod* mod = nullptr;
+    while (mod == nullptr) {
+        mod = GetMod(); // Wait until handle is ready, call from another thread - can cause lockups!
+    }
+    return ImGuiRegisterMenuAction(WStringToString(mod->getName()), label, callback);
+}
+
 
 // API
 ModApi g_ModApi = {
@@ -463,7 +471,8 @@ ModApi g_ModApi = {
     WriteIniString,
     GetGameVersion,
     GetInputs,
-    ShowToast
+    ShowToast,
+    RegisterMenuAction
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

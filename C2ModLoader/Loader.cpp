@@ -81,11 +81,11 @@ std::vector<Mod> GetMods() {
     return mods;
 }
 
-void LoadMods(std::vector<Mod> mods) {
+void LoadMods(std::vector<Mod>& mods) {
 
     std::vector<Mod> failedMods;
 
-    for (auto mod : mods) {
+    for (auto& mod : mods) {
         if (!mod.enabled) {
             api->Log("Skipping mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ")");
             continue;
@@ -93,7 +93,8 @@ void LoadMods(std::vector<Mod> mods) {
 
         HMODULE loaded = LoadLibraryW(mod.path.path.c_str());
         if (loaded) {
-            api->Log("Loaded mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ")");
+            mod.handle = loaded;
+            api->Log("Loaded mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ") - handle: " + std::to_string((int)mod.handle));
         }
         else {
             DWORD err = GetLastError();

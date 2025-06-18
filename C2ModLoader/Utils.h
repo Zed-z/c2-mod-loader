@@ -111,18 +111,6 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
 }
 
 
-inline HMODULE GetCallingModule() {
-    HMODULE caller = nullptr;
-    GetModuleHandleExA(
-        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-        (LPCSTR)_ReturnAddress(),
-        &caller
-    );
-    return caller;
-}
-
-
 inline void ClearLog() {
 
     wchar_t modulePath[MAX_PATH];

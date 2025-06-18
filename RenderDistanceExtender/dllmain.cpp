@@ -24,6 +24,41 @@ void RenderApply() {
 
 }
 
+void __stdcall toggleExtender() {
+    is_active = !is_active;
+    api->WriteIniInt(L"Config", L"Enabled", is_active);
+    RenderApply();
+
+    if (is_active) {
+        api->Log("Render distance extended!");
+        api->ShowToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
+    }
+    else {
+        api->Log("Render distance reverted!");
+        api->ShowToast("Render distance reverted!");
+    }
+}
+
+void __stdcall decreaseExtender() {
+    if (is_active && render_multiplier > 1) {
+        render_multiplier--;
+        RenderApply();
+        api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
+        api->Log("Render distance decreased to: x" + std::to_string(render_multiplier));
+        api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
+    }
+}
+
+void __stdcall increaseExtender() {
+    if (is_active && render_multiplier < RENDER_MULTIPLER_LIMIT) {
+        render_multiplier++;
+        RenderApply();
+        api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
+        api->Log("Render distance increased to: x" + std::to_string(render_multiplier));
+        api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
+    }
+}
+
 static DWORD WINAPI HotkeyThread(LPVOID) {
     RegisterHotKey(NULL, 1, 0, VK_F1);
     RegisterHotKey(NULL, 2, 0, VK_OEM_MINUS);
@@ -34,41 +69,15 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
         if (msg.message == WM_HOTKEY) {
             switch (msg.wParam) {
             case 1: // F1
-
-                is_active = !is_active;
-                api->WriteIniInt(L"Config", L"Enabled", is_active);
-                RenderApply();
-
-                if (is_active) {
-                    api->Log("Render distance extended!");
-                    api->ShowToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
-                }
-                else {
-                    api->Log("Render distance reverted!");
-                    api->ShowToast("Render distance reverted!");
-                }
+                toggleExtender();
                 break;
 
             case 2: // Minus
-
-                if (is_active && render_multiplier > 1) {
-                    render_multiplier--;
-                    RenderApply();
-                    api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-                    api->Log("Render distance decreased to: x" + std::to_string(render_multiplier));
-                    api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
-                }
+                decreaseExtender();
                 break;
 
             case 3: // Plus
-
-                if (is_active && render_multiplier < RENDER_MULTIPLER_LIMIT) {
-                    render_multiplier++;
-                    RenderApply();
-                    api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-                    api->Log("Render distance increased to: x" + std::to_string(render_multiplier));
-                    api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
-                }
+                increaseExtender();
                 break;
             }
         }
@@ -98,6 +107,15 @@ void __stdcall OnDistancesWritten() {
 }
 
 
+
+DWORD WINAPI ModInitThread(LPVOID) {
+    api->RegisterMenuAction("Toggle Extender", toggleExtender);
+    api->RegisterMenuAction("Decrease Distance", decreaseExtender);
+    api->RegisterMenuAction("Increate Distance", increaseExtender);
+    return TRUE;
+}
+
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         api = LoadSharedModApi();
@@ -120,6 +138,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
+        CreateThread(nullptr, 0, ModInitThread, nullptr, 0, nullptr);
     }
     return TRUE;
 }

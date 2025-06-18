@@ -61,6 +61,10 @@ typedef int(*GetGameVersionFunction)();
 typedef void(*ShowToastFunction)(const std::string& message);
 
 
+typedef void(__stdcall* MenuActionCallback)();
+typedef bool(*RegisterMenuActionFunction)(const std::string& label, MenuActionCallback callback);
+
+
 struct Inputs {
     uint32_t raw;
 
@@ -115,6 +119,7 @@ struct ModApi {
     GetInputsFunction GetInputs;
 
     ShowToastFunction ShowToast;
+    RegisterMenuActionFunction RegisterMenuAction;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();
