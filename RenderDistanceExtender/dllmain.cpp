@@ -100,7 +100,7 @@ void __stdcall OnDistancesWritten() {
     base_fog_distance = *(int*)(base + 0xB7B48);
     base_render_distance = *(int*)(base + 0xB7B18);
 
-    api->Log("Render distance changed to: " + std::to_string(base_render_distance));
+    api->LogDebug("Render distance changed to: " + std::to_string(base_render_distance));
 
     // Reapply change
     RenderApply();

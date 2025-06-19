@@ -105,22 +105,22 @@ void __stdcall PhysicsStep() {
 
         // Started moving
         if (anyInput && !anyInputPrev) {
-			api->Log("Input started: " + InputsString(inputs));
-			api->Log("Analog strength: " + std::to_string(analogStrength));
+			api->LogDebug("Input started: " + InputsString(inputs));
+			api->LogDebug("Analog strength: " + std::to_string(analogStrength));
 
             // Keyboard is used - analog strength is 181
             if (analogStrength == 181) {
-				api->Log("Using keyboard controls (Limbus Mode)");
+				api->LogDebug("Using keyboard controls (Limbus Mode)");
                 SetControlScheme(CTRL_TYPE_2);
             }
 
             // Analog stick is being used
             else {
-				api->Log("Using analog controls (Limbus Mode)");
+				api->LogDebug("Using analog controls (Limbus Mode)");
                 SetControlScheme(CTRL_TYPE_1);
             }
 
-            api->Log("Control scheme is: " + ControlSchemeNames[GetControlScheme()]);
+            api->LogDebug("Control scheme is: " + ControlSchemeNames[GetControlScheme()]);
 
         }
     }

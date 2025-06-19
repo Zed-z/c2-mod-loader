@@ -22,6 +22,10 @@ ImFont* toastFont = nullptr;
 
 bool showGui;
 bool showLog;
+bool logMessages;
+bool logDebug;
+bool logWarnings;
+bool logErrors;
 
 static int width = 1000;
 static int height = 300;
@@ -305,7 +309,21 @@ void ImGuiDraw() {
         // Main menu bar
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Mod Loader")) {
-                ImGui::MenuItem("Show Log", nullptr, &showLog);
+                if (ImGui::MenuItem("Show Log", nullptr, &showLog)) {
+                    api->WriteIniBool(L"GUI", L"ShowLog", showLog);
+                }
+                if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
+                    api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+                }
+                if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
+                    api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
+                }
+                if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
+                    api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
+                }
+                if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
+                    api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Mods")) {

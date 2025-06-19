@@ -68,6 +68,18 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         showLog = api->ReadIniBool(L"GUI", L"ShowLog", false);
         api->WriteIniBool(L"GUI", L"ShowLog", showLog);
 
+        logMessages = api->ReadIniBool(L"Logging", L"LogMessages", true);
+        api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+
+        logDebug = api->ReadIniBool(L"Logging", L"LogDebug", false);
+        api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
+
+        logWarnings = api->ReadIniBool(L"Logging", L"LogWarnings", false);
+        api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
+
+        logErrors = api->ReadIniBool(L"Logging", L"LogErrors", true);
+        api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+
         freeMouse = api->ReadIniBool(L"Mouse", L"FreeMouse", true);
         api->WriteIniBool(L"Mouse", L"FreeMouse", freeMouse);
 

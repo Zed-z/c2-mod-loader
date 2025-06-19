@@ -25,8 +25,7 @@
 #include <intrin.h>
 #pragma intrinsic(_ReturnAddress)
 
-
-void Log(const std::string& message) {
+void LogRaw(const std::string& message, const std::string& prefix = "") {
 
     // Get module path
     HMODULE caller = GetCallingModule();
@@ -49,7 +48,7 @@ void Log(const std::string& message) {
 
     // Format and write the timestamp and message
     std::wstringstream msg;
-    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << pathInfo.name << L"] " << StringToWString(message) << std::endl;
+    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << StringToWString(prefix)  << pathInfo.name << L"] " << StringToWString(message) << std::endl;
 
     // Write the log to file and buffer
     log << msg.str();
@@ -57,6 +56,29 @@ void Log(const std::string& message) {
 
     // Close log
     log.close();
+}
+
+void Log(const std::string& message) {
+    if (!logMessages) return;
+    LogRaw(message);
+}
+
+
+void LogDebug(const std::string& message) {
+    if (!logDebug) return;
+    LogRaw(message, "DEBUG | ");
+}
+
+
+void LogWarning(const std::string& message) {
+    if (!logDebug) return;
+    LogRaw(message, "WARNING | ");
+}
+
+
+void LogError(const std::string& message) {
+    if (!logDebug) return;
+    LogRaw(message, "ERROR | ");
 }
 
 
@@ -454,6 +476,9 @@ bool RegisterMenuAction(const std::string& label, MenuActionCallback callback) {
 // API
 ModApi g_ModApi = {
     Log,
+    LogDebug,
+    LogWarning,
+    LogError,
     ResolveAddress,
     FindPattern,
     AddressSetInt,
