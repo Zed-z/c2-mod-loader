@@ -8,9 +8,8 @@ void __stdcall helloWorld() {
     api->ShowToast("Hello world!");
 }
 
-DWORD WINAPI ModInitThread(LPVOID) {
-    api->RegisterMenuAction("Hello World", helloWorld);
-    return TRUE;
+MenuActionRegistration __stdcall helloWorldRegistration() {
+    return { "Hello World", helloWorld, true };
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
@@ -20,8 +19,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         api->Log("Hello world!");
 
+		// Register menu action
+        api->RegisterMenuAction(hModule, helloWorldRegistration);
+
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, 0, ModInitThread, nullptr, 0, nullptr);
     }
     return TRUE;
 }

@@ -64,8 +64,13 @@ typedef int(*GetGameVersionFunction)();
 typedef void(*ShowToastFunction)(const std::string& message);
 
 
-typedef void(__stdcall* MenuActionCallback)();
-typedef bool(*RegisterMenuActionFunction)(const std::string& label, MenuActionCallback callback);
+struct MenuActionRegistration {
+    std::string label;
+    void(__stdcall* callback)();
+    bool enabled;
+};
+typedef MenuActionRegistration(__stdcall* MenuActionRegistrationFunction)();
+typedef bool(*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
 
 
 struct Inputs {

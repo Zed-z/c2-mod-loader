@@ -29,10 +29,9 @@ void ImGuiShowToast(const std::string& message, float duration = 2.0f);
 
 // Menu actions
 struct MenuAction {
-    std::string category;
-    std::string label;
-    MenuActionCallback callback;
+	HMODULE handle;
+    MenuActionRegistrationFunction function;
 };
-extern std::vector<MenuAction> menuActions;
 
-bool ImGuiRegisterMenuAction(const std::string& category, const std::string& label, MenuActionCallback callback);
+extern std::vector<MenuAction> menuActionRegistrations;
+bool ImGuiRegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration);

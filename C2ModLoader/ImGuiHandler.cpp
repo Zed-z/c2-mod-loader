@@ -1,6 +1,8 @@
 #pragma once
 #include "ModApi.h"
 #include "ImGuiHandler.h"
+#include "Utils.h"
+#include "Loader.h"
 
 #include <Windows.h>
 
@@ -279,10 +281,10 @@ void RenderToasts() {
 }
 
 // Display custom GUI
-std::vector<MenuAction> menuActions;
+std::vector<MenuAction> menuActionRegistrations;
 
-bool ImGuiRegisterMenuAction(const std::string& category, const std::string& label, MenuActionCallback callback) {
-    menuActions.push_back({ category, label, callback });
+bool ImGuiRegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
+    menuActionRegistrations.push_back({ handle, registration });
     return true;
 }
 
@@ -327,14 +329,31 @@ void ImGuiDraw() {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Mods")) {
-                for (const auto& action : menuActions) {
-                    if (ImGui::BeginMenu(action.category.c_str())) {
+
+                // Print registrations
+				api->LogDebug("Menu Action Registrations:");
+                for (const auto& registration : menuActionRegistrations) {
+                    api->LogDebug(WStringToString(GetModByHandle(registration.handle)->getName()).c_str());
+                }
+
+                for (const auto& registration : menuActionRegistrations) {
+					Mod* mod = GetModByHandle(registration.handle);
+					std::string category = WStringToString(mod->getName());
+
+                    if (ImGui::BeginMenu(category.c_str())) {
+
+                        MenuActionRegistration action = registration.function();
+
+                        ImGui::BeginDisabled(!action.enabled);
                         if (ImGui::MenuItem(action.label.c_str())) {
                             if (action.callback) action.callback();
                         }
+						ImGui::EndDisabled();
+
                         ImGui::EndMenu();
                     }
-                }
+				}
+
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();

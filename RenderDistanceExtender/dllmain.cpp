@@ -107,12 +107,16 @@ void __stdcall OnDistancesWritten() {
 }
 
 
+MenuActionRegistration __stdcall toggleExtenderRegistration() {
+	return { is_active ? "Disable Extender" : "Enable Extender", toggleExtender, true };
+}
 
-DWORD WINAPI ModInitThread(LPVOID) {
-    api->RegisterMenuAction("Toggle Extender", toggleExtender);
-    api->RegisterMenuAction("Decrease Distance", decreaseExtender);
-    api->RegisterMenuAction("Increate Distance", increaseExtender);
-    return TRUE;
+MenuActionRegistration __stdcall decreaseExtenderRegistration() {
+    return { "Decrease Distance", decreaseExtender, is_active && render_multiplier > 1 };
+}
+
+MenuActionRegistration __stdcall increaseExtenderRegistration() {
+    return { "Increate Distance", increaseExtender, is_active && render_multiplier < RENDER_MULTIPLER_LIMIT };
 }
 
 
@@ -136,9 +140,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         render_multiplier = api->ReadIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
 
+        // Register menu actions
+        api->RegisterMenuAction(hModule, toggleExtenderRegistration);
+        api->RegisterMenuAction(hModule, decreaseExtenderRegistration);
+        api->RegisterMenuAction(hModule, increaseExtenderRegistration);
+
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
-        CreateThread(nullptr, 0, ModInitThread, nullptr, 0, nullptr);
     }
     return TRUE;
 }

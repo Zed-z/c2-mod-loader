@@ -464,12 +464,8 @@ void ShowToast(const std::string& message) {
     ImGuiShowToast(message);
 }
 
-bool RegisterMenuAction(const std::string& label, MenuActionCallback callback) {
-    Mod* mod = nullptr;
-    while (mod == nullptr) {
-        mod = GetMod(); // Wait until handle is ready, call from another thread - can cause lockups!
-    }
-    return ImGuiRegisterMenuAction(WStringToString(mod->getName()), label, callback);
+bool RegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
+    return ImGuiRegisterMenuAction(handle, registration);
 }
 
 
