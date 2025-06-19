@@ -66,6 +66,7 @@ typedef void(*ShowToastFunction)(const std::string& message);
 
 struct MenuActionRegistration {
     std::string label;
+    std::string tooltip;
     void(__stdcall* callback)();
     bool enabled;
 };

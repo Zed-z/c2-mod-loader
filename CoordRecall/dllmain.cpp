@@ -102,9 +102,9 @@ void __stdcall slot0save() { positionSave(0); }
 void __stdcall slot0load() { positionLoad(0); }
 MenuActionRegistration __stdcall slot0registration() {
     if (saved_coords[0].saved) {
-        return { "Recall Slot 0", slot0load, true };
+        return { "Recall Slot 0", "Set your position from this slot.", slot0load, true};
     } else {
-        return { "Save Slot 0", slot0save, true };
+        return { "Save Slot 0", "Save your position to this slot.", slot0save, true };
 	}
 }
 
@@ -112,10 +112,10 @@ void __stdcall slot1save() { positionSave(1); }
 void __stdcall slot1load() { positionLoad(1); }
 MenuActionRegistration __stdcall slot1registration() {
     if (saved_coords[1].saved) {
-        return { "Recall Slot 1", slot1load, true };
+        return { "Recall Slot 1", "Set your position from this slot.", slot1load, true };
     }
     else {
-        return { "Save Slot 1", slot1save, true };
+        return { "Save Slot 1", "Save your position to this slot.", slot1save, true };
     }
 }
 
@@ -123,10 +123,10 @@ void __stdcall slot2save() { positionSave(2); }
 void __stdcall slot2load() { positionLoad(2); }
 MenuActionRegistration __stdcall slot2registration() {
     if (saved_coords[2].saved) {
-        return { "Recall Slot 2", slot2load, true };
+        return { "Recall Slot 2", "Set your position from this slot.", slot2load, true };
     }
     else {
-        return { "Save Slot 2", slot2save, true };
+        return { "Save Slot 2", "Save your position to this slot.", slot2save, true };
     }
 }
 
@@ -134,10 +134,10 @@ void __stdcall slot3save() { positionSave(3); }
 void __stdcall slot3load() { positionLoad(3); }
 MenuActionRegistration __stdcall slot3registration() {
     if (saved_coords[3].saved) {
-        return { "Recall Slot 3", slot3load, true };
+        return { "Recall Slot 3", "Set your position from this slot.", slot3load, true };
     }
     else {
-        return { "Save Slot 3", slot3save, true };
+        return { "Save Slot 3", "Save your position to this slot.", slot3save, true };
     }
 }
 
@@ -145,10 +145,10 @@ void __stdcall slot4save() { positionSave(4); }
 void __stdcall slot4load() { positionLoad(4); }
 MenuActionRegistration __stdcall slot4registration() {
     if (saved_coords[4].saved) {
-        return { "Recall Slot 4", slot4load, true };
+        return { "Recall Slot 4", "Set your position from this slot.", slot4load, true };
     }
     else {
-        return { "Save Slot 4", slot4save, true };
+        return { "Save Slot 4", "Save your position to this slot.", slot4save, true };
     }
 }
 
@@ -156,10 +156,10 @@ void __stdcall slot5save() { positionSave(5); }
 void __stdcall slot5load() { positionLoad(5); }
 MenuActionRegistration __stdcall slot5registration() {
     if (saved_coords[5].saved) {
-        return { "Recall Slot 5", slot5load, true };
+        return { "Recall Slot 5", "Set your position from this slot.", slot5load, true };
     }
     else {
-        return { "Save Slot 5", slot5save, true };
+        return { "Save Slot 5", "Save your position to this slot.", slot5save, true };
     }
 }
 
@@ -167,10 +167,10 @@ void __stdcall slot6save() { positionSave(6); }
 void __stdcall slot6load() { positionLoad(6); }
 MenuActionRegistration __stdcall slot6registration() {
     if (saved_coords[6].saved) {
-        return { "Recall Slot 6", slot6load, true };
+        return { "Recall Slot 6", "Set your position from this slot.", slot6load, true };
     }
     else {
-        return { "Save Slot 6", slot6save, true };
+        return { "Save Slot 6", "Save your position to this slot.", slot6save, true };
     }
 }
 
@@ -178,10 +178,10 @@ void __stdcall slot7save() { positionSave(7); }
 void __stdcall slot7load() { positionLoad(7); }
 MenuActionRegistration __stdcall slot7registration() {
     if (saved_coords[7].saved) {
-        return { "Recall Slot 7", slot7load, true };
+        return { "Recall Slot 7", "Set your position from this slot.", slot7load, true };
     }
     else {
-        return { "Save Slot 7", slot7save, true };
+        return { "Save Slot 7", "Save your position to this slot.", slot7save, true };
     }
 }
 
@@ -189,10 +189,10 @@ void __stdcall slot8save() { positionSave(8); }
 void __stdcall slot8load() { positionLoad(8); }
 MenuActionRegistration __stdcall slot8registration() {
     if (saved_coords[8].saved) {
-        return { "Recall Slot 8", slot8load, true };
+        return { "Recall Slot 8", "Set your position from this slot.", slot8load, true };
     }
     else {
-        return { "Save Slot 8", slot8save, true };
+        return { "Save Slot 8", "Save your position to this slot.", slot8save, true };
     }
 }
 
@@ -200,10 +200,10 @@ void __stdcall slot9save() { positionSave(9); }
 void __stdcall slot9load() { positionLoad(9); }
 MenuActionRegistration __stdcall slot9registration() {
     if (saved_coords[9].saved) {
-        return { "Recall Slot 9", slot9load, true };
+        return { "Recall Slot 9", "Set your position from this slot.", slot9load, true };
     }
     else {
-        return { "Save Slot 9", slot9save, true };
+        return { "Save Slot 9", "Save your position to this slot.", slot9save, true };
     }
 }
 

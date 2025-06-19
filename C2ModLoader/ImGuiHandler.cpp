@@ -348,6 +348,9 @@ void ImGuiDraw() {
                         if (ImGui::MenuItem(action.label.c_str())) {
                             if (action.callback) action.callback();
                         }
+                        if (ImGui::IsItemHovered()) {
+							ImGui::SetTooltip(action.tooltip.c_str());
+                        }
 						ImGui::EndDisabled();
 
                         ImGui::EndMenu();

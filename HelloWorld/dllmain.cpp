@@ -9,7 +9,7 @@ void __stdcall helloWorld() {
 }
 
 MenuActionRegistration __stdcall helloWorldRegistration() {
-    return { "Hello World", helloWorld, true };
+    return { "Hello World", "Show a toast notification.", helloWorld, true};
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {

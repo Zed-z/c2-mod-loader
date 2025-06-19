@@ -108,15 +108,15 @@ void __stdcall OnDistancesWritten() {
 
 
 MenuActionRegistration __stdcall toggleExtenderRegistration() {
-	return { is_active ? "Disable Extender" : "Enable Extender", toggleExtender, true };
+	return { is_active ? "Disable Extender" : "Enable Extender", is_active ? "Disable the extender." : "Enable the extender.", toggleExtender, true };
 }
 
 MenuActionRegistration __stdcall decreaseExtenderRegistration() {
-    return { "Decrease Distance", decreaseExtender, is_active && render_multiplier > 1 };
+    return { "Decrease Distance", "Decrease render distance (currently: x" + std::to_string(render_multiplier) + ")", decreaseExtender, is_active && render_multiplier > 1};
 }
 
 MenuActionRegistration __stdcall increaseExtenderRegistration() {
-    return { "Increate Distance", increaseExtender, is_active && render_multiplier < RENDER_MULTIPLER_LIMIT };
+    return { "Increate Distance", "Increase render distance (currently: x" + std::to_string(render_multiplier) + ")", increaseExtender, is_active && render_multiplier < RENDER_MULTIPLER_LIMIT };
 }
 
 
