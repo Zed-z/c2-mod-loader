@@ -7,6 +7,7 @@
 #include "Resource.h"
 #include "Launcher.h"
 #include "Loader.h"
+#include "CheatsManager.h"
 
 #include <Windows.h>
 #include <fstream>
@@ -118,6 +119,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
         // Initialize API
         ApiSetup();
+
+        // Initialize cheats
+        SetupCheats();
 
         // Call other components
         DisableThreadLibraryCalls(hModule);

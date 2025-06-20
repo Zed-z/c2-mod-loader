@@ -6,6 +6,7 @@
 
 #include "ModApi.h"
 #include "imgui.h"
+#include "Loader.h"
 
 extern ImGuiTextBuffer logBuffer;
 extern ImFont* toastFont;

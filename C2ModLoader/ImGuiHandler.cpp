@@ -3,6 +3,7 @@
 #include "ImGuiHandler.h"
 #include "Utils.h"
 #include "Loader.h"
+#include "CheatsManager.h"
 
 #include <Windows.h>
 
@@ -333,13 +334,48 @@ void ImGuiDraw() {
                 }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Mods")) {
 
-                // Print registrations
-				api->LogDebug("Menu Action Registrations:");
-                for (const auto& registration : menuActionRegistrations) {
-                    api->LogDebug(WStringToString(GetModByHandle(registration.handle)->getName()).c_str());
+            if (ImGui::BeginMenu("Cheats")) {
+
+                if (ImGui::MenuItem("Debug Menu", nullptr, &cheatsDebugMenu)) {
+					setDebugMenu(cheatsDebugMenu);
                 }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Press [Inv Prev + Inv Next] for a debug menu.");
+                }
+
+                if (ImGui::MenuItem("Position Bar", nullptr, &cheatsPositionBar)) {
+                    setPositionBar(cheatsPositionBar);
+                }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Press [F7] for position bar.");
+                }
+
+                if (ImGui::MenuItem("Invulnerability", nullptr, &cheatsInvulnerability)) {
+                    setInvulnerability(cheatsInvulnerability);
+                }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Never take any damage.");
+                }
+
+                if (ImGui::MenuItem("Bonus Crystals", nullptr, &cheatsBonusCrystals)) {
+                    setBonusCrystals(cheatsBonusCrystals);
+                }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Press [Inv Next + Attack] for 100 crystals.");
+                }
+
+                if (ImGui::MenuItem("Music Select", nullptr, &cheatsMusicSelect)) {
+                    setMusicSelect(cheatsMusicSelect);
+                }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Unlocks music select in sound options.");
+                }
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Mods")) {
 
                 for (const auto& registration : menuActionRegistrations) {
 					Mod* mod = GetModByHandle(registration.handle);
@@ -364,6 +400,7 @@ void ImGuiDraw() {
 
                 ImGui::EndMenu();
             }
+
             ImGui::EndMainMenuBar();
         }
     }

@@ -163,6 +163,7 @@ mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPa
   <ItemGroup>
     <ClCompile Include="..\Shared\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="..\Shared\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="CheatsManager.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ImGuiHandler.cpp" />
     <ClCompile Include="Launcher.cpp" />
@@ -174,6 +175,7 @@ mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPa
     <ClInclude Include="..\Shared\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="..\Shared\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\Shared\ModApi.h" />
+    <ClInclude Include="CheatsManager.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="ImGuiHandler.h" />
     <ClInclude Include="Launcher.h" />
