@@ -17,6 +17,17 @@ struct SavedCoords {
     int y;
     int z;
     int angle;
+
+    std::string toString(bool showAngle = false) const {
+        std::ostringstream stream;
+
+        stream << "x:" << x << ",y:" << y << ",z:" << z;
+        if (showAngle) {
+            stream << ",angle:" << angle;
+        }
+
+        return stream.str();
+	}
 };
 
 SavedCoords saved_coords[KEY_COUNT];
@@ -29,13 +40,8 @@ void __stdcall positionSave(int key) {
     saved_coords[key].angle = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE));
     saved_coords[key].saved = true;
 
-    std::ostringstream stream;
-    stream << "Saved position x: " << saved_coords[key].x
-        << " y: " << saved_coords[key].y
-        << " z: " << saved_coords[key].z
-        << " angle: " << saved_coords[key].angle;
-    api->Log(stream.str());
-    api->ShowToast(stream.str());
+    api->ShowToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
+    api->Log("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
 void __stdcall positionLoad(int key) {
@@ -46,13 +52,8 @@ void __stdcall positionLoad(int key) {
     api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_Z), saved_coords[key].z);
     api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE), saved_coords[key].angle);
 
-    std::ostringstream stream;
-    stream << "Recalled position x: " << saved_coords[key].x
-        << " y: " << saved_coords[key].y
-        << " z: " << saved_coords[key].z
-        << " angle: " << saved_coords[key].angle;
-    api->Log(stream.str());
-    api->ShowToast(stream.str());
+    api->ShowToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
+    api->Log("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
 void __stdcall positionClear(int key) {
@@ -62,6 +63,19 @@ void __stdcall positionClear(int key) {
 
     std::ostringstream stream;
     stream << "Cleared position!";
+    api->Log(stream.str());
+    api->ShowToast(stream.str());
+}
+
+void __stdcall positionClearAll() {
+    for (int i = 0; i < KEY_COUNT; i++) {
+        if (saved_coords[i].saved) {
+            saved_coords[i].saved = false;
+        }
+    }
+
+    std::ostringstream stream;
+    stream << "Cleared all positions!";
     api->Log(stream.str());
     api->ShowToast(stream.str());
 }
@@ -98,113 +112,31 @@ DWORD WINAPI PatchThread(LPVOID) {
 }
 
 
-void __stdcall slot0save() { positionSave(0); }
-void __stdcall slot0load() { positionLoad(0); }
-MenuActionRegistration __stdcall slot0registration() {
-    if (saved_coords[0].saved) {
-        return { "Recall Slot 0", "Set your position from this slot.", slot0load, true};
-    } else {
-        return { "Save Slot 0", "Save your position to this slot.", slot0save, true };
-	}
+#define DEFINE_SLOT_FUNCS(N) \
+void __stdcall slot##N##save() { positionSave(N); } \
+void __stdcall slot##N##load() { positionLoad(N); } \
+MenuActionRegistration __stdcall slot##N##registration() { \
+    if (saved_coords[N].saved) { \
+        return { "Recall Slot " #N " - " + saved_coords[N].toString(), "Set your position from this slot.", slot##N##load, true }; \
+    } else { \
+        return { "Save Slot " #N " - EMPTY", "Save your position to this slot.", slot##N##save, true }; \
+    } \
 }
 
-void __stdcall slot1save() { positionSave(1); }
-void __stdcall slot1load() { positionLoad(1); }
-MenuActionRegistration __stdcall slot1registration() {
-    if (saved_coords[1].saved) {
-        return { "Recall Slot 1", "Set your position from this slot.", slot1load, true };
-    }
-    else {
-        return { "Save Slot 1", "Save your position to this slot.", slot1save, true };
-    }
-}
+DEFINE_SLOT_FUNCS(0)
+DEFINE_SLOT_FUNCS(1)
+DEFINE_SLOT_FUNCS(2)
+DEFINE_SLOT_FUNCS(3)
+DEFINE_SLOT_FUNCS(4)
+DEFINE_SLOT_FUNCS(5)
+DEFINE_SLOT_FUNCS(6)
+DEFINE_SLOT_FUNCS(7)
+DEFINE_SLOT_FUNCS(8)
+DEFINE_SLOT_FUNCS(9)
 
-void __stdcall slot2save() { positionSave(2); }
-void __stdcall slot2load() { positionLoad(2); }
-MenuActionRegistration __stdcall slot2registration() {
-    if (saved_coords[2].saved) {
-        return { "Recall Slot 2", "Set your position from this slot.", slot2load, true };
-    }
-    else {
-        return { "Save Slot 2", "Save your position to this slot.", slot2save, true };
-    }
-}
 
-void __stdcall slot3save() { positionSave(3); }
-void __stdcall slot3load() { positionLoad(3); }
-MenuActionRegistration __stdcall slot3registration() {
-    if (saved_coords[3].saved) {
-        return { "Recall Slot 3", "Set your position from this slot.", slot3load, true };
-    }
-    else {
-        return { "Save Slot 3", "Save your position to this slot.", slot3save, true };
-    }
-}
-
-void __stdcall slot4save() { positionSave(4); }
-void __stdcall slot4load() { positionLoad(4); }
-MenuActionRegistration __stdcall slot4registration() {
-    if (saved_coords[4].saved) {
-        return { "Recall Slot 4", "Set your position from this slot.", slot4load, true };
-    }
-    else {
-        return { "Save Slot 4", "Save your position to this slot.", slot4save, true };
-    }
-}
-
-void __stdcall slot5save() { positionSave(5); }
-void __stdcall slot5load() { positionLoad(5); }
-MenuActionRegistration __stdcall slot5registration() {
-    if (saved_coords[5].saved) {
-        return { "Recall Slot 5", "Set your position from this slot.", slot5load, true };
-    }
-    else {
-        return { "Save Slot 5", "Save your position to this slot.", slot5save, true };
-    }
-}
-
-void __stdcall slot6save() { positionSave(6); }
-void __stdcall slot6load() { positionLoad(6); }
-MenuActionRegistration __stdcall slot6registration() {
-    if (saved_coords[6].saved) {
-        return { "Recall Slot 6", "Set your position from this slot.", slot6load, true };
-    }
-    else {
-        return { "Save Slot 6", "Save your position to this slot.", slot6save, true };
-    }
-}
-
-void __stdcall slot7save() { positionSave(7); }
-void __stdcall slot7load() { positionLoad(7); }
-MenuActionRegistration __stdcall slot7registration() {
-    if (saved_coords[7].saved) {
-        return { "Recall Slot 7", "Set your position from this slot.", slot7load, true };
-    }
-    else {
-        return { "Save Slot 7", "Save your position to this slot.", slot7save, true };
-    }
-}
-
-void __stdcall slot8save() { positionSave(8); }
-void __stdcall slot8load() { positionLoad(8); }
-MenuActionRegistration __stdcall slot8registration() {
-    if (saved_coords[8].saved) {
-        return { "Recall Slot 8", "Set your position from this slot.", slot8load, true };
-    }
-    else {
-        return { "Save Slot 8", "Save your position to this slot.", slot8save, true };
-    }
-}
-
-void __stdcall slot9save() { positionSave(9); }
-void __stdcall slot9load() { positionLoad(9); }
-MenuActionRegistration __stdcall slot9registration() {
-    if (saved_coords[9].saved) {
-        return { "Recall Slot 9", "Set your position from this slot.", slot9load, true };
-    }
-    else {
-        return { "Save Slot 9", "Save your position to this slot.", slot9save, true };
-    }
+MenuActionRegistration __stdcall slotClearAllRegistration() {
+    return { "Clear All Slots", "Clear all saved positions.", positionClearAll, true };
 }
 
 
@@ -224,6 +156,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		api->RegisterMenuAction(hModule, slot7registration);
 		api->RegisterMenuAction(hModule, slot8registration);
 		api->RegisterMenuAction(hModule, slot9registration);
+		api->RegisterMenuAction(hModule, slotClearAllRegistration);
 
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);

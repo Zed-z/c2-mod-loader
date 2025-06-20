@@ -109,7 +109,7 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             io.Fonts->AddFontDefault();
             io.FontDefault = io.Fonts->Fonts.back();
 
-            toastFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 32.0f);
+            toastFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 24.0f);
             
 
             if (g_hWnd && !oWndProc) {

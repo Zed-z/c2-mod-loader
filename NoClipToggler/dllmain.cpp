@@ -30,6 +30,35 @@ int noclip_y = 0;
 
 Inputs inputs, prevInputs;
 
+
+void __stdcall toggleNoclip() {
+    noclip_enabled = !noclip_enabled;
+
+    auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
+    if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+        return;
+    }
+    noclip_y = api->AddressGetInt(addr);
+
+    if (noclip_enabled) {
+        api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
+        api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
+        api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
+        //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
+        api->Log("Noclip enabled!");
+        api->ShowToast("Noclip enabled!");
+    }
+    else {
+        api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
+        api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
+        api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
+        //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
+        api->Log("Noclip disabled!");
+        api->ShowToast("Noclip disabled!");
+    }
+}
+
+
 void __stdcall PhysicsLoop() {
 
     prevInputs = inputs;
@@ -37,30 +66,7 @@ void __stdcall PhysicsLoop() {
 
     // Toggle
     if (inputs.stepLeft && inputs.stepRight && !prevInputs.attack && inputs.attack) {
-        noclip_enabled = !noclip_enabled;
-
-        auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-        if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-            return;
-        }
-        noclip_y = api->AddressGetInt(addr);
-
-        if (noclip_enabled) {
-            api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
-            api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
-            api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
-            //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
-            api->Log("Noclip enabled!");
-            api->ShowToast("Noclip enabled!");
-        }
-        else {
-            api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
-            api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
-            api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
-            //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
-            api->Log("Noclip disabled!");
-            api->ShowToast("Noclip disabled!");
-        }
+        toggleNoclip();
     }
 
     // Go up and down
@@ -85,12 +91,19 @@ void __stdcall PhysicsLoop() {
 
 }
 
+
+MenuActionRegistration __stdcall toggleNoclipRegistration() {
+    return { noclip_enabled ? "Disable Noclip" : "Enable Noclip", noclip_enabled ? "Disable noclip." : "Enable noclip.", toggleNoclip, true};
+}
+
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         api = LoadSharedModApi();
         if (!api) return FALSE;
 
 		api->HookPhysics(PhysicsLoop);
+		api->RegisterMenuAction(hModule, toggleNoclipRegistration);
 
         DisableThreadLibraryCalls(hModule);
     }
