@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <vector>
 #include <string>
+#include <deque>
 
 #include "ModApi.h"
 #include "imgui.h"
@@ -23,7 +24,7 @@ struct Toast {
     std::string message;
     float timeRemaining;
 };
-extern std::vector<Toast> g_ToastQueue;
+extern std::deque<Toast> toastQueue;
 
 void ImGuiShowToast(const std::string& message, float duration = 2.0f);
 

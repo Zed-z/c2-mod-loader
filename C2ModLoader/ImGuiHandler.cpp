@@ -212,10 +212,10 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
 
 
 
-std::vector<Toast> g_ToastQueue;
+std::deque<Toast> toastQueue;
 
 void ImGuiShowToast(const std::string& message, float duration) {
-    g_ToastQueue.push_back({ message, duration });
+    toastQueue.push_front({ message, duration });
 }
 
 void RenderToasts() {
@@ -232,14 +232,15 @@ void RenderToasts() {
     float originY = margin;
     
 
-    for (size_t i = 0; i < g_ToastQueue.size(); ) {
-        Toast& toast = g_ToastQueue[i];
+    for (size_t i = 0; i < toastQueue.size(); ) {
+        Toast& toast = toastQueue[i];
         toast.timeRemaining -= io.DeltaTime;
 
         // Fade out in the last 0.5 seconds
         float alpha = 1.0f;
-        if (toast.timeRemaining < 0.5f)
+        if (toast.timeRemaining < 0.5f) {
             alpha = toast.timeRemaining / 0.5f;
+        }
 
         ImGui::SetNextWindowBgAlpha(alpha * 0.85f);
         ImGui::SetNextWindowPos(ImVec2(originX, originY), ImGuiCond_Always);
@@ -254,17 +255,21 @@ void RenderToasts() {
             | ImGuiWindowFlags_NoMove;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1, 1, 1, alpha));
         ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
 
         // Text with wrapping
         ImGui::PushFont(toastFont);
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, alpha));
         ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
         ImGui::TextUnformatted(toast.message.c_str());
         ImGui::PopTextWrapPos();
+        ImGui::PopStyleColor();
 		ImGui::PopFont();
 
         float toastHeight = ImGui::GetWindowSize().y;
         ImGui::End();
+        ImGui::PopStyleColor();
         ImGui::PopStyleVar();
 
 		// Add offset based on toast height
@@ -272,7 +277,7 @@ void RenderToasts() {
 
         // Erase toast if needed
         if (toast.timeRemaining <= 0.0f) {
-            g_ToastQueue.erase(g_ToastQueue.begin() + i);
+            toastQueue.erase(toastQueue.begin() + i);
         }
         else {
             i++;
