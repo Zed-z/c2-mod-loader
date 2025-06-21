@@ -10,18 +10,6 @@ bool type1flip = false;
 bool hybridControls = false;
 bool limbusMode = false;
 
-#define CTRL_TYPE_1 1
-#define CTRL_TYPE_2 0
-std::string ControlSchemeNames[] = { "Type 2", "Type 1" };
-
-#define CONTROL_SCHEME_SLOT 0x60438C
-#define CONTROL_SCHEME_COPY1 0x52A5F4
-#define CONTROL_SCHEME_COPY2 0x52AE64
-
-#define ANALOG_STRENGTH 0x52A54C
-
-#define PHYSICS_FPS 30
-
 #include <bitset>
 
 Inputs inputs, prevInputs;
@@ -49,14 +37,14 @@ std::string InputsString(Inputs inputs) {
 
 int GetControlScheme() {
     int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-    return api->AddressGetInt(CONTROL_SCHEME_SLOT + saveSlotOffset);
+    return api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
 }
 
 void SetControlScheme(int scheme) {
     int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-    api->AddressSetInt(CONTROL_SCHEME_SLOT + saveSlotOffset, scheme);
-    api->AddressSetInt(CONTROL_SCHEME_COPY1 + saveSlotOffset, scheme);
-    api->AddressSetInt(CONTROL_SCHEME_COPY2 + saveSlotOffset, scheme);
+    api->AddressSetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset, scheme);
+    api->AddressSetInt(ADDR_CONTROL_SCHEME_COPY1 + saveSlotOffset, scheme);
+    api->AddressSetInt(ADDR_CONTROL_SCHEME_COPY2 + saveSlotOffset, scheme);
 }
 
 void __stdcall PhysicsStep() {
@@ -101,7 +89,7 @@ void __stdcall PhysicsStep() {
 
         bool anyInput = inputs.up || inputs.down || inputs.left || inputs.right;
         bool anyInputPrev = prevInputs.up || prevInputs.down || prevInputs.left || prevInputs.right;
-        int analogStrength = api->AddressGetInt(ANALOG_STRENGTH);
+        int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
 
         // Started moving
         if (anyInput && !anyInputPrev) {
@@ -120,7 +108,7 @@ void __stdcall PhysicsStep() {
                 SetControlScheme(CTRL_TYPE_1);
             }
 
-            api->LogDebug("Control scheme is: " + ControlSchemeNames[GetControlScheme()]);
+            api->LogDebug("Control scheme is: " + std::string(ControlSchemeNames[GetControlScheme()]));
 
         }
     }
@@ -146,9 +134,9 @@ void __stdcall PhysicsStep() {
     }
 
 	// Max stick strength
-	/*int analogStrength = api->AddressGetInt(ANALOG_STRENGTH);
+	/*int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
     if (analogStrength > 0 && analogStrength <= 180) {
-		api->AddressSetInt(ANALOG_STRENGTH, 180);
+		api->AddressSetInt(ADDR_ANALOG_STRENGTH, 180);
     }*/
 }
 

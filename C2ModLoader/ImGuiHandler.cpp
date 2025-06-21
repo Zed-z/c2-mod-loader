@@ -31,10 +31,15 @@ bool logMessages;
 bool logDebug;
 bool logWarnings;
 bool logErrors;
+bool showInputs;
 
-static int width = 1000;
-static int height = 300;
-static int margin = 10;
+static int logWidth = 1000;
+static int logHeight = 300;
+
+static int inputsWidth = 500;
+static int inputsHeight = 200;
+
+static int margin = 32;
 
 // Globals for hook & ImGui state
 typedef HRESULT(__stdcall* PresentFunction)(IDXGISwapChain*, UINT, UINT);
@@ -316,7 +321,7 @@ void RenderToasts() {
         ImGui::PopStyleColor();
         ImGui::PopStyleVar();
 
-		// Add offset based on toast height
+		// Add offset based on toast logHeight
         originY += toastHeight + toastMargin;
 
         // Erase toast if needed
@@ -342,11 +347,12 @@ void ImGuiDraw() {
 
     if (showGui) {
         if (showLog) {
+
+            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - logWidth * 0.5f, io.DisplaySize.y - logHeight - margin), ImGuiCond_Once);
+            ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
+
             ImGui::Begin("Console Log");
-
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - width * 0.5f, io.DisplaySize.y - height - margin), ImGuiCond_Once);
-            ImGui::SetNextWindowSize(ImVec2((float)width, (float)height), ImGuiCond_Once);
-
+            
             ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
             ImGui::TextUnformatted(logBuffer.begin());
@@ -357,23 +363,82 @@ void ImGuiDraw() {
             ImGui::End();
         }
 
+        if (showInputs) {
+
+            Inputs inputs = api->GetInputs();
+			std::bitset<32> inputBits(inputs.raw);
+
+            int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
+
+            int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
+            int controlScheme = api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
+
+            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - inputsWidth * 0.5f, margin), ImGuiCond_Once);
+            ImGui::SetNextWindowSize(ImVec2((float)inputsWidth, (float)inputsHeight), ImGuiCond_Once);
+
+            ImGui::Begin("Inputs");
+
+            std::ostringstream ss0;
+			ss0 << "Inputs: " << inputBits << " (" << inputs.raw << ")";
+
+            std::ostringstream ss1;
+            ss1 << "User input | Up: " << inputs.up << ", Down: " << inputs.down << ", Left: " << inputs.left << ", Right: " << inputs.right;
+
+            std::ostringstream ss2;
+            ss2 << "Effective  | Up: " << inputs.effectiveUp << ", Down: " << inputs.effectiveDown << ", Left: " << inputs.effectiveLeft << ", Right: " << inputs.effectiveRight;
+
+            std::ostringstream ss3;
+            ss3 << "Analog Strength: " << analogStrength;
+
+            std::ostringstream ss4;
+            ss4 << "Jump: " << inputs.jump << ", Attack: " << inputs.attack;
+
+            std::ostringstream ss5;
+            ss5 << "Flip: " << inputs.flip << ", Step Left: " << inputs.stepLeft << ", Step Right: " << inputs.stepRight;
+
+            std::ostringstream ss6;
+            ss6 << "Inv Use : " << inputs.invUse << ", Inv Left: " << inputs.invLeft << ", Inv Right: " << inputs.invRight;
+
+            std::ostringstream ss7;
+            ss7 << "Control Method: " << ControlSchemeNames[controlScheme];
+
+            ImGui::Text(ss0.str().c_str());
+            ImGui::Text(ss1.str().c_str());
+            ImGui::Text(ss2.str().c_str());
+            ImGui::Text(ss3.str().c_str());
+            ImGui::Text(ss4.str().c_str());
+            ImGui::Text(ss5.str().c_str());
+            ImGui::Text(ss6.str().c_str());
+            ImGui::Text(ss7.str().c_str());
+
+            ImGui::End();
+        }
+
         // Main menu bar
         if (ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("Mod Loader")) {
                 if (ImGui::MenuItem("Show Log", nullptr, &showLog)) {
                     api->WriteIniBool(L"GUI", L"ShowLog", showLog);
                 }
-                if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
-                    api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+                if (ImGui::BeginMenu("Logging")) {
+
+                    if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
+                        api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+                    }
+                    if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
+                        api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
+                    }
+                    if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
+                        api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
+                    }
+                    if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
+                        api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+                    }
+
+                    ImGui::EndMenu();
                 }
-                if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
-                    api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
-                }
-                if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
-                    api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
-                }
-                if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
-                    api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+                if (ImGui::MenuItem("Show Inputs", nullptr, &showInputs)) {
+                    api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
                 }
                 ImGui::EndMenu();
             }

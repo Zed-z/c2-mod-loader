@@ -69,6 +69,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         showLog = api->ReadIniBool(L"GUI", L"ShowLog", false);
         api->WriteIniBool(L"GUI", L"ShowLog", showLog);
 
+        showInputs = api->ReadIniBool(L"GUI", L"ShowInputs", false);
+        api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
+
         incompatibleWarningShown = api->ReadIniBool(L"GUI", L"IncompatibleWarningShown", false);
         api->WriteIniBool(L"GUI", L"IncompatibleWarningShown", incompatibleWarningShown);
 

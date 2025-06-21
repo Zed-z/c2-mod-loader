@@ -23,6 +23,19 @@ typedef struct {
 #define ADDR_SAVE_SLOT_OFFSET   0x2000
 
 #define ADDR_INPUTS 0x52A590
+#define ADDR_ANALOG_STRENGTH 0x52A54C
+
+#define CTRL_TYPE_1 1
+#define CTRL_TYPE_2 0
+// Control scheme names for logging/display purposes
+// Usage example: ControlSchemeNames[CTRL_TYPE_1] -> "Type 1"
+constexpr const char* ControlSchemeNames[] = { "Type 2", "Type 1" };
+
+#define ADDR_CONTROL_SCHEME_SLOT 0x60438C
+#define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
+#define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
+
+#define PHYSICS_FPS 30
 
 typedef void(*LogFunction)(const std::string& message);
 typedef void(*LogDebugFunction)(const std::string& message);

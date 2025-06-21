@@ -19,6 +19,7 @@ extern bool logMessages;
 extern bool logDebug;
 extern bool logWarnings;
 extern bool logErrors;
+extern bool showInputs;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);
 void ImGuiDraw();
