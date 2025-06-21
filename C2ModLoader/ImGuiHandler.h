@@ -10,6 +10,9 @@
 
 extern ImGuiTextBuffer logBuffer;
 extern ImFont* toastFont;
+
+extern bool incompatibleWarningShown;
+
 extern bool showGui;
 extern bool showLog;
 extern bool logMessages;

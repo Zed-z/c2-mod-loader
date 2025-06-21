@@ -23,6 +23,8 @@ extern ModApi* api;
 ImGuiTextBuffer logBuffer;
 ImFont* toastFont = nullptr;
 
+bool incompatibleWarningShown;
+
 bool showGui;
 bool showLog;
 bool logMessages;
@@ -150,6 +152,45 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
 // Thread to wait for d3d11.dll, create a dummy device to locate Present, then hook it
 DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
 
+	// Check if dgVoodoo is present
+    // (ddraw.dll loaded from the game directory)
+    HMODULE hDDraw = GetModuleHandleA("ddraw.dll");
+    HMODULE hGame = GetModuleHandleA(NULL);
+    bool DDrawLoaded = (hDDraw != nullptr);
+
+    if (DDrawLoaded) {
+
+        char gamePath[MAX_PATH];
+        GetModuleFileNameA(hGame, gamePath, MAX_PATH);
+        std::string gamePathStr(gamePath);
+		std::string gameDir = gamePathStr.substr(0, gamePathStr.find_last_of("\\/"));
+
+        char DDrawPath[MAX_PATH];
+        GetModuleFileNameA(hDDraw, DDrawPath, MAX_PATH);
+		std::string DDrawPathStr(DDrawPath);
+		std::string DDrawDir = DDrawPathStr.substr(0, DDrawPathStr.find_last_of("\\/"));
+
+        api->LogDebug("Game located at: " + gamePathStr);
+		api->LogDebug("ddraw.dll found at: " + DDrawPathStr);
+
+		// Check if ddraw.dll is loaded from the game directory
+        if (DDrawDir != gameDir) {
+			api->LogWarning("ddraw.dll is not loaded from the game directory! Custom GUI won't be displayed.");
+
+            if (!incompatibleWarningShown) {
+                MessageBoxW(NULL, L"Failed to initialize GUI! Make sure you're using dgVoodoo.\nMods will continue to work but custom GUI won't be displayed.\nNote: this warning won't be shown again.", LOADER_NAME_L, MB_OK | MB_ICONWARNING);
+                incompatibleWarningShown = true;
+                api->WriteIniBool(L"GUI", L"IncompatibleWarningShown", incompatibleWarningShown);
+            }
+
+            return 1;
+        } else {
+            api->LogDebug("ddraw.dll is loaded from the game directory. Custom GUI will be displayed.");
+		}
+
+	}
+    
+
     // Wait for dgVoodoo (D3D11) to load
     int attemptCount = 0;
     while (!GetModuleHandleA("d3d11.dll")) {
@@ -157,7 +198,9 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
         attemptCount++;
 
         if (attemptCount > 10) {
-            api->Log("Failed to get d3d11.dll handle for GUI, quitting!");
+            api->LogWarning("Failed to get d3d11.dll handle for GUI, quitting!");
+            MessageBoxW(NULL, L"Failed to grab d3d11.dll!\nCustom GUI won't be displayed.", LOADER_NAME_L, MB_OK | MB_ICONWARNING);
+
             return 1;
         }
     }
