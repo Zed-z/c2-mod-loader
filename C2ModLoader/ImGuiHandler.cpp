@@ -571,12 +571,12 @@ void RenderObjectList() {
                     // Model
                     ImGui::Text("Model Data");
                     uintptr_t modelAddress = reinterpret_cast<uintptr_t>(node->model);
-                    if (ImGui::InputScalar((std::string("Model Address##model_addr") + ss.str()).c_str(), ImGuiDataType_U64, &modelAddress, NULL, NULL, "%llX", ImGuiSliderFlags_None)) {
+                    if (ImGui::InputScalar((std::string("Model Address##model_addr") + ss.str()).c_str(), ImGuiDataType_U32, &modelAddress, NULL, NULL, "%X", ImGuiSliderFlags_None)) {
                         node->model = reinterpret_cast<void*>(modelAddress);
                     }
 
                     uintptr_t animationAddress = reinterpret_cast<uintptr_t>(node->animation);
-                    if (ImGui::InputScalar((std::string("Animation Address##animation_addr") + ss.str()).c_str(), ImGuiDataType_U64, &animationAddress, NULL, NULL, "%llX", ImGuiSliderFlags_None)) {
+                    if (ImGui::InputScalar((std::string("Animation Address##animation_addr") + ss.str()).c_str(), ImGuiDataType_U32, &animationAddress, NULL, NULL, "%X", ImGuiSliderFlags_None)) {
                         node->animation = reinterpret_cast<void*>(animationAddress);
                     }
 
