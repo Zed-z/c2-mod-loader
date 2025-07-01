@@ -20,6 +20,7 @@ extern bool logDebug;
 extern bool logWarnings;
 extern bool logErrors;
 extern bool showInputs;
+extern bool showObjectList;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);
 void ImGuiDraw();
@@ -41,3 +42,9 @@ struct MenuAction {
 
 extern std::vector<MenuAction> menuActionRegistrations;
 bool ImGuiRegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration);
+
+void RenderToasts();
+void RenderInputs();
+void RenderLog();
+void RenderObjectList();
+void RenderMenuBar();

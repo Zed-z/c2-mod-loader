@@ -14,6 +14,12 @@ typedef struct {
 #define ADDR_FOG_DISTANCE       { 0x4B7B48 }
 #define ADDR_RENDER_DISTANCE    { 0x4B7B18 }
 
+#define ADDR_ROOT_OBJ           { 0x4A8C3C, { 0x14, 0x28, 0x00 } }
+#define ADDR_CROC_OBJ           { 0x4A8C3C, { 0x14, 0x30, 0x00 } }
+#define ADDR_CAMERA_OBJ         { 0x4A8C3C, { 0x14, 0x3C, 0x00 } }
+#define ADDR_DIALOG_OBJ         { 0x4A8C3C, { 0x14, 0x40, 0x00 } }
+#define ADDR_STRAT_COUNT        { 0x636160 }
+
 #define ADDR_CROC_POS_X         { 0x4A8C3C, { 0x14, 0x28, 0x2C } }
 #define ADDR_CROC_POS_Y         { 0x4A8C3C, { 0x14, 0x28, 0x30 } }
 #define ADDR_CROC_POS_Z         { 0x4A8C3C, { 0x14, 0x28, 0x34 } }

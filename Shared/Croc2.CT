@@ -1,0 +1,1702 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Health"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2042D0</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Credit Card Balance"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2042D4</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Heart Pots"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2042CC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Health SS1"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2062D0</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Credit Card Balance SS1"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2062D4</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Heart Pots SS1"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+2062CC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Current Save Slot?"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>006220FC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"CheatsActive"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>4B7964 </Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Current Tribe"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x4A8C44</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Current Level"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x4A8C48</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Current Map"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x4A8C4C</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Render Distance"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x4B7B18</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"Fog Distance"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x4B7B48</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"1-continue screen, 2-game over, 3-no clue, 4-credits, 5-restart map"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>004B7880</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"If above is 5 and this is 1, restart the map instead of returning to hub"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>004B7950</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"Cheats? Set to 4 to disable health loss"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>004B7964</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>004AF340</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Control Method 2"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+12A5F4</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26</ID>
+      <Description>"Control Method 3"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+20438C</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>27</ID>
+      <Description>"No description"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+12A5F4</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"No description"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+12A5F4</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>29</ID>
+      <Description>"Inputs"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>Croc2.exe+12A590</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>30</ID>
+      <Description>"Inputs???"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0052A588</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"Inputs??????????????????"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0052A588</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>33</ID>
+      <Description>"Stick strength?"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0052A54C</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>38</ID>
+      <Description>"Croc"</Description>
+      <Options moManualExpandCollapse="1"/>
+      <GroupHeader>1</GroupHeader>
+      <Address>0</Address>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"Croc Object"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>51</ID>
+          <Description>"Name"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>String</VariableType>
+          <Length>256</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>18</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>52</ID>
+          <Description>"Distance To Player?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>1C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"Angle [newRotation.x]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>20</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49</ID>
+          <Description>"Angle [newRotation.y]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>24</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Angle [newRotation.z]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>28</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"X [newPosition.x]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>2c</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>41</ID>
+          <Description>"Y [newPosition.y]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>30</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"Z [newPosition.z]"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>34</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"OldRotPos.rot.x"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>38</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"OldRotPos.rot.y"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"OldRotPos.rot.z"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>40</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"OldRotPos.pos.x"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>44</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"OldRotPos.pos.y"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>48</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"OldRotPos.pos.z"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>4C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"scale.x"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>50</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>60</ID>
+          <Description>"scale.y"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>54</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"scale.z"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>58</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>62</ID>
+          <Description>"matrix0.0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>5C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>63</ID>
+          <Description>"matrix0.1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>60</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>64</ID>
+          <Description>"matrix0.2"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>64</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>65</ID>
+          <Description>"matrix0.3"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>68</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>66</ID>
+          <Description>"matrix0.4"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>6C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"matrix0.5"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>70</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>68</ID>
+          <Description>"matrix0.6"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>74</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>69</ID>
+          <Description>"matrix0.7"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>78</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>70</ID>
+          <Description>"matrix0.8"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>7C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>71</ID>
+          <Description>"matrix0.9"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>80</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>72</ID>
+          <Description>"matrix0.10"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>84</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>73</ID>
+          <Description>"matrix0.11"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>88</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>80</ID>
+          <Description>"Spawn Location [StartRotPos]"</Description>
+          <GroupHeader>1</GroupHeader>
+          <Address>0</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>74</ID>
+              <Description>"StartRotPos.rot.x"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>8C</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"StartRotPos.rot.y"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>90</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"StartRotPos.rot.z"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>94</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>77</ID>
+              <Description>"StartRotPos.pos.x"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>98</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>78</ID>
+              <Description>"StartRotPos.pos.y"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>9C</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"StartRotPos.pos.z"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>A0</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>81</ID>
+          <Description>"collPoints*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>A4</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>82</ID>
+          <Description>"collExtent"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>A8</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>83</ID>
+          <Description>"collisionBoneCount"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>AA</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>84</ID>
+          <Description>"collisionBones"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>AC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>85</ID>
+          <Description>"collisionOffset.x"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>B0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>86</ID>
+          <Description>"collisionOffset.y"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>B4</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87</ID>
+          <Description>"collisionOffset.z"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>B8</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>88</ID>
+          <Description>"collRadius - I don't believe it does anything"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>BC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89</ID>
+          <Description>"gapField6"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>C0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>90</ID>
+          <Description>"wField7"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>C4</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91</ID>
+          <Description>"wField8"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>C6</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>92</ID>
+          <Description>"wField9"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>C8</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>93</ID>
+          <Description>"wField10"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>CA</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>94</ID>
+          <Description>"vec0.x"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>CC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>95</ID>
+          <Description>"vec0.y"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>D0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>96</ID>
+          <Description>"vec0.z"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>D4</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>97</ID>
+          <Description>"flags0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>D8</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>98</ID>
+          <Description>"flags1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>DC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>99</ID>
+          <Description>"map*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>E0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>103</ID>
+          <Description>"localVars"</Description>
+          <GroupHeader>1</GroupHeader>
+          <Address>0</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>100</ID>
+              <Description>"localVars*"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>136</ID>
+              <Description>"[0] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>137</ID>
+              <Description>"[1] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>4</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>138</ID>
+              <Description>"[2] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>8</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>139</ID>
+              <Description>"[3] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>C</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>140</ID>
+              <Description>"[4] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>10</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>141</ID>
+              <Description>"[5] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>14</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>142</ID>
+              <Description>"[6] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>143</ID>
+              <Description>"[7] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>144</ID>
+              <Description>"[8] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>20</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>145</ID>
+              <Description>"[9] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>24</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>146</ID>
+              <Description>"[10] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>28</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>147</ID>
+              <Description>"[11] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>2C</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>148</ID>
+              <Description>"[12] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>30</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>149</ID>
+              <Description>"[13] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>34</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>150</ID>
+              <Description>"[14] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>38</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>151</ID>
+              <Description>"[15] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>3C</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>134</ID>
+              <Description>"[16] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>40</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>135</ID>
+              <Description>"[17] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>44</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104</ID>
+              <Description>"[18] localVar"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>48</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>133</ID>
+              <Description>"[19] Lava bounce"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>4C</Offset>
+                <Offset>E4</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>106</ID>
+          <Description>"triggers"</Description>
+          <GroupHeader>1</GroupHeader>
+          <Address>0</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>101</ID>
+              <Description>"triggers*"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>152</ID>
+              <Description>"[0] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>153</ID>
+              <Description>"[1] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>4</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>154</ID>
+              <Description>"[2] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>8</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>155</ID>
+              <Description>"[3] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>C</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>156</ID>
+              <Description>"[4] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>10</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>157</ID>
+              <Description>"[5] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>14</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>158</ID>
+              <Description>"[6] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>18</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"[7] trigger"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>4A8C3C</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+                <Offset>E8</Offset>
+                <Offset>28</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>108</ID>
+          <Description>"wField0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>EC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>109</ID>
+          <Description>"wField1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>EE</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>110</ID>
+          <Description>"field1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>F0</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"triggerCount"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>F4</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>112</ID>
+          <Description>"StackPtr*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>F8</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>113</ID>
+          <Description>"Fade"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>FC</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>114</ID>
+          <Description>"animIndex0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>100</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>115</ID>
+          <Description>"animSpeed"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>104</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>116</ID>
+          <Description>"animFrame"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>108</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>117</ID>
+          <Description>"verticalVelocity"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>10C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>118</ID>
+          <Description>"wpFirst*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>110</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>119</ID>
+          <Description>"wpLast*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>114</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>120</ID>
+          <Description>"wpCurrent*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>118</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>121</ID>
+          <Description>"wpField*"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>11C</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>122</ID>
+          <Description>"shadowSpriteIndex"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>120</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>123</ID>
+          <Description>"shadowSize"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>122</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>124</ID>
+          <Description>"bfield2"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>123</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>125</ID>
+          <Description>"blinkCount - ???"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>124</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>126</ID>
+          <Description>"blinkCountdown - ???"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>125</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>127</ID>
+          <Description>"blinkNum - ???"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>126</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>128</ID>
+          <Description>"field6.0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>127</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>129</ID>
+          <Description>"field6.1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>128</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>130</ID>
+          <Description>"gap13.0"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>129</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>131</ID>
+          <Description>"gap13.1"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>12B</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>132</ID>
+          <Description>"gap14"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>4A8C3C</Address>
+          <Offsets>
+            <Offset>12D</Offset>
+            <Offset>28</Offset>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>107</ID>
+      <Description>"[] Fall timer?"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>4A8C3C</Address>
+      <Offsets>
+        <Offset>-A0</Offset>
+        <Offset>E8</Offset>
+        <Offset>28</Offset>
+        <Offset>14</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>160</ID>
+      <Description>"Strat Count"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x00636160</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>161</ID>
+      <Description>"Movement allowed state"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>622c44</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

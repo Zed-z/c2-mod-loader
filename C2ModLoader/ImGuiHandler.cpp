@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Loader.h"
 #include "CheatsManager.h"
+#include "GameStructs.h"
 
 #include <Windows.h>
 
@@ -32,6 +33,7 @@ bool logDebug;
 bool logWarnings;
 bool logErrors;
 bool showInputs;
+bool showObjectList;
 
 static int logWidth = 1000;
 static int logHeight = 300;
@@ -342,175 +344,544 @@ bool ImGuiRegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction regi
     return true;
 }
 
+
+void RenderLog() {
+    if (!showLog) return;
+
+    //ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - logWidth * 0.5f, io.DisplaySize.y - logHeight - margin), ImGuiCond_Once);
+    //ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
+
+    ImGui::Begin("Console Log");
+
+    ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+
+    ImGui::TextUnformatted(logBuffer.begin());
+    ImGui::SetScrollHereY(1.0f);
+
+    ImGui::EndChild();
+
+    ImGui::End();
+}
+
+void RenderInputs() {
+    if (!showInputs) return;
+
+    Inputs inputs = api->GetInputs();
+    std::bitset<32> inputBits(inputs.raw);
+
+    int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
+
+    int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
+    int controlScheme = api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
+
+    //ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - inputsWidth * 0.5f, margin), ImGuiCond_Once);
+    //ImGui::SetNextWindowSize(ImVec2((float)inputsWidth, (float)inputsHeight), ImGuiCond_Once);
+
+    ImGui::Begin("Inputs");
+
+    std::ostringstream ss0;
+    ss0 << "Inputs: " << inputBits << " (" << inputs.raw << ")";
+
+    std::ostringstream ss1;
+    ss1 << "User input | Up: " << inputs.up << ", Down: " << inputs.down << ", Left: " << inputs.left << ", Right: " << inputs.right;
+
+    std::ostringstream ss2;
+    ss2 << "Effective  | Up: " << inputs.effectiveUp << ", Down: " << inputs.effectiveDown << ", Left: " << inputs.effectiveLeft << ", Right: " << inputs.effectiveRight;
+
+    std::ostringstream ss3;
+    ss3 << "Analog Strength: " << analogStrength;
+
+    std::ostringstream ss4;
+    ss4 << "Jump: " << inputs.jump << ", Attack: " << inputs.attack;
+
+    std::ostringstream ss5;
+    ss5 << "Flip: " << inputs.flip << ", Step Left: " << inputs.stepLeft << ", Step Right: " << inputs.stepRight;
+
+    std::ostringstream ss6;
+    ss6 << "Inv Use : " << inputs.invUse << ", Inv Left: " << inputs.invLeft << ", Inv Right: " << inputs.invRight;
+
+    std::ostringstream ss7;
+    ss7 << "Control Method: " << ControlSchemeNames[controlScheme];
+
+    ImGui::Text(ss0.str().c_str());
+    ImGui::Text(ss1.str().c_str());
+    ImGui::Text(ss2.str().c_str());
+    ImGui::Text(ss3.str().c_str());
+    ImGui::Text(ss4.str().c_str());
+    ImGui::Text(ss5.str().c_str());
+    ImGui::Text(ss6.str().c_str());
+    ImGui::Text(ss7.str().c_str());
+
+    ImGui::End();
+}
+
+void RenderObjectList() {
+    if (!showObjectList) return;
+
+    ImGui::Begin("Object List");
+
+    int itemWidth;
+
+    uintptr_t objectManagerAddress = api->ResolveAddress(ADDR_ROOT_OBJ);
+    uintptr_t crocObjectAddress = api->ResolveAddress(ADDR_CROC_OBJ);
+    uintptr_t stratCountAddress = api->ResolveAddress(ADDR_STRAT_COUNT);
+    if (
+        objectManagerAddress != 0 && !IsBadReadPtr((void*)objectManagerAddress, sizeof(StratEntity))
+        && stratCountAddress != 0 && !IsBadReadPtr((void*)stratCountAddress, sizeof(int))
+        ) {
+        int stratCount = api->AddressGetInt(stratCountAddress);
+
+        StratEntity* objectManager = (StratEntity*)objectManagerAddress;
+
+        if (objectManager->next != nullptr) {
+
+            // Reverse to the beginning of the list
+            StratEntity* node = objectManager->next;
+            while (node->prev != nullptr) {
+                node = node->prev;
+            }
+
+            // Croc object
+            StratEntity* croc = nullptr;
+            if (crocObjectAddress != 0 && !IsBadReadPtr((void*)crocObjectAddress, sizeof(StratEntity))) {
+                croc = (StratEntity*)crocObjectAddress;
+                croc = croc->next;
+            }
+
+            // Max distance to player
+            StratEntity* distanceNode = node;
+            int maxDistanceToPlayer = 0;
+            if (croc == nullptr) {
+                maxDistanceToPlayer = -1;
+            }
+            else {
+                while (distanceNode != nullptr) {
+
+                    int playerDistance = sqrt(
+                        pow(distanceNode->newPosition.x - croc->newPosition.x, 2)
+                        + pow(distanceNode->newPosition.y - croc->newPosition.y, 2)
+                        + pow(distanceNode->newPosition.z - croc->newPosition.z, 2)
+                    );
+
+                    if (playerDistance > maxDistanceToPlayer) {
+                        maxDistanceToPlayer = playerDistance;
+                    }
+
+                    distanceNode = distanceNode->next;
+                }
+            }
+
+
+            ImGui::Text(("Object count: " + std::to_string(stratCount)).c_str());
+
+            while (node != nullptr) {
+
+                int playerDistance = (croc != nullptr) ? sqrt(
+                    pow(node->newPosition.x - croc->newPosition.x, 2)
+                    + pow(node->newPosition.y - croc->newPosition.y, 2)
+                    + pow(node->newPosition.z - croc->newPosition.z, 2)
+                ) : 0;
+
+                std::ostringstream ss;
+                ss << "(" << std::hex << std::uppercase << (uintptr_t)node << ") ";
+                ss << std::nouppercase << node->name;
+
+                // Header colors
+                float distanceModifier = maxDistanceToPlayer != -1 ? (1 - ((float)playerDistance / (float)maxDistanceToPlayer)) : 1;
+
+                ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f * distanceModifier, 0.35f * distanceModifier, 0.5f * distanceModifier, 1.0f));         // A darker blue/gray
+                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.3f * distanceModifier, 0.45f * distanceModifier, 0.6f * distanceModifier, 1.0f));  // Slightly lighter on hover
+                ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.4f * distanceModifier, 0.55f * distanceModifier, 0.7f * distanceModifier, 1.0f));   // Even lighter when pressed
+
+                if (ImGui::CollapsingHeader(ss.str().c_str())) {
+                    ImGui::Indent();
+
+                    // Position
+                    ImGui::Text("Position / Rotation");
+
+                    itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3;
+
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("PosX##posx") + ss.str()).c_str(), &(node->newPosition.x), 100, 1000));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("PosY##posy") + ss.str()).c_str(), &(node->newPosition.y), 100, 1000));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("PosZ##posz") + ss.str()).c_str(), &(node->newPosition.z), 100, 1000));
+
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("RotX##rotx") + ss.str()).c_str(), &(node->newRotation.x), 100, 1000));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("RotY##roty") + ss.str()).c_str(), &(node->newRotation.y), 100, 1000));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("RotZ##rotz") + ss.str()).c_str(), &(node->newRotation.z), 100, 1000));
+
+                    ImGui::Text(("Distance from player: " + std::to_string(node->distanceToPlayer) + " (" + std::to_string(playerDistance) + ")").c_str());
+
+                    // More position info
+                    if (ImGui::CollapsingHeader(("More Position Info##moreposinfo" + ss.str()).c_str())) {
+
+                        // Old position
+                        ImGui::Text("Old Position / Rotation");
+
+                        itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3;
+
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosX##oldposx") + ss.str()).c_str(), &(node->OldRotPos.position.x), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosY##oldposy") + ss.str()).c_str(), &(node->OldRotPos.position.y), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosZ##oldposz") + ss.str()).c_str(), &(node->OldRotPos.position.z), 100, 1000));
+
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotX##oldrotx") + ss.str()).c_str(), &(node->OldRotPos.rotation.x), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotY##oldroty") + ss.str()).c_str(), &(node->OldRotPos.rotation.y), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotZ##oldrotz") + ss.str()).c_str(), &(node->OldRotPos.rotation.z), 100, 1000));
+
+                        // Start Position
+                        ImGui::Text("Start Position");
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosX##startposx") + ss.str()).c_str(), &(node->StartRotPos.position.x), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosY##startposy") + ss.str()).c_str(), &(node->StartRotPos.position.y), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("PosZ##startposz") + ss.str()).c_str(), &(node->StartRotPos.position.z), 100, 1000));
+
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotX##startrotx") + ss.str()).c_str(), &(node->StartRotPos.rotation.x), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotY##startroty") + ss.str()).c_str(), &(node->StartRotPos.rotation.y), 100, 1000));
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(itemWidth);
+                        if (ImGui::InputInt((std::string("RotZ##startrotz") + ss.str()).c_str(), &(node->StartRotPos.rotation.z), 100, 1000));
+                    }
+
+                    // Model
+                    ImGui::Text("Model Data");
+                    uintptr_t modelAddress = reinterpret_cast<uintptr_t>(node->model);
+                    if (ImGui::InputScalar((std::string("Model Address##model_addr") + ss.str()).c_str(), ImGuiDataType_U64, &modelAddress, NULL, NULL, "%llX", ImGuiSliderFlags_None)) {
+                        node->model = reinterpret_cast<void*>(modelAddress);
+                    }
+
+                    uintptr_t animationAddress = reinterpret_cast<uintptr_t>(node->animation);
+                    if (ImGui::InputScalar((std::string("Animation Address##animation_addr") + ss.str()).c_str(), ImGuiDataType_U64, &animationAddress, NULL, NULL, "%llX", ImGuiSliderFlags_None)) {
+                        node->animation = reinterpret_cast<void*>(animationAddress);
+                    }
+
+                    // Scale
+                    ImGui::Text("Scale");
+
+                    itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 8 / 3;
+
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("X##scalex") + ss.str()).c_str(), &(node->scale.x), 128, 4096));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("Y##scaley") + ss.str()).c_str(), &(node->scale.y), 128, 4096));
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(itemWidth);
+                    if (ImGui::InputInt((std::string("Z##scalez") + ss.str()).c_str(), &(node->scale.z), 128, 4096));
+
+                    // Actions
+                    ImGui::Text("Actions");
+
+                    if (ImGui::Button((std::string("Teleport Here##tphere") + ss.str()).c_str())) {
+                        node->newPosition.x = croc->newPosition.x;
+                        node->newPosition.y = croc->newPosition.y;
+                        node->newPosition.z = croc->newPosition.z;
+                    }
+
+                    ImGui::SameLine();
+
+                    if (ImGui::Button((std::string("Teleport Start Here##tpstarthere") + ss.str()).c_str())) {
+                        node->StartRotPos.position.x = croc->newPosition.x;
+                        node->StartRotPos.position.y = croc->newPosition.y;
+                        node->StartRotPos.position.z = croc->newPosition.z;
+                    }
+
+                    if (ImGui::Button((std::string("Teleport To##tphere") + ss.str()).c_str())) {
+                        croc->newPosition.x = node->newPosition.x;
+                        croc->newPosition.y = node->newPosition.y;
+                        croc->newPosition.z = node->newPosition.z;
+                    }
+
+                    ImGui::SameLine();
+
+                    if (ImGui::Button((std::string("Teleport To Start##tpstarthere") + ss.str()).c_str())) {
+                        croc->newPosition.x = node->StartRotPos.position.x;
+                        croc->newPosition.y = node->StartRotPos.position.y;
+                        croc->newPosition.z = node->StartRotPos.position.z;
+                    }
+
+                    // Freeze
+                    {
+                        int flagMask = (1 << 4);
+                        bool isFlagSet = (node->flags0 & flagMask) != 0;
+                        if (ImGui::Checkbox(("Freeze##freezecheckbox" + ss.str()).c_str(), &isFlagSet)) {
+                            if (isFlagSet) {
+                                node->flags0 |= flagMask;
+                            }
+                            else {
+                                node->flags0 &= ~flagMask;
+                            }
+                        }
+                    }
+
+                    ImGui::SameLine();
+
+                    // Invisible
+                    {
+                        int flagMask = (1 << 24);
+                        bool isFlagSet = (node->flags0 & flagMask) != 0;
+                        if (ImGui::Checkbox(("Invisible##invisiblecheckbox" + ss.str()).c_str(), &isFlagSet)) {
+                            if (isFlagSet) {
+                                node->flags0 |= flagMask;
+                            }
+                            else {
+                                node->flags0 &= ~flagMask;
+                            }
+                        }
+                    }
+
+                    // Local Variables
+                    if (ImGui::CollapsingHeader(("Local Variables##localvars" + ss.str()).c_str())) {
+
+                        ImGui::Text("Flags");
+                        if (ImGui::InputInt(("Flags 0" + std::string("##flags0") + ss.str()).c_str(), &(node->flags0), 0, 0));
+
+                        for (int i = 0; i < 32; i++) {
+                            std::string checkboxLabel =
+                                (i < 10 ? " " : "")
+                                + std::to_string(i) + "##flags0flag" + ss.str();
+                            int flagMask = (1 << i);
+                            bool isFlagSet = (node->flags0 & flagMask) != 0;
+
+                            if (ImGui::Checkbox(checkboxLabel.c_str(), &isFlagSet)) {
+                                if (isFlagSet) {
+                                    node->flags0 |= flagMask;
+                                }
+                                else {
+                                    node->flags0 &= ~flagMask;
+                                }
+                            }
+
+                            if ((i + 1) % 8 != 0 && i < 31) {
+                                ImGui::SameLine();
+                            }
+                        }
+
+                        if (ImGui::InputInt(("Flags 1" + std::string("##flags1") + ss.str()).c_str(), &(node->flags1), 0, 0));
+
+                        for (int i = 0; i < 32; i++) {
+                            std::string checkboxLabel =
+                                (i < 10 ? " " : "")
+                                + std::to_string(i) + "##flags0flag" + ss.str();
+                            int flagMask = (1 << i);
+                            bool isFlagSet = (node->flags1 & flagMask) != 0;
+
+                            if (ImGui::Checkbox(checkboxLabel.c_str(), &isFlagSet)) {
+                                if (isFlagSet) {
+                                    node->flags1 |= flagMask;
+                                }
+                                else {
+                                    node->flags1 &= ~flagMask;
+                                }
+                            }
+
+                            if ((i + 1) % 8 != 0 && i < 31) {
+                                ImGui::SameLine();
+                            }
+                        }
+
+
+                        ImGui::Text("Local Variables");
+                        int varCount = 20;
+                        itemWidth = ImGui::GetContentRegionAvail().x / 2 - ImGui::GetStyle().ItemSpacing.x * 8 / 3;
+                        for (int i = 0; i < varCount; i++) {
+                            ImGui::SetNextItemWidth(itemWidth);
+
+                            std::string label =
+                                (i < 10 ? " " : "")
+                                + std::to_string(i) + std::string("##localvar") + std::to_string(i) + ss.str();
+
+                            if (ImGui::InputInt(label.c_str(), &(node->localVars->vars[i]), 0, 0));
+
+                            if (i % 2 == 0) {
+                                ImGui::SameLine();
+                            }
+                        }
+
+
+                    }
+
+                    ImGui::Unindent();
+                }
+
+                // Header colors
+                ImGui::PopStyleColor(3);
+
+                node = node->next;
+            }
+
+            if (ImGui::Button("Dump to Log##logdump")) {
+                StratEntity* node = objectManager->next;
+
+                // Reverse to the beginning of the list
+                while (node->prev != nullptr) {
+                    node = node->prev;
+                }
+
+                std::ostringstream ss;
+
+                int i = 0;
+                while (node != nullptr) {
+
+                    ss << "- (" << std::hex << (uintptr_t)node << ") " << node->name;
+                    ss << "\t\tPos: " << node->newPosition.x << "," << node->newPosition.y << "," << node->newPosition.z;
+                    ss << "\t\tRot: " << node->newRotation.x << "," << node->newRotation.y << "," << node->newRotation.z;
+                    ss << "\t\tScale: " << node->scale.x << "," << node->scale.y << "," << node->scale.z;
+                    ss << std::endl;
+
+                    node = node->next;
+                }
+
+                api->Log("Object List: (" + std::to_string(stratCount) + ")\n" + ss.str());
+            }
+        }
+        else {
+            ImGui::Text("No objects found!");
+        }
+    }
+    else {
+        ImGui::Text("No objects found!");
+    }
+
+    ImGui::End();
+}
+
+void RenderMenuBar() {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Mod Loader")) {
+            if (ImGui::MenuItem("Show Log", nullptr, &showLog)) {
+                api->WriteIniBool(L"GUI", L"ShowLog", showLog);
+            }
+            if (ImGui::BeginMenu("Logging")) {
+
+                if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
+                    api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+                }
+                if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
+                    api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
+                }
+                if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
+                    api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
+                }
+                if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
+                    api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::MenuItem("Show Inputs", nullptr, &showInputs)) {
+                api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
+            }
+            if (ImGui::MenuItem("Show Object List", nullptr, &showObjectList)) {
+                api->WriteIniBool(L"GUI", L"ShowObjectList", showObjectList);
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Cheats")) {
+
+            if (ImGui::MenuItem("Debug Menu", nullptr, &cheatsDebugMenu)) {
+                setDebugMenu(cheatsDebugMenu);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Press [Inv Prev + Inv Next] for a debug menu.");
+            }
+
+            if (ImGui::MenuItem("Position Bar", nullptr, &cheatsPositionBar)) {
+                setPositionBar(cheatsPositionBar);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Press [F7] for position bar.");
+            }
+
+            if (ImGui::MenuItem("Invulnerability", nullptr, &cheatsInvulnerability)) {
+                setInvulnerability(cheatsInvulnerability);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Never take any damage.");
+            }
+
+            if (ImGui::MenuItem("Bonus Crystals", nullptr, &cheatsBonusCrystals)) {
+                setBonusCrystals(cheatsBonusCrystals);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Press [Inv Next + Attack] for 100 crystals.");
+            }
+
+            if (ImGui::MenuItem("Music Select", nullptr, &cheatsMusicSelect)) {
+                setMusicSelect(cheatsMusicSelect);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Unlocks music select in sound options.");
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Mods")) {
+
+            for (const auto& registration : menuActionRegistrations) {
+                Mod* mod = GetModByHandle(registration.handle);
+                std::string category = WStringToString(mod->getName());
+
+                if (ImGui::BeginMenu(category.c_str())) {
+
+                    MenuActionRegistration action = registration.function();
+
+                    ImGui::BeginDisabled(!action.enabled);
+                    if (ImGui::MenuItem(action.label.c_str())) {
+                        if (action.callback) action.callback();
+                    }
+                    if (ImGui::IsItemHovered()) {
+                        ImGui::SetTooltip(action.tooltip.c_str());
+                    }
+                    ImGui::EndDisabled();
+
+                    ImGui::EndMenu();
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+}
+
+
 void ImGuiDraw() {
     ImGuiIO& io = ImGui::GetIO();
 
     if (showGui) {
-        if (showLog) {
-
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - logWidth * 0.5f, io.DisplaySize.y - logHeight - margin), ImGuiCond_Once);
-            ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
-
-            ImGui::Begin("Console Log");
-            
-            ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-
-            ImGui::TextUnformatted(logBuffer.begin());
-            ImGui::SetScrollHereY(1.0f);
-
-            ImGui::EndChild();
-
-            ImGui::End();
-        }
-
-        if (showInputs) {
-
-            Inputs inputs = api->GetInputs();
-			std::bitset<32> inputBits(inputs.raw);
-
-            int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
-
-            int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-            int controlScheme = api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
-
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - inputsWidth * 0.5f, margin), ImGuiCond_Once);
-            ImGui::SetNextWindowSize(ImVec2((float)inputsWidth, (float)inputsHeight), ImGuiCond_Once);
-
-            ImGui::Begin("Inputs");
-
-            std::ostringstream ss0;
-			ss0 << "Inputs: " << inputBits << " (" << inputs.raw << ")";
-
-            std::ostringstream ss1;
-            ss1 << "User input | Up: " << inputs.up << ", Down: " << inputs.down << ", Left: " << inputs.left << ", Right: " << inputs.right;
-
-            std::ostringstream ss2;
-            ss2 << "Effective  | Up: " << inputs.effectiveUp << ", Down: " << inputs.effectiveDown << ", Left: " << inputs.effectiveLeft << ", Right: " << inputs.effectiveRight;
-
-            std::ostringstream ss3;
-            ss3 << "Analog Strength: " << analogStrength;
-
-            std::ostringstream ss4;
-            ss4 << "Jump: " << inputs.jump << ", Attack: " << inputs.attack;
-
-            std::ostringstream ss5;
-            ss5 << "Flip: " << inputs.flip << ", Step Left: " << inputs.stepLeft << ", Step Right: " << inputs.stepRight;
-
-            std::ostringstream ss6;
-            ss6 << "Inv Use : " << inputs.invUse << ", Inv Left: " << inputs.invLeft << ", Inv Right: " << inputs.invRight;
-
-            std::ostringstream ss7;
-            ss7 << "Control Method: " << ControlSchemeNames[controlScheme];
-
-            ImGui::Text(ss0.str().c_str());
-            ImGui::Text(ss1.str().c_str());
-            ImGui::Text(ss2.str().c_str());
-            ImGui::Text(ss3.str().c_str());
-            ImGui::Text(ss4.str().c_str());
-            ImGui::Text(ss5.str().c_str());
-            ImGui::Text(ss6.str().c_str());
-            ImGui::Text(ss7.str().c_str());
-
-            ImGui::End();
-        }
-
-        // Main menu bar
-        if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("Mod Loader")) {
-                if (ImGui::MenuItem("Show Log", nullptr, &showLog)) {
-                    api->WriteIniBool(L"GUI", L"ShowLog", showLog);
-                }
-                if (ImGui::BeginMenu("Logging")) {
-
-                    if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
-                        api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
-                    }
-                    if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
-                        api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
-                    }
-                    if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
-                        api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
-                    }
-                    if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
-                        api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
-                    }
-
-                    ImGui::EndMenu();
-                }
-                if (ImGui::MenuItem("Show Inputs", nullptr, &showInputs)) {
-                    api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
-                }
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Cheats")) {
-
-                if (ImGui::MenuItem("Debug Menu", nullptr, &cheatsDebugMenu)) {
-					setDebugMenu(cheatsDebugMenu);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Press [Inv Prev + Inv Next] for a debug menu.");
-                }
-
-                if (ImGui::MenuItem("Position Bar", nullptr, &cheatsPositionBar)) {
-                    setPositionBar(cheatsPositionBar);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Press [F7] for position bar.");
-                }
-
-                if (ImGui::MenuItem("Invulnerability", nullptr, &cheatsInvulnerability)) {
-                    setInvulnerability(cheatsInvulnerability);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Never take any damage.");
-                }
-
-                if (ImGui::MenuItem("Bonus Crystals", nullptr, &cheatsBonusCrystals)) {
-                    setBonusCrystals(cheatsBonusCrystals);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Press [Inv Next + Attack] for 100 crystals.");
-                }
-
-                if (ImGui::MenuItem("Music Select", nullptr, &cheatsMusicSelect)) {
-                    setMusicSelect(cheatsMusicSelect);
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Unlocks music select in sound options.");
-                }
-
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Mods")) {
-
-                for (const auto& registration : menuActionRegistrations) {
-					Mod* mod = GetModByHandle(registration.handle);
-					std::string category = WStringToString(mod->getName());
-
-                    if (ImGui::BeginMenu(category.c_str())) {
-
-                        MenuActionRegistration action = registration.function();
-
-                        ImGui::BeginDisabled(!action.enabled);
-                        if (ImGui::MenuItem(action.label.c_str())) {
-                            if (action.callback) action.callback();
-                        }
-                        if (ImGui::IsItemHovered()) {
-							ImGui::SetTooltip(action.tooltip.c_str());
-                        }
-						ImGui::EndDisabled();
-
-                        ImGui::EndMenu();
-                    }
-				}
-
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMainMenuBar();
-        }
+        RenderLog();
+        RenderInputs();
+        RenderObjectList();
+        RenderMenuBar();
     }
     
     // Toast notifications

@@ -91,14 +91,14 @@ uintptr_t ResolveAddress(MemoryAddress address) {
         if (address.offsets[i] == 0) break;
 
         if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-            Log("Bad read at: " + std::to_string(addr));
+            //Log("Bad read at: " + std::to_string(addr));
             return 0;
         }
 
         addr = *(uintptr_t*)addr;
 
         if (addr == 0) {
-            Log("Null pointer during chain at offset index: " + std::to_string(i));
+            //Log("Null pointer during chain at offset index: " + std::to_string(i));
             return 0;
         }
 
@@ -106,7 +106,7 @@ uintptr_t ResolveAddress(MemoryAddress address) {
     }
 
     if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
-        Log("Bad address at: " + std::to_string(addr));
+        //Log("Bad address at: " + std::to_string(addr));
         return 0;
     }
 

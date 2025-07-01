@@ -172,6 +172,7 @@ mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPa
     <ClCompile Include="MouseCaptureRemover.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Shared\GameStructs.h" />
     <ClInclude Include="..\Shared\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="..\Shared\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\Shared\ModApi.h" />

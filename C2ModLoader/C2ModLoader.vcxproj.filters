@@ -77,6 +77,9 @@
     <ClInclude Include="CheatsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\GameStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="C2ModLoader.manifest">
