@@ -23,6 +23,9 @@
     <ClInclude Include="..\Shared\ModApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\GameStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NoClipToggler.rc">

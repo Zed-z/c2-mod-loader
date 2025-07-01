@@ -1,4 +1,5 @@
 #include "ModApi.h"
+#include "GameStructs.h"
 #include <Windows.h>
 #include <iostream>
 #include <sstream>
@@ -26,9 +27,45 @@ const BYTE fallTimerCodeOriginal[] = { 0x81, 0x00, 0x00, 0x10, 0x00, 0x00 };
 const BYTE fallTimerCodePatch[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 
 bool noclip_enabled = false;
+bool freecam_enabled = false;
+
+StratEntity* camera = nullptr;
+RotPos3i cameraRotPos;
+
 int noclip_y = 0;
 
 Inputs inputs, prevInputs;
+
+
+void __stdcall toggleFreecam() {
+    freecam_enabled = !freecam_enabled;
+
+    auto addr = api->ResolveAddress(ADDR_CAMERA_OBJ);
+    if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+        freecam_enabled = false;
+        return;
+    }
+    camera = (StratEntity*)addr;
+    if (IsBadReadPtr(camera, sizeof(StratEntity)) || IsBadReadPtr(camera->next, sizeof(StratEntity)) || camera->next == nullptr) {
+        freecam_enabled = false;
+        api->Log("No camera found!");
+        api->ShowToast("No camera found!");
+        return;
+    }
+
+    if (freecam_enabled) {
+        camera = camera->next;
+        cameraRotPos = camera->OldRotPos;
+
+        api->Log("Freecam enabled!");
+        api->ShowToast("Freecam enabled!");
+    }
+    else {
+
+        api->Log("Freecam disabled!");
+        api->ShowToast("Freecam disabled!");
+    }
+}
 
 
 void __stdcall toggleNoclip() {
@@ -36,6 +73,7 @@ void __stdcall toggleNoclip() {
 
     auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
     if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+        noclip_enabled = false;
         return;
     }
     noclip_y = api->AddressGetInt(addr);
@@ -71,16 +109,17 @@ void __stdcall PhysicsLoop() {
 
     // Go up and down
     if (noclip_enabled) {
-        if (inputs.stepRight) {// Page up
+        if (inputs.stepRight) {
             noclip_y += 100;
         }
 
-        if (inputs.stepLeft) {// Page down
+        if (inputs.stepLeft) {
             noclip_y -= 100;
         }
 
         auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
         if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+            noclip_enabled = false;
             return;
         }
         api->AddressSetInt(
@@ -89,11 +128,53 @@ void __stdcall PhysicsLoop() {
         );
     }
 
+    // Freecam
+    if (freecam_enabled) {
+
+        if (IsBadReadPtr(camera, sizeof(StratEntity)) || camera == nullptr) {
+            noclip_enabled = false;
+            api->Log("No camera found!");
+            api->ShowToast("No camera found!");
+            return;
+        }
+
+        if (inputs.left) {
+            cameraRotPos.position.x -= 100;
+        }
+
+        if (inputs.right) {
+            cameraRotPos.position.x += 100;
+        }
+
+        if (inputs.up) {
+            cameraRotPos.position.z -= 100;
+        }
+
+        if (inputs.down) {
+            cameraRotPos.position.z += 100;
+        }
+
+        if (inputs.stepLeft) {
+            cameraRotPos.position.y -= 100;
+        }
+
+        if (inputs.stepRight) {
+            cameraRotPos.position.y += 100;
+        }
+
+        camera->newRotPos = cameraRotPos;
+        
+    }
+
 }
 
 
 MenuActionRegistration __stdcall toggleNoclipRegistration() {
     return { noclip_enabled ? "Disable Noclip" : "Enable Noclip", noclip_enabled ? "Disable noclip." : "Enable noclip.", toggleNoclip, true};
+}
+
+MenuActionRegistration __stdcall toggleFreecamRegistration() {
+    return { freecam_enabled ? "Disable Freecam" : "Enable Freecam", freecam_enabled ? "Disable freecam." : "Enable freecam.", toggleFreecam, true };
 }
 
 
@@ -104,6 +185,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
 		api->HookPhysics(PhysicsLoop);
 		api->RegisterMenuAction(hModule, toggleNoclipRegistration);
+		api->RegisterMenuAction(hModule, toggleFreecamRegistration);
 
         DisableThreadLibraryCalls(hModule);
     }

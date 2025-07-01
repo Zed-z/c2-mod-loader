@@ -146,6 +146,7 @@
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Shared\GameStructs.h" />
     <ClInclude Include="..\Shared\ModApi.h" />
   </ItemGroup>
   <ItemGroup>
