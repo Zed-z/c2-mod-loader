@@ -664,7 +664,7 @@ void RenderObjectList() {
                         for (int i = 0; i < 32; i++) {
                             std::string checkboxLabel =
                                 (i < 10 ? " " : "")
-                                + std::to_string(i) + "##flags0flag" + ss.str();
+                                + std::to_string(i) + "##flags0flag" + std::to_string(i) + ss.str();
                             int flagMask = (1 << i);
                             bool isFlagSet = (node->flags0 & flagMask) != 0;
 
@@ -687,7 +687,7 @@ void RenderObjectList() {
                         for (int i = 0; i < 32; i++) {
                             std::string checkboxLabel =
                                 (i < 10 ? " " : "")
-                                + std::to_string(i) + "##flags0flag" + ss.str();
+                                + std::to_string(i) + "##flags1flag" + std::to_string(i) + ss.str();
                             int flagMask = (1 << i);
                             bool isFlagSet = (node->flags1 & flagMask) != 0;
 
