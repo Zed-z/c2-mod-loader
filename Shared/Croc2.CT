@@ -1697,6 +1697,119 @@
       <VariableType>4 Bytes</VariableType>
       <Address>622c44</Address>
     </CheatEntry>
+    <CheatEntry>
+      <ID>184</ID>
+      <Description>"Camera"</Description>
+      <GroupHeader>1</GroupHeader>
+      <Address>0</Address>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>183</ID>
+          <Description>"Camera lookat rotX"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B88</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>182</ID>
+          <Description>"Camera lookat rotY"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B8C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>181</ID>
+          <Description>"Camera lookat rotZ"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B90</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>162</ID>
+          <Description>"Camera lookat X"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B94</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>163</ID>
+          <Description>"Camera lookat Y"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B98</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>164</ID>
+          <Description>"Camera lookat Z"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B9C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>165</ID>
+          <Description>"Camera X"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B38</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>167</ID>
+          <Description>"Camera Y"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B3C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>168</ID>
+          <Description>"Camera Z"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+222B40</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>187</ID>
+          <Description>"CamRotPos2 rotX"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>004AF328</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>188</ID>
+          <Description>"CamRotPos2 rotY"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+AF32C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>189</ID>
+          <Description>"CamRotPos2 rotZ"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+AF330</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>190</ID>
+          <Description>"CamRotPos2 posX"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+AF334</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>191</ID>
+          <Description>"CamRotPos2 posY"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+AF338</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>192</ID>
+          <Description>"CamRotPos2 posZ"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+AF33C</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>
 </CheatTable>

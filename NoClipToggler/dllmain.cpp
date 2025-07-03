@@ -31,37 +31,69 @@ bool freecam_enabled = false;
 
 StratEntity* camera = nullptr;
 RotPos3i cameraRotPos;
+double cameraYaw = 0;
+double cameraPitch = 0;
+Vec3i cameraLookAt;
 
 int noclip_y = 0;
 
 Inputs inputs, prevInputs;
 
+const double PI = 3.141;
+
 
 void __stdcall toggleFreecam() {
     freecam_enabled = !freecam_enabled;
 
-    auto addr = api->ResolveAddress(ADDR_CAMERA_OBJ);
-    if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+    auto cameraAddr = api->ResolveAddress(ADDR_CAMERA_OBJ);
+    auto crocAddr = api->ResolveAddress(ADDR_CROC_OBJ);
+
+    if (IsBadReadPtr((void*)cameraAddr, sizeof(uintptr_t))) {
         freecam_enabled = false;
+        camera = nullptr;
         return;
     }
-    camera = (StratEntity*)addr;
+    camera = (StratEntity*)cameraAddr;
     if (IsBadReadPtr(camera, sizeof(StratEntity)) || IsBadReadPtr(camera->next, sizeof(StratEntity)) || camera->next == nullptr) {
         freecam_enabled = false;
+        camera = nullptr;
         api->Log("No camera found!");
         api->ShowToast("No camera found!");
         return;
     }
 
+    StratEntity* croc = nullptr;
+    if (!IsBadReadPtr((void*)crocAddr, sizeof(uintptr_t))) {
+        croc = (StratEntity*)crocAddr;
+        croc = croc->next;
+    }
+
+    camera = camera->next;
+
     if (freecam_enabled) {
-        camera = camera->next;
+
         cameraRotPos = camera->OldRotPos;
+        cameraLookAt.x = api->AddressGetInt(ADDR_CAMERA_LOOKAT_X);
+        cameraLookAt.y = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Y);
+        cameraLookAt.z = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Z);
+
+        camera->flags1 &= ~(1 << 23);
+
+        if (croc != nullptr) {
+            croc->flags0 |= (1 << 4);
+        }
 
         api->Log("Freecam enabled!");
         api->ShowToast("Freecam enabled!");
     }
     else {
 
+        camera->flags1 |= (1 << 23);
+
+        if (croc != nullptr) {
+            croc->flags0 &= ~(1 << 4);
+        }
+        
         api->Log("Freecam disabled!");
         api->ShowToast("Freecam disabled!");
     }
@@ -94,6 +126,28 @@ void __stdcall toggleNoclip() {
         api->Log("Noclip disabled!");
         api->ShowToast("Noclip disabled!");
     }
+}
+
+
+int RadiansToGameRotation(double radians_input) {
+    radians_input = fmod(radians_input, 2 * PI);
+    while (radians_input <= -PI) {
+        radians_input += 2 * PI;
+    }
+    while (radians_input > PI) {
+        radians_input -= 2 * PI;
+    }
+
+    
+    double scaled_value = radians_input * (2048.0 / PI);
+
+    int game_rotation_value = static_cast<int>(round(scaled_value));
+
+    if (game_rotation_value == 2048) {
+        game_rotation_value = -2048;
+    }
+
+    return game_rotation_value;
 }
 
 
@@ -133,37 +187,57 @@ void __stdcall PhysicsLoop() {
 
         if (IsBadReadPtr(camera, sizeof(StratEntity)) || camera == nullptr) {
             noclip_enabled = false;
+            camera = nullptr;
             api->Log("No camera found!");
             api->ShowToast("No camera found!");
             return;
         }
 
-        if (inputs.left) {
-            cameraRotPos.position.x -= 100;
-        }
+        int input_x = inputs.right - inputs.left;
+        int input_z = -(inputs.down - inputs.up);
+        int input_y = inputs.jump - inputs.attack;
+        int input_rot_yaw = inputs.stepRight - inputs.stepLeft;
+        int input_rot_pitch = inputs.invRight - inputs.invLeft;
 
-        if (inputs.right) {
-            cameraRotPos.position.x += 100;
-        }
+        cameraYaw += input_rot_yaw * 0.1;
 
-        if (inputs.up) {
-            cameraRotPos.position.z -= 100;
-        }
+        cameraPitch += input_rot_pitch * 0.05;
+        cameraPitch = min(max(cameraPitch, -0.9), 0.9);
 
-        if (inputs.down) {
-            cameraRotPos.position.z += 100;
-        }
+        double forwards_x = -cos(cameraYaw);
+        double forwards_z = -sin(cameraYaw);
 
-        if (inputs.stepLeft) {
-            cameraRotPos.position.y -= 100;
-        }
+        double sidewards_x = cos(cameraYaw + PI / 2);
+        double sidewards_z = sin(cameraYaw + PI / 2);
 
-        if (inputs.stepRight) {
-            cameraRotPos.position.y += 100;
-        }
+        cameraRotPos.position.x += forwards_x * input_x * 100;
+        cameraRotPos.position.z += forwards_z * input_x * 100;
 
+        cameraRotPos.position.x += sidewards_x * input_z * 100;
+        cameraRotPos.position.z += sidewards_z * input_z * 100;
+
+        cameraRotPos.position.y += input_y * 100;
+
+        cameraLookAt.x = cameraRotPos.position.x + (sin(-cameraYaw) * cos(-cameraPitch) * 100.0);
+        cameraLookAt.y = cameraRotPos.position.y + (sin(-cameraPitch) * 100.0);
+        cameraLookAt.z = cameraRotPos.position.z + (cos(-cameraYaw) * cos(-cameraPitch) * 100.0);
+
+        camera->OldRotPos = cameraRotPos;
         camera->newRotPos = cameraRotPos;
-        
+        api->AddressSetInt(0x622B38, cameraRotPos.position.x);
+        api->AddressSetInt(0x622B3C, cameraRotPos.position.y);
+        api->AddressSetInt(0x622B40, cameraRotPos.position.z);
+
+        api->AddressSetInt(ADDR_CAMERA_LOOKAT_X, cameraLookAt.x);
+        api->AddressSetInt(ADDR_CAMERA_LOOKAT_Y, cameraLookAt.y);
+        api->AddressSetInt(ADDR_CAMERA_LOOKAT_Z, cameraLookAt.z);
+
+        api->AddressSetInt(0x4AF328, RadiansToGameRotation(-cameraPitch));
+        api->AddressSetInt(0x4AF32C, RadiansToGameRotation(-cameraYaw));
+
+        //api->Log("Camera Pos: " + std::to_string(cameraRotPos.position.x) + " " + std::to_string(cameraRotPos.position.y) + " " + std::to_string(cameraRotPos.position.z));
+        //api->Log("Camera LookAt: " + std::to_string(cameraLookAt.x) + " " + std::to_string(cameraLookAt.y) + " " + std::to_string(cameraLookAt.z));
+        //api->Log("Camera Rot: " + std::to_string(cameraYaw) + " " + std::to_string(cameraPitch));
     }
 
 }

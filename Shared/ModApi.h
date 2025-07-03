@@ -31,6 +31,10 @@ typedef struct {
 #define ADDR_INPUTS 0x52A590
 #define ADDR_ANALOG_STRENGTH 0x52A54C
 
+#define ADDR_CAMERA_LOOKAT_X 0x622B94
+#define ADDR_CAMERA_LOOKAT_Y 0x622B98
+#define ADDR_CAMERA_LOOKAT_Z 0x622B9C
+
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
 // Control scheme names for logging/display purposes
