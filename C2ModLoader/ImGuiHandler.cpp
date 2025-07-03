@@ -422,21 +422,21 @@ void RenderObjectList() {
 
     int itemWidth;
 
-    uintptr_t objectManagerAddress = api->ResolveAddress(ADDR_ROOT_OBJ);
+    uintptr_t rootObjectAddress = api->ResolveAddress(ADDR_ROOT_OBJ);
     uintptr_t crocObjectAddress = api->ResolveAddress(ADDR_CROC_OBJ);
     uintptr_t stratCountAddress = api->ResolveAddress(ADDR_STRAT_COUNT);
     if (
-        objectManagerAddress != 0 && !IsBadReadPtr((void*)objectManagerAddress, sizeof(StratEntity))
+        rootObjectAddress != 0 && !IsBadReadPtr((void*)rootObjectAddress, sizeof(StratEntity))
         && stratCountAddress != 0 && !IsBadReadPtr((void*)stratCountAddress, sizeof(int))
         ) {
         int stratCount = api->AddressGetInt(stratCountAddress);
 
-        StratEntity* objectManager = (StratEntity*)objectManagerAddress;
+        StratEntity* rootObject = (StratEntity*)rootObjectAddress;
 
-        if (objectManager->next != nullptr) {
+        if (rootObject->next != nullptr) {
 
             // Reverse to the beginning of the list
-            StratEntity* node = objectManager->next;
+            StratEntity* node = rootObject->next;
             while (node->prev != nullptr) {
                 node = node->prev;
             }
@@ -736,7 +736,7 @@ void RenderObjectList() {
             }
 
             if (ImGui::Button("Dump to Log##logdump")) {
-                StratEntity* node = objectManager->next;
+                StratEntity* node = rootObject->next;
 
                 // Reverse to the beginning of the list
                 while (node->prev != nullptr) {

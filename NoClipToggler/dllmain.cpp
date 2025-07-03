@@ -224,16 +224,16 @@ void __stdcall PhysicsLoop() {
 
         camera->OldRotPos = cameraRotPos;
         camera->newRotPos = cameraRotPos;
-        api->AddressSetInt(0x622B38, cameraRotPos.position.x);
-        api->AddressSetInt(0x622B3C, cameraRotPos.position.y);
-        api->AddressSetInt(0x622B40, cameraRotPos.position.z);
+        api->AddressSetInt(ADDR_CAMERA_POS_X, cameraRotPos.position.x);
+        api->AddressSetInt(ADDR_CAMERA_POS_Y, cameraRotPos.position.y);
+        api->AddressSetInt(ADDR_CAMERA_POS_Z, cameraRotPos.position.z);
 
         api->AddressSetInt(ADDR_CAMERA_LOOKAT_X, cameraLookAt.x);
         api->AddressSetInt(ADDR_CAMERA_LOOKAT_Y, cameraLookAt.y);
         api->AddressSetInt(ADDR_CAMERA_LOOKAT_Z, cameraLookAt.z);
 
-        api->AddressSetInt(0x4AF328, RadiansToGameRotation(-cameraPitch));
-        api->AddressSetInt(0x4AF32C, RadiansToGameRotation(-cameraYaw));
+        api->AddressSetInt(ADDR_CAMERA_ROT_X, RadiansToGameRotation(-cameraPitch));
+        api->AddressSetInt(ADDR_CAMERA_ROT_Y, RadiansToGameRotation(-cameraYaw));
 
         //api->Log("Camera Pos: " + std::to_string(cameraRotPos.position.x) + " " + std::to_string(cameraRotPos.position.y) + " " + std::to_string(cameraRotPos.position.z));
         //api->Log("Camera LookAt: " + std::to_string(cameraLookAt.x) + " " + std::to_string(cameraLookAt.y) + " " + std::to_string(cameraLookAt.z));

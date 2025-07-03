@@ -3,13 +3,7 @@
 #include <Windows.h>
 #include <bitset>
 
-// Api definition --------------------------------------------------------
-
-#define MAX_OFFSETS 256
-typedef struct {
-    uintptr_t base;
-    uintptr_t offsets[MAX_OFFSETS];
-} MemoryAddress;
+// Addresses --------------------------------------------------------
 
 #define ADDR_FOG_DISTANCE       { 0x4B7B48 }
 #define ADDR_RENDER_DISTANCE    { 0x4B7B18 }
@@ -31,19 +25,35 @@ typedef struct {
 #define ADDR_INPUTS 0x52A590
 #define ADDR_ANALOG_STRENGTH 0x52A54C
 
+#define ADDR_CAMERA_POS_X 0x622B38
+#define ADDR_CAMERA_POS_Y 0x622B3C
+#define ADDR_CAMERA_POS_Z 0x622B40
+
+#define ADDR_CAMERA_ROT_X 0x4AF328
+#define ADDR_CAMERA_ROT_Y 0x4AF32C
+#define ADDR_CAMERA_ROT_Z 0x4AF330
+
 #define ADDR_CAMERA_LOOKAT_X 0x622B94
 #define ADDR_CAMERA_LOOKAT_Y 0x622B98
 #define ADDR_CAMERA_LOOKAT_Z 0x622B9C
+
+#define ADDR_CONTROL_SCHEME_SLOT 0x60438C
+#define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
+#define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
+
+// Api definition --------------------------------------------------------
+
+#define MAX_OFFSETS 256
+typedef struct {
+    uintptr_t base;
+    uintptr_t offsets[MAX_OFFSETS];
+} MemoryAddress;
 
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
 // Control scheme names for logging/display purposes
 // Usage example: ControlSchemeNames[CTRL_TYPE_1] -> "Type 1"
 constexpr const char* ControlSchemeNames[] = { "Type 2", "Type 1" };
-
-#define ADDR_CONTROL_SCHEME_SLOT 0x60438C
-#define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
-#define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
 
 #define PHYSICS_FPS 30
 
@@ -159,8 +169,8 @@ struct ModApi {
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();
 
-
 // Api client --------------------------------------------------------
+
 inline ModApi* LoadSharedModApi(const char* moduleName = "C2ModLoader.asi") {
 #ifdef IS_MOD_LOADER
     return nullptr;
