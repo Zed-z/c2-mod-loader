@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <bitset>
 
+#include "GameStructs.h"
+
 // Addresses --------------------------------------------------------
 
 #define ADDR_FOG_DISTANCE       { 0x4B7B48 }
@@ -23,6 +25,8 @@
 #define ADDR_SAVE_SLOT_OFFSET   0x2000
 
 #define ADDR_INPUTS 0x52A590
+#define ADDR_INPUTS_PRESSED 0x52A554
+#define ADDR_INPUTS_RELEASED 0x52A558
 #define ADDR_ANALOG_STRENGTH 0x52A54C
 
 #define ADDR_CAMERA_POS_X 0x622B38
@@ -106,6 +110,8 @@ struct MenuActionRegistration {
 typedef MenuActionRegistration(__stdcall* MenuActionRegistrationFunction)();
 typedef bool(*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
 
+typedef StratEntity*(*GetEntityFunction)(MemoryAddress address);
+
 
 struct Inputs {
     uint32_t raw;
@@ -132,6 +138,8 @@ struct Inputs {
     bool invRight;
 };
 typedef Inputs(*GetInputsFunction)();
+typedef Inputs(*GetInputsPressedFunction)();
+typedef Inputs(*GetInputsReleasedFunction)();
 
 
 struct ModApi {
@@ -161,10 +169,15 @@ struct ModApi {
     WriteIniStringFunction WriteIniString;
 
     GetGameVersionFunction GetGameVersion;
+
     GetInputsFunction GetInputs;
+    GetInputsPressedFunction GetInputsPressed;
+    GetInputsReleasedFunction GetInputsReleased;
 
     ShowToastFunction ShowToast;
     RegisterMenuActionFunction RegisterMenuAction;
+    
+    GetEntityFunction GetEntity;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

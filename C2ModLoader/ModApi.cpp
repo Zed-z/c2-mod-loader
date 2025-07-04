@@ -123,6 +123,7 @@ void AddressSetInt(uintptr_t address, int value) {
 #endif
 }
 
+
 int AddressGetInt(uintptr_t address) {
 
     int value = *(int*)address;
@@ -425,10 +426,10 @@ int GetGameVersion() {
 }
 
 
-Inputs GetInputs() {
+Inputs GetInputsRaw(int address) {
 
     // Get inputs
-    int input = AddressGetInt(ADDR_INPUTS);
+    int input = AddressGetInt(address);
 
     Inputs result;
     result.raw = input;
@@ -460,12 +461,44 @@ Inputs GetInputs() {
     return result;
 }
 
+Inputs GetInputs() {
+    return GetInputsRaw(ADDR_INPUTS);
+}
+
+Inputs GetInputsPressed() {
+    return GetInputsRaw(ADDR_INPUTS_PRESSED);
+}
+
+Inputs GetInputsReleased() {
+    return GetInputsRaw(ADDR_INPUTS_RELEASED);
+}
+
+
 void ShowToast(const std::string& message) {
     ImGuiShowToast(message);
 }
 
 bool RegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
     return ImGuiRegisterMenuAction(handle, registration);
+}
+
+
+StratEntity* GetEntity(MemoryAddress address) {
+    StratEntity* entity = nullptr;
+
+    uintptr_t addr = api->ResolveAddress(address);
+
+    if (addr == 0) return nullptr;
+    if (IsBadReadPtr((void*)addr, sizeof(StratEntity))) return nullptr;
+
+    entity = (StratEntity*)addr;
+
+    if (entity->next == nullptr) return nullptr;
+    if (IsBadReadPtr((void*)(entity->next), sizeof(StratEntity))) return nullptr;
+
+    entity = entity->next;
+
+    return entity;
 }
 
 
@@ -492,8 +525,11 @@ ModApi g_ModApi = {
     WriteIniString,
     GetGameVersion,
     GetInputs,
+    GetInputsPressed,
+    GetInputsReleased,
     ShowToast,
-    RegisterMenuAction
+    RegisterMenuAction,
+    GetEntity
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

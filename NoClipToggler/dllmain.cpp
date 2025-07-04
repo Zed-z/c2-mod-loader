@@ -30,6 +30,8 @@ bool noclip_enabled = false;
 bool freecam_enabled = false;
 
 StratEntity* camera = nullptr;
+StratEntity* croc = nullptr;
+
 RotPos3i cameraRotPos;
 double cameraYaw = 0;
 double cameraPitch = 0;
@@ -37,38 +39,21 @@ Vec3i cameraLookAt;
 
 int noclip_y = 0;
 
-Inputs inputs, prevInputs;
-
 const double PI = 3.141;
 
 
 void __stdcall toggleFreecam() {
     freecam_enabled = !freecam_enabled;
 
-    auto cameraAddr = api->ResolveAddress(ADDR_CAMERA_OBJ);
-    auto crocAddr = api->ResolveAddress(ADDR_CROC_OBJ);
+    camera = api->GetEntity(ADDR_CAMERA_OBJ);
+    croc = api->GetEntity(ADDR_CROC_OBJ);
 
-    if (IsBadReadPtr((void*)cameraAddr, sizeof(uintptr_t))) {
+    if (camera == nullptr) {
         freecam_enabled = false;
-        camera = nullptr;
-        return;
-    }
-    camera = (StratEntity*)cameraAddr;
-    if (IsBadReadPtr(camera, sizeof(StratEntity)) || IsBadReadPtr(camera->next, sizeof(StratEntity)) || camera->next == nullptr) {
-        freecam_enabled = false;
-        camera = nullptr;
         api->Log("No camera found!");
         api->ShowToast("No camera found!");
         return;
     }
-
-    StratEntity* croc = nullptr;
-    if (!IsBadReadPtr((void*)crocAddr, sizeof(uintptr_t))) {
-        croc = (StratEntity*)crocAddr;
-        croc = croc->next;
-    }
-
-    camera = camera->next;
 
     if (freecam_enabled) {
 
@@ -79,9 +64,14 @@ void __stdcall toggleFreecam() {
 
         camera->flags1 &= ~(1 << 23);
 
+        // Pause player movement
         if (croc != nullptr) {
             croc->flags0 |= (1 << 4);
         }
+
+        // Get rotation from lookat
+        cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
+        cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
 
         api->Log("Freecam enabled!");
         api->ShowToast("Freecam enabled!");
@@ -153,12 +143,15 @@ int RadiansToGameRotation(double radians_input) {
 
 void __stdcall PhysicsLoop() {
 
-    prevInputs = inputs;
-    inputs = api->GetInputs();
+    Inputs inputs = api->GetInputs();
+    Inputs inputsPressed = api->GetInputsPressed();
 
     // Toggle
-    if (inputs.stepLeft && inputs.stepRight && !prevInputs.attack && inputs.attack) {
+    if (inputs.stepLeft && inputs.stepRight && inputsPressed.attack) {
         toggleNoclip();
+    }
+    if (inputs.stepLeft&& inputs.stepRight && inputsPressed.flip) {
+        toggleFreecam();
     }
 
     // Go up and down
@@ -188,6 +181,7 @@ void __stdcall PhysicsLoop() {
         if (IsBadReadPtr(camera, sizeof(StratEntity)) || camera == nullptr) {
             noclip_enabled = false;
             camera = nullptr;
+            croc = nullptr;
             api->Log("No camera found!");
             api->ShowToast("No camera found!");
             return;

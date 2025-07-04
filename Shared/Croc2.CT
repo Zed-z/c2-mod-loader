@@ -147,32 +147,48 @@
       <Address>Croc2.exe+12A5F4</Address>
     </CheatEntry>
     <CheatEntry>
-      <ID>29</ID>
-      <Description>"Inputs"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>Croc2.exe+12A590</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>30</ID>
-      <Description>"Inputs???"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>0052A588</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>31</ID>
-      <Description>"Inputs??????????????????"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>0052A588</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>33</ID>
-      <Description>"Stick strength?"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>0052A54C</Address>
+      <ID>195</ID>
+      <Description>"Input"</Description>
+      <Options moManualExpandCollapse="1"/>
+      <GroupHeader>1</GroupHeader>
+      <Address>0</Address>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"Inputs ???"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+12A588</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>194</ID>
+          <Description>"Inputs"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+12A590</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>193</ID>
+          <Description>"Inputs Pressed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0052A554</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"Inputs Released"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0052A558</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"Stick strength?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0052A54C</Address>
+        </CheatEntry>
+      </CheatEntries>
     </CheatEntry>
     <CheatEntry>
       <ID>38</ID>
@@ -1700,6 +1716,7 @@
     <CheatEntry>
       <ID>184</ID>
       <Description>"Camera"</Description>
+      <Options moManualExpandCollapse="1"/>
       <GroupHeader>1</GroupHeader>
       <Address>0</Address>
       <CheatEntries>

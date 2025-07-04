@@ -12,8 +12,6 @@ bool limbusMode = false;
 
 #include <bitset>
 
-Inputs inputs, prevInputs;
-
 int hybridControlsTimer = 0;
 bool type1flipIsFlipping = false;
 int type1flipTimer = 0;
@@ -50,8 +48,8 @@ void SetControlScheme(int scheme) {
 void __stdcall PhysicsStep() {
     bool changeControls = GetAsyncKeyState(VK_CAPITAL) & 1;
 
-    prevInputs = inputs;
-    inputs = api->GetInputs();
+    Inputs inputs = api->GetInputs();
+    Inputs inputsPressed = api->GetInputsPressed();
 
     bool controlScheme = (bool)GetControlScheme();
 
@@ -87,13 +85,12 @@ void __stdcall PhysicsStep() {
     // Limbus controls
     if (limbusMode) {
 
-        bool anyInput = inputs.up || inputs.down || inputs.left || inputs.right;
-        bool anyInputPrev = prevInputs.up || prevInputs.down || prevInputs.left || prevInputs.right;
+        bool anyInput = inputsPressed.up || inputsPressed.down || inputsPressed.left || inputsPressed.right;
         int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
 
         // Started moving
-        if (anyInput && !anyInputPrev) {
-			api->LogDebug("Input started: " + InputsString(inputs));
+        if (anyInput) {
+			api->LogDebug("Input started: " + InputsString(inputsPressed));
 			api->LogDebug("Analog strength: " + std::to_string(analogStrength));
 
             // Keyboard is used - analog strength is 181
@@ -117,7 +114,7 @@ void __stdcall PhysicsStep() {
     if (type1flip) {
 
         if (!type1flipIsFlipping) {
-            if (inputs.flip && !prevInputs.flip) {
+            if (inputsPressed.flip) {
                 if (controlScheme == CTRL_TYPE_1) {
                     SetControlScheme(CTRL_TYPE_2);
                     type1flipIsFlipping = true;

@@ -457,10 +457,10 @@ void RenderObjectList() {
             else {
                 while (distanceNode != nullptr) {
 
-                    int playerDistance = sqrt(
-                        pow(distanceNode->newPosition.x - croc->newPosition.x, 2)
-                        + pow(distanceNode->newPosition.y - croc->newPosition.y, 2)
-                        + pow(distanceNode->newPosition.z - croc->newPosition.z, 2)
+                    int playerDistance = std::sqrt(
+                        std::pow(distanceNode->newPosition.x - croc->newPosition.x, 2)
+                        + std::pow(distanceNode->newPosition.y - croc->newPosition.y, 2)
+                        + std::pow(distanceNode->newPosition.z - croc->newPosition.z, 2)
                     );
 
                     if (playerDistance > maxDistanceToPlayer) {
@@ -476,10 +476,10 @@ void RenderObjectList() {
 
             while (node != nullptr) {
 
-                int playerDistance = (croc != nullptr) ? sqrt(
-                    pow(node->newPosition.x - croc->newPosition.x, 2)
-                    + pow(node->newPosition.y - croc->newPosition.y, 2)
-                    + pow(node->newPosition.z - croc->newPosition.z, 2)
+                int playerDistance = (croc != nullptr) ? std::sqrt(
+                    std::pow(node->newPosition.x - croc->newPosition.x, 2)
+                    + std::pow(node->newPosition.y - croc->newPosition.y, 2)
+                    + std::pow(node->newPosition.z - croc->newPosition.z, 2)
                 ) : 0;
 
                 std::ostringstream ss;
