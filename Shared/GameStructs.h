@@ -28,8 +28,9 @@ struct Mat3x4i {
 
 typedef int32_t StratEntityFlags;
 
+#define LOCAL_VAR_COUNT 20
 struct LocalVarsStruct {
-	int32_t vars[20];
+	int32_t vars[LOCAL_VAR_COUNT];
 	int32_t triggers[];
 };
 

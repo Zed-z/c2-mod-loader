@@ -30,6 +30,8 @@ bool noclip_enabled = false;
 bool freecam_enabled = false;
 
 StratEntity* camera = nullptr;
+bool cameraFlag = false;
+
 StratEntity* croc = nullptr;
 
 RotPos3i cameraRotPos;
@@ -62,6 +64,7 @@ void __stdcall toggleFreecam() {
         cameraLookAt.y = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Y);
         cameraLookAt.z = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Z);
 
+		cameraFlag = camera->flags1 & (1 << 23);
         camera->flags1 &= ~(1 << 23);
 
         // Pause player movement
@@ -78,7 +81,7 @@ void __stdcall toggleFreecam() {
     }
     else {
 
-        camera->flags1 |= (1 << 23);
+        camera->flags1 |= (cameraFlag << 23);
 
         if (croc != nullptr) {
             croc->flags0 &= ~(1 << 4);

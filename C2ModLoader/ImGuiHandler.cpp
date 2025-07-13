@@ -598,31 +598,39 @@ void RenderObjectList() {
                     ImGui::Text("Actions");
 
                     if (ImGui::Button((std::string("Teleport Here##tphere") + ss.str()).c_str())) {
-                        node->newPosition.x = croc->newPosition.x;
-                        node->newPosition.y = croc->newPosition.y;
-                        node->newPosition.z = croc->newPosition.z;
+                        if (croc != nullptr) {
+                            node->newPosition.x = croc->newPosition.x;
+                            node->newPosition.y = croc->newPosition.y;
+                            node->newPosition.z = croc->newPosition.z;
+                        }
                     }
 
                     ImGui::SameLine();
 
                     if (ImGui::Button((std::string("Teleport Start Here##tpstarthere") + ss.str()).c_str())) {
-                        node->StartRotPos.position.x = croc->newPosition.x;
-                        node->StartRotPos.position.y = croc->newPosition.y;
-                        node->StartRotPos.position.z = croc->newPosition.z;
+                        if (croc != nullptr) {
+                            node->StartRotPos.position.x = croc->newPosition.x;
+                            node->StartRotPos.position.y = croc->newPosition.y;
+                            node->StartRotPos.position.z = croc->newPosition.z;
+                        }
                     }
 
                     if (ImGui::Button((std::string("Teleport To##tphere") + ss.str()).c_str())) {
-                        croc->newPosition.x = node->newPosition.x;
-                        croc->newPosition.y = node->newPosition.y;
-                        croc->newPosition.z = node->newPosition.z;
+                        if (croc != nullptr) {
+                            croc->newPosition.x = node->newPosition.x;
+                            croc->newPosition.y = node->newPosition.y;
+                            croc->newPosition.z = node->newPosition.z;
+                        }
                     }
 
                     ImGui::SameLine();
 
                     if (ImGui::Button((std::string("Teleport To Start##tpstarthere") + ss.str()).c_str())) {
-                        croc->newPosition.x = node->StartRotPos.position.x;
-                        croc->newPosition.y = node->StartRotPos.position.y;
-                        croc->newPosition.z = node->StartRotPos.position.z;
+                        if (croc != nullptr) {
+                            croc->newPosition.x = node->StartRotPos.position.x;
+                            croc->newPosition.y = node->StartRotPos.position.y;
+                            croc->newPosition.z = node->StartRotPos.position.z;
+                        }
                     }
 
                     // Freeze
@@ -707,9 +715,8 @@ void RenderObjectList() {
 
 
                         ImGui::Text("Local Variables");
-                        int varCount = 20;
                         itemWidth = ImGui::GetContentRegionAvail().x / 2 - ImGui::GetStyle().ItemSpacing.x * 8 / 3;
-                        for (int i = 0; i < varCount; i++) {
+                        for (int i = 0; i < LOCAL_VAR_COUNT; i++) {
                             ImGui::SetNextItemWidth(itemWidth);
 
                             std::string label =
@@ -752,6 +759,10 @@ void RenderObjectList() {
                     ss << "\t\tPos: " << node->newPosition.x << "," << node->newPosition.y << "," << node->newPosition.z;
                     ss << "\t\tRot: " << node->newRotation.x << "," << node->newRotation.y << "," << node->newRotation.z;
                     ss << "\t\tScale: " << node->scale.x << "," << node->scale.y << "," << node->scale.z;
+                    ss << "\t\tLocal Vars: ";
+                    for (int j = 0; j < LOCAL_VAR_COUNT; j++) {
+                        ss << node->localVars->vars[j] << (j < 19 ? ", " : "");
+					}
                     ss << std::endl;
 
                     node = node->next;
