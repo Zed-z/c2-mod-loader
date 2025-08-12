@@ -71,13 +71,13 @@ void LogDebug(const std::string& message) {
 
 
 void LogWarning(const std::string& message) {
-    if (!logDebug) return;
+    if (!logWarnings) return;
     LogRaw(message, "WARNING | ");
 }
 
 
 void LogError(const std::string& message) {
-    if (!logDebug) return;
+    if (!logErrors) return;
     LogRaw(message, "ERROR | ");
 }
 

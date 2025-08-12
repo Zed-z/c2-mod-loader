@@ -5,7 +5,7 @@
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
-        auto api = LoadSharedModApi();
+        auto api = LoadModApi();
         if (!api) return FALSE;
 
         // JIceCave1 

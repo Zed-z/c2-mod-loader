@@ -184,7 +184,7 @@ extern "C" __declspec(dllexport) ModApi * GetModApi();
 
 // Api client --------------------------------------------------------
 
-inline ModApi* LoadSharedModApi(const char* moduleName = "C2ModLoader.asi") {
+inline ModApi* LoadModApi(const char* moduleName = "C2ModLoader.asi") {
 #ifdef IS_MOD_LOADER
     return nullptr;
 #else

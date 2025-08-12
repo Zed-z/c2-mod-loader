@@ -9,7 +9,7 @@ bool fullHealthOnLevelEntry = true;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
-        api = LoadSharedModApi();
+        api = LoadModApi();
         if (!api) return FALSE;
 
         fullHealthOnRetry = api->ReadIniInt(L"Config", L"FullHealthOnRetry", true);
