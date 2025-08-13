@@ -124,6 +124,9 @@ copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)"
 mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPath)";2
 </Command>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\Shared</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

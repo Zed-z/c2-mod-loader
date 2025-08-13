@@ -5,9 +5,12 @@
 #include <fstream>
 
 #include "Resource.h"
+#include "ModApi.h"
 
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
+
+extern ModApi* api;
 
 
 inline std::wstring StringToWString(const std::string& str) {
@@ -61,11 +64,11 @@ inline PathInfo GetModuleFilepath(HMODULE module) {
 
 #pragma comment(lib, "Version.lib")
 struct FileVersionInfo {
-    std::wstring fileVersion;
-    std::wstring productVersion;
-    std::wstring companyName;
-    std::wstring productName;
-    std::wstring fileDescription;
+    std::wstring name = L"";
+    std::wstring author = L"";
+    std::wstring description = L"";
+    std::wstring version = L"";
+    int apiVersion = -1;
 };
 
 inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
@@ -102,11 +105,14 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
     };
 
     // Fill in fields and return the struct
-    info.fileVersion = queryValue(L"FileVersion");
-    info.productVersion = queryValue(L"ProductVersion");
-    info.companyName = queryValue(L"CompanyName");
-    info.productName = queryValue(L"ProductName");
-    info.fileDescription = queryValue(L"FileDescription");
+    info.name = queryValue(L"Name");
+    info.author = queryValue(L"Author");
+    info.description = queryValue(L"Description");
+    info.version = queryValue(L"Version");
+
+    std::wstring apiVersionStr = queryValue(L"ApiVersion");
+    info.apiVersion = apiVersionStr.empty() ? -1 : std::stoi(apiVersionStr);
+
     return info;
 }
 

@@ -5,8 +5,8 @@ extern ModApi* api;
 std::vector<Mod> mods;
 
 std::wstring Mod::getName() {
-    return (this->info.productName.length() > 0)
-        ? (this->info.productName)
+    return (this->info.name.length() > 0)
+        ? (this->info.name)
         : (this->path.name);
 }
 
@@ -86,21 +86,37 @@ void LoadMods(std::vector<Mod>& mods) {
     std::vector<Mod> failedMods;
 
     for (auto& mod : mods) {
+
+        const std::string modName = WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ")";
+
+        // Skip due to settings
         if (!mod.enabled) {
-            api->Log("Skipping mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ")");
+            api->Log("Skipping mod: " + modName);
             continue;
         }
 
-        HMODULE loaded = LoadLibraryW(mod.path.path.c_str());
-        if (loaded) {
-            mod.handle = loaded;
-            api->Log("Loaded mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ") - handle: " + std::to_string((int)mod.handle));
+        // API version check
+        if (mod.info.apiVersion == -1) {
+            api->LogWarning("Mod: " + modName + " does not have a defined API version, issues may arise!");
         }
-        else {
-            DWORD err = GetLastError();
-            api->Log("Failed to load mod: " + WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ") with error code: " + std::to_string(err));
+
+        if (mod.info.apiVersion > API_VERSION) {
+            api->LogError("Failed to load mod: " + modName + " due to incorrect API version: v" + std::to_string(mod.info.apiVersion));
             failedMods.push_back(mod);
+            continue;
         }
+
+        // Load the mod file
+        HMODULE loaded = LoadLibraryW(mod.path.path.c_str());
+        if (!loaded) {
+            DWORD err = GetLastError();
+            api->LogError("Failed to load mod: " + modName + " with error code: " + std::to_string(err));
+            failedMods.push_back(mod);
+            continue;
+        }
+
+        mod.handle = loaded;
+        api->Log("Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle));
     }
 
     // Show message box when mods failed to load

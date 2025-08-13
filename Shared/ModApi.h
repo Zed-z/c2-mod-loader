@@ -5,6 +5,12 @@
 
 #include "GameStructs.h"
 
+#define API_VERSION 1
+
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x) STRINGIFY_(x)
+#define API_VERSION_STR STRINGIFY(API_VERSION)
+
 // Addresses --------------------------------------------------------
 
 #define ADDR_FOG_DISTANCE       { 0x4B7B48 }

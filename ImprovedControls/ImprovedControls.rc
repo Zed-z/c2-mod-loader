@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "ModApi.h"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     1,0,0,0
@@ -13,11 +14,11 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "Zed-z (https://github.com/Zed-z/)"
-            VALUE "FileDescription", "Alters the way the game controls."
-            VALUE "FileVersion", "1.0.0.0"
-            VALUE "ProductName", "Improved Controls"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "Name", "Improved Controls"
+            VALUE "Author", "Zed-z (https://github.com/Zed-z/)"
+            VALUE "Description", "Alters the way the game controls."
+            VALUE "Version", "1.0"
+            VALUE "ApiVersion", API_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"

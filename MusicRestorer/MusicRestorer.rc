@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "ModApi.h"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     1,0,0,0
@@ -13,11 +14,11 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "Zed-z (https://github.com/Zed-z/)"
-            VALUE "FileDescription", "Restores missing music from the console version of the game. Requires providing your own JIceCave1.asf and JHub34.asf file."
-            VALUE "FileVersion", "1.0.0.0"
-            VALUE "ProductName", "Music Restorer"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "Name", "Music Restorer"
+            VALUE "Author", "Zed-z (https://github.com/Zed-z/)"
+            VALUE "Description", "Restores missing music from the console version of the game. Requires providing your own JIceCave1.asf and JHub34.asf file."
+            VALUE "Version", "1.0"
+            VALUE "ApiVersion", API_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"

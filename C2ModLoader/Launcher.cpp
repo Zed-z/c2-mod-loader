@@ -122,10 +122,10 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             ListView_SetItemText(g_listView, (int)i, COL_MOD_NAME, const_cast<LPWSTR>(modName.c_str()));
 
             // Column: Version
-            ListView_SetItemText(g_listView, (int)i, COL_VERSION, const_cast<LPWSTR>(mod.info.fileVersion.c_str()));
+            ListView_SetItemText(g_listView, (int)i, COL_VERSION, const_cast<LPWSTR>(mod.info.version.c_str()));
 
             // Column: Author
-            ListView_SetItemText(g_listView, (int)i, COL_AUTHOR, const_cast<LPWSTR>(mod.info.companyName.c_str()));
+            ListView_SetItemText(g_listView, (int)i, COL_AUTHOR, const_cast<LPWSTR>(mod.info.author.c_str()));
 
             // Column: Configure
             std::wstring iniPath = mod.path.path;
@@ -164,7 +164,7 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         // About window
         if (LOWORD(wParam) == ID_HELP_ABOUT) {
             std::wstring message = L"About " LOADER_NAME_L L":\n\n"
-                L"Version: " LOADER_VERSION_L L"\n\n"
+                L"Version: " LOADER_VERSION_L L" (API v" API_VERSION_STR L")\n\n"
                 LOADER_DESCRIPTION_L L"\n\n"
                 L"Created by: " AUTHOR_NAME_L "\n\n";
             MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
@@ -173,6 +173,11 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         // Open settings
         if (LOWORD(wParam) == ID_FILE_SETTINGS) {
             OpenNotepad(CONFIG_FILE_L);
+        }
+
+        // View log
+        if (LOWORD(wParam) == ID_FILE_LOG) {
+            OpenNotepad(LOG_FILE_L);
         }
 
         // Launch button
@@ -220,10 +225,10 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             if (nmItem->iItem >= 0 && nmItem->iSubItem == COL_MOD_NAME) {
 				Mod& mod = mods[nmItem->iItem];
 
-                std::wstring message = L"About " + mod.info.productName + L":\n\n"
-                    L"Version: " + mod.info.fileVersion + L"\n\n" +
-                    mod.info.fileDescription + L"\n\n"
-                    L"Created by: " + mod.info.companyName + L"\n\n"
+                std::wstring message = L"About " + mod.getName() + L":\n\n"
+                    L"Version: " + mod.info.version + L" (API v" + std::to_wstring(mod.info.apiVersion) + L")\n\n" +
+                    mod.info.description + L"\n\n"
+                    L"Created by: " + mod.info.author + L"\n\n"
                     L"File location: " + mod.path.path + L"\n\n";
                 MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
             }
@@ -246,10 +251,10 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
                     tipText = mods[row].getName();
                     break;
                 case COL_VERSION:
-                    tipText = mods[row].info.fileVersion;
+                    tipText = mods[row].info.version;
                     break;
                 case COL_AUTHOR:
-                    tipText = mods[row].info.companyName;
+                    tipText = mods[row].info.author;
                     break;
                 default:
                     tipText = L"";

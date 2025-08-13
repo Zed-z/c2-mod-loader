@@ -3,8 +3,8 @@
 #define LOADER_NAME "Croc 2 Mod Loader"
 #define LOADER_NAME_L L"Croc 2 Mod Loader"
 
-#define LOADER_VERSION "1.0.0.0"
-#define LOADER_VERSION_L L"1.0.0.0"
+#define LOADER_VERSION "1.0"
+#define LOADER_VERSION_L L"1.0"
 
 #define AUTHOR_NAME "Zed-z (https://github.com/Zed-z/)"
 #define AUTHOR_NAME_L L"Zed-z (https://github.com/Zed-z/)"
@@ -24,3 +24,4 @@
 #define MENU_BAR 100
 #define ID_FILE_SETTINGS 9001
 #define ID_HELP_ABOUT 9002
+#define ID_FILE_LOG 9003

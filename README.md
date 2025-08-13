@@ -35,6 +35,7 @@ Without it, the mod loader will continue to function, but you will not see a cus
 	- Include the `ModApi.h` [header file](https://github.com/Zed-z/c2-mod-loader/blob/main/Shared/ModApi.h)
 		- If using the provided Visual Studio solution:
 			- `C/C++ > General > Additional Include Directories`: ..\Shared\
+			- `Resources > General > Additional Include Directories`: ..\Shared\
 			- `Right Click "Headers" > Add > Existing Item`: ..\Shared\ModApi.h
 1) Add your desired code to the `DllMain()` function
 1) Example code template:

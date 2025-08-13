@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "ModApi.h"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     1,0,0,0
@@ -13,11 +14,11 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "Zed-z (https://github.com/Zed-z/)"
-            VALUE "FileDescription", "Template dummy mod."
-            VALUE "FileVersion", "0.0.0.0"
-            VALUE "ProductName", "Hello World"
-            VALUE "ProductVersion", "0.0.0.0"
+            VALUE "Name", "Hello World"
+            VALUE "Author", "Zed-z (https://github.com/Zed-z/)"
+            VALUE "Description", "Template dummy mod."
+            VALUE "Version", "1.0"
+            VALUE "ApiVersion", API_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"
