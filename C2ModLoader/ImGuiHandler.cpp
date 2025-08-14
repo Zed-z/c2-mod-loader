@@ -4,7 +4,8 @@
 #include "Utils.h"
 #include "Loader.h"
 #include "CheatsManager.h"
-#include "GameStructs.h"
+
+#include <bitset>
 
 #include <Windows.h>
 

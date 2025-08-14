@@ -1,5 +1,5 @@
 #include "ModApi.h"
-#include "GameStructs.h"
+
 #include <Windows.h>
 #include <iostream>
 #include <sstream>
