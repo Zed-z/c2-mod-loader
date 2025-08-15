@@ -17,7 +17,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadModApi();
         if (!api) return FALSE;
 
-        api->Log("Hello world!");
+        api->LogInfo("Hello world!");
 
 		// Register menu action
         api->RegisterMenuAction(hModule, helloWorldRegistration);

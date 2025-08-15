@@ -52,7 +52,7 @@ void __stdcall toggleFreecam() {
 
     if (camera == nullptr) {
         freecam_enabled = false;
-        api->Log("No camera found!");
+        api->LogError("No camera found!");
         api->ShowToast("No camera found!");
         return;
     }
@@ -76,7 +76,7 @@ void __stdcall toggleFreecam() {
         cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
         cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
 
-        api->Log("Freecam enabled!");
+        api->LogInfo("Freecam enabled!");
         api->ShowToast("Freecam enabled!");
     }
     else {
@@ -87,7 +87,7 @@ void __stdcall toggleFreecam() {
             croc->flags0 &= ~(1 << 4);
         }
         
-        api->Log("Freecam disabled!");
+        api->LogInfo("Freecam disabled!");
         api->ShowToast("Freecam disabled!");
     }
 }
@@ -108,7 +108,7 @@ void __stdcall toggleNoclip() {
         api->PatchBytes(fallingCode, fallingCodePatch, sizeof(fallingCodePatch));
         api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
         //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
-        api->Log("Noclip enabled!");
+        api->LogInfo("Noclip enabled!");
         api->ShowToast("Noclip enabled!");
     }
     else {
@@ -116,7 +116,7 @@ void __stdcall toggleNoclip() {
         api->PatchBytes(fallingCode, fallingCodeOriginal, sizeof(fallingCodeOriginal));
         api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
         //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
-        api->Log("Noclip disabled!");
+        api->LogInfo("Noclip disabled!");
         api->ShowToast("Noclip disabled!");
     }
 }
@@ -185,7 +185,7 @@ void __stdcall PhysicsLoop() {
             noclip_enabled = false;
             camera = nullptr;
             croc = nullptr;
-            api->Log("No camera found!");
+            api->LogError("No camera found!");
             api->ShowToast("No camera found!");
             return;
         }
@@ -232,9 +232,9 @@ void __stdcall PhysicsLoop() {
         api->AddressSetInt(ADDR_CAMERA_ROT_X, RadiansToGameRotation(-cameraPitch));
         api->AddressSetInt(ADDR_CAMERA_ROT_Y, RadiansToGameRotation(-cameraYaw));
 
-        //api->Log("Camera Pos: " + std::to_string(cameraRotPos.position.x) + " " + std::to_string(cameraRotPos.position.y) + " " + std::to_string(cameraRotPos.position.z));
-        //api->Log("Camera LookAt: " + std::to_string(cameraLookAt.x) + " " + std::to_string(cameraLookAt.y) + " " + std::to_string(cameraLookAt.z));
-        //api->Log("Camera Rot: " + std::to_string(cameraYaw) + " " + std::to_string(cameraPitch));
+        //api->LogDebug("Camera Pos: " + std::to_string(cameraRotPos.position.x) + " " + std::to_string(cameraRotPos.position.y) + " " + std::to_string(cameraRotPos.position.z));
+        //api->LogDebug("Camera LookAt: " + std::to_string(cameraLookAt.x) + " " + std::to_string(cameraLookAt.y) + " " + std::to_string(cameraLookAt.z));
+        //api->LogDebug("Camera Rot: " + std::to_string(cameraYaw) + " " + std::to_string(cameraPitch));
     }
 
 }

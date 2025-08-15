@@ -22,14 +22,14 @@
 extern ModApi* api;
 
 // Variables for GUI
-ImGuiTextBuffer logBuffer;
+std::vector<LogMessage> logMessages;
 ImFont* toastFont = nullptr;
 
 bool incompatibleWarningShown;
 
 bool showGui;
 bool showLog;
-bool logMessages;
+bool logInfo;
 bool logDebug;
 bool logWarnings;
 bool logErrors;
@@ -353,14 +353,24 @@ void RenderLog() {
     //ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
 
     ImGui::Begin("Console Log");
-
     ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    ImGui::TextUnformatted(logBuffer.begin());
+    for (const LogMessage& msg : logMessages) {
+        ImVec4 logColor;
+        switch (msg.severity) {
+            case LogSeverity::Info: logColor = ImVec4(1, 1, 1, 1); break;
+            case LogSeverity::Debug: logColor = ImVec4(0.5f, 0.8f, 1, 1); break;
+            case LogSeverity::Warning: logColor = ImVec4(1, 1, 0.3f, 1); break;
+            case LogSeverity::Error: logColor = ImVec4(1, 0.3f, 0.3f, 1); break;
+        }
+        ImGui::PushStyleColor(ImGuiCol_Text, logColor);
+        ImGui::TextUnformatted(msg.text.c_str());
+        ImGui::PopStyleColor();
+	}
+
     ImGui::SetScrollHereY(1.0f);
 
     ImGui::EndChild();
-
     ImGui::End();
 }
 
@@ -769,7 +779,7 @@ void RenderObjectList() {
                     node = node->next;
                 }
 
-                api->Log("Object List: (" + std::to_string(stratCount) + ")\n" + ss.str());
+                api->LogInfo("Object List: (" + std::to_string(stratCount) + ")\n" + ss.str());
             }
         }
         else {
@@ -791,8 +801,8 @@ void RenderMenuBar() {
             }
             if (ImGui::BeginMenu("Logging")) {
 
-                if (ImGui::MenuItem("Log Messages", nullptr, &logMessages)) {
-                    api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+                if (ImGui::MenuItem("Log Info", nullptr, &logInfo)) {
+                    api->WriteIniBool(L"Logging", L"LogInfo", logInfo);
                 }
                 if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
                     api->WriteIniBool(L"Logging", L"LogDebug", logDebug);

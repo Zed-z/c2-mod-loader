@@ -13,7 +13,7 @@ typedef HCURSOR(WINAPI* SetCursorFunc)(HCURSOR);
 SetCursorFunc oSetCursor = nullptr;
 
 HCURSOR WINAPI hkSetCursor(HCURSOR hCursor) {
-    if (logHooks) api->Log("hkSetCursor");
+    if (logHooks) api->LogDebug("hkSetCursor");
     return hCursor;
 }
 
@@ -24,7 +24,7 @@ int WINAPI hkShowCursor(BOOL bShow) {
     // Initialize fake cursor display counter
     static int fakeCursorCount = 1;
 
-    if (logHooks) api->Log("hkShowCursor");
+    if (logHooks) api->LogDebug("hkShowCursor");
 
     // Simulate the internal counter behavior
     if (bShow) {
@@ -41,7 +41,7 @@ typedef BOOL(WINAPI* SetCursorPosFunc)(int, int);
 SetCursorPosFunc oSetCursorPos = nullptr;
 
 BOOL WINAPI hkSetCursorPos(int X, int Y) {
-    if (logHooks) api->Log("hkSetCursorPos");
+    if (logHooks) api->LogDebug("hkSetCursorPos");
     return TRUE;
 }
 
@@ -49,7 +49,7 @@ typedef BOOL(WINAPI* ClipCursorFunc)(const RECT*);
 ClipCursorFunc oClipCursor = nullptr;
 
 BOOL WINAPI hkClipCursor(const RECT* lpRect) {
-    if (logHooks) api->Log("hkClipCursor");
+    if (logHooks) api->LogDebug("hkClipCursor");
     return TRUE;
 }
 
@@ -57,7 +57,7 @@ typedef HWND(WINAPI* SetCaptureFunc)(HWND);
 SetCaptureFunc oSetCapture = nullptr;
 
 HWND WINAPI hkSetCapture(HWND hWnd) {
-    if (logHooks) api->Log("hkSetCapture");
+    if (logHooks) api->LogDebug("hkSetCapture");
     return NULL;
 }
 
@@ -65,7 +65,7 @@ typedef BOOL(WINAPI* ReleaseCaptureFunc)();
 ReleaseCaptureFunc oReleaseCapture = nullptr;
 
 BOOL WINAPI hkReleaseCapture() {
-    if (logHooks) api->Log("hkReleaseCapture");
+    if (logHooks) api->LogDebug("hkReleaseCapture");
     return TRUE;
 }
 
@@ -80,7 +80,7 @@ DWORD WINAPI InitHooks(LPVOID lpParam) {
     MH_CreateHook(&ReleaseCapture, &hkReleaseCapture, (void**)&oReleaseCapture);
 
     MH_EnableHook(MH_ALL_HOOKS);
-    api->Log("Mouse capture API hooks installed!");
+    api->LogDebug("Mouse capture API hooks installed!");
 
     return TRUE;
 }
@@ -107,7 +107,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
     if (gameVersion != GAMEVER_UNKNOWN) {
         BYTE patch1[] = { 0x83, 0xC4, 0x10 };
         api->PatchBytes(ADDR_CALL_CREATEDEVICE_MOUSE, patch1, sizeof(patch1));
-        api->Log("Patched CreateDevice!");
+        api->LogDebug("Patched CreateDevice!");
     }
 
     // Replace calls to "SetCursorPos" with "add esp, 8" and 3 nop bytes
@@ -123,7 +123,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
     if (gameVersion != GAMEVER_UNKNOWN) {
         BYTE patch2[] = { 0x83, 0xC4, 0x08, 0x90, 0x90, 0x90 };
         api->PatchBytes(ADDR_CALL_SETCURSORPOS, patch2, sizeof(patch2));
-        api->Log("Patched SetCursorPos!");
+        api->LogDebug("Patched SetCursorPos!");
     }
 
     // Replace calls to "SetCursor" with "pop eax" and 5 nop bytes
@@ -145,7 +145,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
         for (int i = 0; i < (sizeof(ADDRS_CALL_SETCURSOR) / sizeof(uintptr_t)); i++) {
             api->PatchBytes(ADDRS_CALL_SETCURSOR[i], patch3, sizeof(patch3));
         }
-        api->Log("Patched SetCursor!");
+        api->LogDebug("Patched SetCursor!");
     }
 
     // Replace calls to "ShowCursor" with "pop eax" and 1 nop byte
@@ -169,7 +169,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
         for (int i = 0; i < (sizeof(ADDRS_CALL_SHOWCURSOR) / sizeof(uintptr_t)); i++) {
             api->PatchBytes(ADDRS_CALL_SHOWCURSOR[i], patch4, sizeof(patch4));
         }
-        api->Log("Patched ShowCursor!");
+        api->LogDebug("Patched ShowCursor!");
     }
 
 

@@ -78,8 +78,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         incompatibleWarningShown = api->ReadIniBool(L"GUI", L"IncompatibleWarningShown", false);
         api->WriteIniBool(L"GUI", L"IncompatibleWarningShown", incompatibleWarningShown);
 
-        logMessages = api->ReadIniBool(L"Logging", L"LogMessages", true);
-        api->WriteIniBool(L"Logging", L"LogMessages", logMessages);
+        logInfo = api->ReadIniBool(L"Logging", L"LogInfo", true);
+        api->WriteIniBool(L"Logging", L"LogInfo", logInfo);
 
         logDebug = api->ReadIniBool(L"Logging", L"LogDebug", false);
         api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
@@ -96,11 +96,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         logHooks = api->ReadIniBool(L"Mouse", L"LogHooks", false);
         api->WriteIniBool(L"Mouse", L"LogHooks", logHooks);
 
-        api->Log("Game version: " + GameVersions[api->GetGameVersion()]);
+        api->LogInfo("Game version: " + GameVersions[api->GetGameVersion()]);
 
         // Quit if loader disabled
         if (!loaderEnabled) {
-            api->Log("Loader disabled, quitting!");
+            api->LogInfo("Loader disabled, quitting!");
             return TRUE;
         }
 
@@ -113,7 +113,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             bool result = !ShowLauncherWindow(hModule);
             SaveDisabledMods(mods);
             if (result) {
-                api->Log("Exiting modloader.");
+                api->LogInfo("Exiting modloader.");
                 ExitProcess(0);
             }
             

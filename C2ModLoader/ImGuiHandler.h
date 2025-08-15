@@ -8,14 +8,14 @@
 #include "imgui.h"
 #include "Loader.h"
 
-extern ImGuiTextBuffer logBuffer;
+extern std::vector<LogMessage> logMessages;
 extern ImFont* toastFont;
 
 extern bool incompatibleWarningShown;
 
 extern bool showGui;
 extern bool showLog;
-extern bool logMessages;
+extern bool logInfo;
 extern bool logDebug;
 extern bool logWarnings;
 extern bool logErrors;

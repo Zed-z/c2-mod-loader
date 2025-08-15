@@ -173,7 +173,14 @@ constexpr const char* ControlSchemeNames[] = { "Type 2", "Type 1" };
 
 #define PHYSICS_FPS 30
 
-typedef void(*LogFunction)(const std::string& message);
+enum LogSeverity { Info, Debug, Warning, Error };
+
+struct LogMessage {
+	std::string text;
+	LogSeverity severity;
+};
+
+typedef void(*LogInfoFunction)(const std::string& message);
 typedef void(*LogDebugFunction)(const std::string& message);
 typedef void(*LogWarningFunction)(const std::string& message);
 typedef void(*LogErrorFunction)(const std::string& message);
@@ -255,7 +262,7 @@ typedef Inputs(*GetInputsReleasedFunction)();
 
 
 struct ModApi {
-    LogFunction Log;
+	LogInfoFunction LogInfo;
     LogDebugFunction LogDebug;
     LogWarningFunction LogWarning;
     LogErrorFunction LogError;

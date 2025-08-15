@@ -41,7 +41,7 @@ void __stdcall positionSave(int key) {
     saved_coords[key].saved = true;
 
     api->ShowToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
-    api->Log("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
+    api->LogInfo("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
 void __stdcall positionLoad(int key) {
@@ -53,7 +53,7 @@ void __stdcall positionLoad(int key) {
     api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE), saved_coords[key].angle);
 
     api->ShowToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
-    api->Log("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
+    api->LogInfo("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
 void __stdcall positionClear(int key) {
@@ -63,7 +63,7 @@ void __stdcall positionClear(int key) {
 
     std::ostringstream stream;
     stream << "Cleared position!";
-    api->Log(stream.str());
+    api->LogInfo(stream.str());
     api->ShowToast(stream.str());
 }
 
@@ -76,7 +76,7 @@ void __stdcall positionClearAll() {
 
     std::ostringstream stream;
     stream << "Cleared all positions!";
-    api->Log(stream.str());
+    api->LogInfo(stream.str());
     api->ShowToast(stream.str());
 }
 

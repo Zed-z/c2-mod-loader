@@ -55,15 +55,15 @@ void __stdcall PhysicsStep() {
 
     if (changeControls) {
         if (controlScheme == CTRL_TYPE_1) {
-			api->Log("Changing control scheme to Type 2");
+			api->LogInfo("Changing control scheme to Type 2");
         }
         else {
-			api->Log("Changing control scheme to Type 1");
+			api->LogInfo("Changing control scheme to Type 1");
 		}
         SetControlScheme(!controlScheme);
     }
 
-    //api->Log(inputs.toString());
+    //api->LogDebug(inputs.toString());
 
     // Hybrid controls
     if (hybridControls) {

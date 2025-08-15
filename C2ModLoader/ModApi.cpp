@@ -25,7 +25,7 @@
 #include <intrin.h>
 #pragma intrinsic(_ReturnAddress)
 
-void LogRaw(const std::string& message, const std::string& prefix = "") {
+void LogRaw(const std::string& message, const LogSeverity& severity, const std::string& prefix = "") {
 
     // Get module path
     HMODULE caller = GetCallingModule();
@@ -52,33 +52,33 @@ void LogRaw(const std::string& message, const std::string& prefix = "") {
 
     // Write the log to file and buffer
     log << msg.str();
-    logBuffer.appendf("%s\n", WStringToString(msg.str()).c_str());
+    logMessages.push_back({ WStringToString(msg.str()), severity });
 
     // Close log
     log.close();
 }
 
-void Log(const std::string& message) {
-    if (!logMessages) return;
-    LogRaw(message);
+void LogInfo(const std::string& message) {
+    if (!logInfo) return;
+    LogRaw(message, LogSeverity::Info, "INFO    | ");
 }
 
 
 void LogDebug(const std::string& message) {
     if (!logDebug) return;
-    LogRaw(message, "DEBUG | ");
+    LogRaw(message, LogSeverity::Debug, "DEBUG   | ");
 }
 
 
 void LogWarning(const std::string& message) {
     if (!logWarnings) return;
-    LogRaw(message, "WARNING | ");
+    LogRaw(message, LogSeverity::Warning, "WARNING | ");
 }
 
 
 void LogError(const std::string& message) {
     if (!logErrors) return;
-    LogRaw(message, "ERROR | ");
+    LogRaw(message, LogSeverity::Error, "ERROR   | ");
 }
 
 
@@ -119,7 +119,7 @@ void AddressSetInt(uintptr_t address, int value) {
 #ifdef DEBUG
     std::ostringstream stream;
     stream << "Memory at " << address << " set to " << value;
-    Log(stream.str());
+    LogInfo(stream.str());
 #endif
 }
 
@@ -131,7 +131,7 @@ int AddressGetInt(uintptr_t address) {
 #ifdef DEBUG
     std::ostringstream stream;
     stream << "Memory at " << address << " is " << value;
-    Log(stream.str());
+    LogInfo(stream.str());
 #endif
 
     return value;
@@ -199,7 +199,7 @@ bool InjectCode(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t c
 
     uintptr_t newmem = (uintptr_t)VirtualAlloc(NULL, totalSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!newmem) {
-        Log("Failed to allocate memory for code injection.");
+        LogError("Failed to allocate memory for code injection.");
         return false;
     }
 
@@ -504,7 +504,7 @@ StratEntity* GetEntity(MemoryAddress address) {
 
 // API
 ModApi g_ModApi = {
-    Log,
+    LogInfo,
     LogDebug,
     LogWarning,
     LogError,

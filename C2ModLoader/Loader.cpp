@@ -91,7 +91,7 @@ void LoadMods(std::vector<Mod>& mods) {
 
         // Skip due to settings
         if (!mod.enabled) {
-            api->Log("Skipping mod: " + modName);
+            api->LogInfo("Skipping mod: " + modName);
             continue;
         }
 
@@ -116,7 +116,7 @@ void LoadMods(std::vector<Mod>& mods) {
         }
 
         mod.handle = loaded;
-        api->Log("Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle));
+        api->LogInfo("Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle));
     }
 
     // Show message box when mods failed to load

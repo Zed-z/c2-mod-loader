@@ -14,15 +14,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         uintptr_t match1 = api->FindPattern(pattern1, sizeof(pattern1), 1);
         if (!match1) {
-            api->Log("JIceCave1 pattern not found.");
+            api->LogError("JIceCave1 pattern not found.");
             return FALSE;
         }
 
         if (api->PatchBytes(match1, replacement1, sizeof(replacement1))) {
-            api->Log("JIceCave1 patch applied.");
+            api->LogDebug("JIceCave1 patch applied.");
         }
         else {
-            api->Log("JIceCave1 patch failed.");
+            api->LogError("JIceCave1 patch failed.");
             return FALSE;
         }
 
@@ -32,15 +32,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         uintptr_t match2 = api->FindPattern(pattern2, sizeof(pattern2), 1);
         if (!match2) {
-            api->Log("JHub1 pattern not found.");
+            api->LogError("JHub1 pattern not found.");
             return FALSE;
         }
 
         if (api->PatchBytes(match2, replacement2, sizeof(replacement2))) {
-            api->Log("JHub1 patch applied.");
+            api->LogDebug("JHub1 patch applied.");
         }
         else {
-            api->Log("JHub1 patch failed.");
+            api->LogError("JHub1 patch failed.");
             return FALSE;
         }
 
@@ -50,15 +50,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         uintptr_t match3 = api->FindPattern(pattern3, sizeof(pattern3), 1);
         if (!match3) {
-            api->Log("JHub2 pattern not found.");
+            api->LogError("JHub2 pattern not found.");
             return FALSE;
         }
 
         if (api->PatchBytes(match3, replacement3, sizeof(replacement3))) {
-            api->Log("JHub2 patch applied.");
+            api->LogDebug("JHub2 patch applied.");
         }
         else {
-            api->Log("JHub2 patch failed.");
+            api->LogError("JHub2 patch failed.");
             return FALSE;
         }
 
