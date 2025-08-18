@@ -60,27 +60,36 @@ void __stdcall increaseExtender() {
 }
 
 static DWORD WINAPI HotkeyThread(LPVOID) {
-    RegisterHotKey(NULL, 1, 0, VK_F1);
-    RegisterHotKey(NULL, 2, 0, VK_OEM_MINUS);
-    RegisterHotKey(NULL, 3, 0, VK_OEM_PLUS);
+    DWORD pid = GetCurrentProcessId();
 
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        if (msg.message == WM_HOTKEY) {
-            switch (msg.wParam) {
-            case 1: // F1
-                toggleExtender();
-                break;
+    bool prevF1 = false;
+    bool prevMinus = false;
+    bool prevPlus = false;
 
-            case 2: // Minus
-                decreaseExtender();
-                break;
+    while (true) {
+        DWORD foregroundPid = 0;
+        GetWindowThreadProcessId(GetForegroundWindow(), &foregroundPid);
+        bool isForeground = pid == foregroundPid;
 
-            case 3: // Plus
-                increaseExtender();
-                break;
-            }
+        if (isForeground) {
+
+            // Toggle extender
+            bool currF1 = GetAsyncKeyState(VK_F1) & 0x8000;
+            if (currF1 && !prevF1) toggleExtender();
+            prevF1 = currF1;
+
+            // Decrease distance
+            bool currMinus = GetAsyncKeyState(VK_OEM_MINUS) & 0x8000;
+            if (currMinus && !prevMinus) decreaseExtender();
+            prevMinus = currMinus;
+
+            // Increase distance
+            bool currPlus = GetAsyncKeyState(VK_OEM_PLUS) & 0x8000;
+            if (currPlus && !prevPlus) increaseExtender();
+            prevPlus = currPlus;
         }
+
+        Sleep(20);
     }
     return 0;
 }

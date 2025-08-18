@@ -28,20 +28,27 @@ bool guiEnabled = true;
 
 // Keyboard input thread
 static DWORD WINAPI HotkeyThread(LPVOID) {
-    RegisterHotKey(NULL, 1, 0, VK_TAB);
+    DWORD pid = GetCurrentProcessId();
 
-    MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        if (msg.message == WM_HOTKEY) {
-            switch (msg.wParam) {
-            case 1: // TAB
+    bool prevTab = false;
 
+    while (true) {
+        DWORD foregroundPid = 0;
+        GetWindowThreadProcessId(GetForegroundWindow(), &foregroundPid);
+        bool isForeground = pid == foregroundPid;
+
+        if (isForeground) {
+            
+            // Toggle GUI
+            bool currTab = GetAsyncKeyState(VK_TAB) & 0x8000;
+            if (currTab && !prevTab) {
                 showGui = !showGui;
                 api->WriteIniInt(L"GUI", L"ShowGui", (int)showGui);
-
-                break;
             }
+            prevTab = currTab;
         }
+
+        Sleep(20);
     }
     return 0;
 }
