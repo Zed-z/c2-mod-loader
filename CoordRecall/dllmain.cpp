@@ -12,18 +12,14 @@ int coordKeys[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39 }
 
 struct SavedCoords {
     bool saved = false;
-
-    int x;
-    int y;
-    int z;
-    int angle;
+    RotPos3i coords;
 
     std::string toString(bool showAngle = false) const {
         std::ostringstream stream;
 
-        stream << "x:" << x << ",y:" << y << ",z:" << z;
+        stream << "x:" << coords.position.x << ",y:" << coords.position.y << ",z:" << coords.position.z;
         if (showAngle) {
-            stream << ",angle:" << angle;
+            stream << ",angle:" << coords.rotation.y;
         }
 
         return stream.str();
@@ -34,10 +30,13 @@ SavedCoords saved_coords[KEY_COUNT];
 
 
 void __stdcall positionSave(int key) {
-    saved_coords[key].x = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_X));
-    saved_coords[key].y = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_Y));
-    saved_coords[key].z = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_Z));
-    saved_coords[key].angle = api->AddressGetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE));
+    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+    if (croc == nullptr) {
+        api->ShowToast("Croc entity not present!");
+        api->LogInfo("Croc entity not present!");
+    }
+
+    saved_coords[key].coords = croc->newRotPos;
     saved_coords[key].saved = true;
 
     api->ShowToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
@@ -47,10 +46,13 @@ void __stdcall positionSave(int key) {
 void __stdcall positionLoad(int key) {
     if (!saved_coords[key].saved) return;
 
-    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_X), saved_coords[key].x);
-    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_Y), saved_coords[key].y);
-    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_Z), saved_coords[key].z);
-    api->AddressSetInt(api->ResolveAddress(ADDR_CROC_POS_ANGLE), saved_coords[key].angle);
+    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+    if (croc == nullptr) {
+        api->ShowToast("Croc entity not present!");
+        api->LogInfo("Croc entity not present!");
+    }
+
+    croc->newRotPos = saved_coords[key].coords;
 
     api->ShowToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
     api->LogInfo("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));

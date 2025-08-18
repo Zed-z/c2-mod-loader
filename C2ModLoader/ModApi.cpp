@@ -496,6 +496,7 @@ StratEntity* GetEntity(MemoryAddress address) {
     if (entity->next == nullptr) return nullptr;
     if (IsBadReadPtr((void*)(entity->next), sizeof(StratEntity))) return nullptr;
 
+    // There's probably a better way to do this
     entity = entity->next;
 
     return entity;

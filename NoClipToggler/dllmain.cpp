@@ -96,12 +96,12 @@ void __stdcall toggleFreecam() {
 void __stdcall toggleNoclip() {
     noclip_enabled = !noclip_enabled;
 
-    auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-    if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+    if (croc == nullptr) {
         noclip_enabled = false;
         return;
     }
-    noclip_y = api->AddressGetInt(addr);
+    noclip_y = croc->newRotPos.position.y;
 
     if (noclip_enabled) {
         api->PatchBytes(patchAddress, patchBytes, sizeof(patchBytes));
@@ -167,15 +167,12 @@ void __stdcall PhysicsLoop() {
             noclip_y -= 100;
         }
 
-        auto addr = api->ResolveAddress(ADDR_CROC_POS_Y);
-        if (IsBadReadPtr((void*)addr, sizeof(uintptr_t))) {
+        StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+        if (croc == nullptr) {
             noclip_enabled = false;
             return;
         }
-        api->AddressSetInt(
-            addr,
-            noclip_y
-        );
+        croc->newRotPos.position.y = noclip_y;
     }
 
     // Freecam

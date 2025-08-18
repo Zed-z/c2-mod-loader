@@ -19,11 +19,6 @@
 #define ADDR_DIALOG_OBJ         { 0x4A8C3C, { 0x14, 0x40, 0x00 } }
 #define ADDR_STRAT_COUNT        { 0x636160 }
 
-#define ADDR_CROC_POS_X         { 0x4A8C3C, { 0x14, 0x28, 0x2C } }
-#define ADDR_CROC_POS_Y         { 0x4A8C3C, { 0x14, 0x28, 0x30 } }
-#define ADDR_CROC_POS_Z         { 0x4A8C3C, { 0x14, 0x28, 0x34 } }
-#define ADDR_CROC_POS_ANGLE     { 0x4A8C3C, { 0x14, 0x28, 0x24 } }
-
 #define ADDR_CURRENT_SAVE_SLOT  { 0x6220FC }
 #define ADDR_SAVE_SLOT_OFFSET   0x2000
 
