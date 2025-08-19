@@ -31,11 +31,11 @@ void __stdcall toggleExtender() {
 
     if (is_active) {
         api->LogInfo("Render distance extended!");
-        api->ShowToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
+        api->ShowInfoToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
     }
     else {
         api->LogInfo("Render distance reverted!");
-        api->ShowToast("Render distance reverted!");
+        api->ShowInfoToast("Render distance reverted!");
     }
 }
 
@@ -45,7 +45,7 @@ void __stdcall decreaseExtender() {
         RenderApply();
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
         api->LogInfo("Render distance decreased to: x" + std::to_string(render_multiplier));
-        api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
+        api->ShowInfoToast("Render distance: x" + std::to_string(render_multiplier));
     }
 }
 
@@ -55,7 +55,7 @@ void __stdcall increaseExtender() {
         RenderApply();
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
         api->LogInfo("Render distance increased to: x" + std::to_string(render_multiplier));
-        api->ShowToast("Render distance: x" + std::to_string(render_multiplier));
+        api->ShowInfoToast("Render distance: x" + std::to_string(render_multiplier));
     }
 }
 

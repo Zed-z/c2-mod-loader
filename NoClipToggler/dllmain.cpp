@@ -53,7 +53,7 @@ void __stdcall toggleFreecam() {
     if (camera == nullptr) {
         freecam_enabled = false;
         api->LogError("No camera found!");
-        api->ShowToast("No camera found!");
+        api->ShowErrorToast("No camera found!");
         return;
     }
 
@@ -77,7 +77,7 @@ void __stdcall toggleFreecam() {
         cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
 
         api->LogInfo("Freecam enabled!");
-        api->ShowToast("Freecam enabled!");
+        api->ShowInfoToast("Freecam enabled!");
     }
     else {
 
@@ -88,7 +88,7 @@ void __stdcall toggleFreecam() {
         }
         
         api->LogInfo("Freecam disabled!");
-        api->ShowToast("Freecam disabled!");
+        api->ShowInfoToast("Freecam disabled!");
     }
 }
 
@@ -109,7 +109,7 @@ void __stdcall toggleNoclip() {
         api->PatchBytes(jumpFalloffCode, jumpFalloffCodePatch, sizeof(jumpFalloffCodePatch));
         //api->PatchBytes(fallTimerCode, fallTimerCodePatch, sizeof(fallTimerCodePatch));
         api->LogInfo("Noclip enabled!");
-        api->ShowToast("Noclip enabled!");
+        api->ShowInfoToast("Noclip enabled!");
     }
     else {
         api->PatchBytes(patchAddress, originalBytes, sizeof(originalBytes));
@@ -117,7 +117,7 @@ void __stdcall toggleNoclip() {
         api->PatchBytes(jumpFalloffCode, jumpFalloffCodeOriginal, sizeof(jumpFalloffCodeOriginal));
         //api->PatchBytes(fallTimerCode, fallTimerCodeOriginal, sizeof(fallTimerCodeOriginal));
         api->LogInfo("Noclip disabled!");
-        api->ShowToast("Noclip disabled!");
+        api->ShowInfoToast("Noclip disabled!");
     }
 }
 
@@ -183,7 +183,7 @@ void __stdcall PhysicsLoop() {
             camera = nullptr;
             croc = nullptr;
             api->LogError("No camera found!");
-            api->ShowToast("No camera found!");
+            api->ShowErrorToast("No camera found!");
             return;
         }
 

@@ -266,8 +266,8 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
 
 std::deque<Toast> toastQueue;
 
-void ImGuiShowToast(const std::string& message, float duration) {
-    toastQueue.push_front({ message, duration });
+void ImGuiShowToast(const std::string& message, const LogSeverity& severity, float duration) {
+    toastQueue.push_front({ message, severity, duration });
 }
 
 void RenderToasts() {
@@ -294,6 +294,14 @@ void RenderToasts() {
             alpha = toast.timeRemaining / 0.5f;
         }
 
+        ImVec4 toastColor;
+        switch (toast.severity) {
+        case LogSeverity::Info: toastColor = ImVec4(1, 1, 1, alpha); break;
+        case LogSeverity::Debug: toastColor = ImVec4(0.5f, 0.8f, 1, alpha); break;
+        case LogSeverity::Warning: toastColor = ImVec4(1, 1, 0.3f, alpha); break;
+        case LogSeverity::Error: toastColor = ImVec4(1, 0.3f, 0.3f, alpha); break;
+        }
+
         ImGui::SetNextWindowBgAlpha(alpha * 0.85f);
         ImGui::SetNextWindowPos(ImVec2(originX, originY), ImGuiCond_Always);
         ImGui::SetNextWindowSize(ImVec2(toastWidth, 0), ImGuiCond_Always);
@@ -307,12 +315,12 @@ void RenderToasts() {
             | ImGuiWindowFlags_NoMove;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1, 1, 1, alpha));
+        ImGui::PushStyleColor(ImGuiCol_Border, toastColor);
         ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
 
         // Text with wrapping
         ImGui::PushFont(toastFont);
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, alpha));
+        ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
         ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
         ImGui::TextUnformatted(toast.message.c_str());
         ImGui::PopTextWrapPos();

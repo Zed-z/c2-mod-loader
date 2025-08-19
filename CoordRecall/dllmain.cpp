@@ -32,14 +32,15 @@ SavedCoords saved_coords[KEY_COUNT];
 void __stdcall positionSave(int key) {
     StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
     if (croc == nullptr) {
-        api->ShowToast("Croc entity not present!");
-        api->LogInfo("Croc entity not present!");
+        api->ShowErrorToast("Croc entity not present!");
+        api->LogError("Croc entity not present!");
+        return;
     }
 
     saved_coords[key].coords = croc->newRotPos;
     saved_coords[key].saved = true;
 
-    api->ShowToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
+    api->ShowInfoToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
     api->LogInfo("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
@@ -48,13 +49,14 @@ void __stdcall positionLoad(int key) {
 
     StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
     if (croc == nullptr) {
-        api->ShowToast("Croc entity not present!");
-        api->LogInfo("Croc entity not present!");
+        api->ShowErrorToast("Croc entity not present!");
+        api->LogError("Croc entity not present!");
+        return;
     }
 
     croc->newRotPos = saved_coords[key].coords;
 
-    api->ShowToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
+    api->ShowInfoToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
     api->LogInfo("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
 }
 
@@ -66,7 +68,7 @@ void __stdcall positionClear(int key) {
     std::ostringstream stream;
     stream << "Cleared position!";
     api->LogInfo(stream.str());
-    api->ShowToast(stream.str());
+    api->ShowInfoToast(stream.str());
 }
 
 void __stdcall positionClearAll() {
@@ -79,7 +81,7 @@ void __stdcall positionClearAll() {
     std::ostringstream stream;
     stream << "Cleared all positions!";
     api->LogInfo(stream.str());
-    api->ShowToast(stream.str());
+    api->ShowInfoToast(stream.str());
 }
 
 

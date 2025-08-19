@@ -5,7 +5,7 @@
 ModApi* api = nullptr;
 
 void __stdcall helloWorld() {
-    api->ShowToast("Hello world!");
+    api->ShowInfoToast("Hello world!");
 }
 
 MenuActionRegistration __stdcall helloWorldRegistration() {

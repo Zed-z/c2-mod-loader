@@ -6,7 +6,7 @@ ModApi* api = nullptr;
 
 void __stdcall resetBossFlags() {
     api->AddressSetInt(0x622D50, 0);
-    api->ShowToast("Reset boss flags successfully.");
+    api->ShowInfoToast("Reset boss flags successfully.");
 }
 
 MenuActionRegistration __stdcall resetBossFlagsRegistration() {

@@ -175,10 +175,7 @@ struct LogMessage {
 	LogSeverity severity;
 };
 
-typedef void(*LogInfoFunction)(const std::string& message);
-typedef void(*LogDebugFunction)(const std::string& message);
-typedef void(*LogWarningFunction)(const std::string& message);
-typedef void(*LogErrorFunction)(const std::string& message);
+typedef void(*LogFunction)(const std::string& message);
 
 typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);
 typedef uintptr_t(*FindPatternFunction)(const void* pattern, size_t pattern_size, int occurrence);
@@ -257,10 +254,10 @@ typedef Inputs(*GetInputsReleasedFunction)();
 
 
 struct ModApi {
-	LogInfoFunction LogInfo;
-    LogDebugFunction LogDebug;
-    LogWarningFunction LogWarning;
-    LogErrorFunction LogError;
+	LogFunction LogInfo;
+	LogFunction LogDebug;
+	LogFunction LogWarning;
+	LogFunction LogError;
 
     ResolveAddressFunction ResolveAddress;
     FindPatternFunction FindPattern;
@@ -288,7 +285,10 @@ struct ModApi {
     GetInputsPressedFunction GetInputsPressed;
     GetInputsReleasedFunction GetInputsReleased;
 
-    ShowToastFunction ShowToast;
+    ShowToastFunction ShowInfoToast;
+    ShowToastFunction ShowDebugToast;
+    ShowToastFunction ShowWarningToast;
+    ShowToastFunction ShowErrorToast;
     RegisterMenuActionFunction RegisterMenuAction;
     
     GetEntityFunction GetEntity;

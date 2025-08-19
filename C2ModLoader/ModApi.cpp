@@ -474,9 +474,22 @@ Inputs GetInputsReleased() {
 }
 
 
-void ShowToast(const std::string& message) {
-    ImGuiShowToast(message);
+void ShowInfoToast(const std::string& message) {
+    ImGuiShowToast(message, LogSeverity::Info);
 }
+
+void ShowDebugToast(const std::string& message) {
+    ImGuiShowToast(message, LogSeverity::Debug);
+}
+
+void ShowWarningToast(const std::string& message) {
+    ImGuiShowToast(message, LogSeverity::Warning);
+}
+
+void ShowErrorToast(const std::string& message) {
+    ImGuiShowToast(message, LogSeverity::Error);
+}
+
 
 bool RegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
     return ImGuiRegisterMenuAction(handle, registration);
@@ -528,7 +541,10 @@ ModApi g_ModApi = {
     GetInputs,
     GetInputsPressed,
     GetInputsReleased,
-    ShowToast,
+    ShowInfoToast,
+    ShowDebugToast,
+    ShowWarningToast,
+    ShowErrorToast,
     RegisterMenuAction,
     GetEntity
 };
