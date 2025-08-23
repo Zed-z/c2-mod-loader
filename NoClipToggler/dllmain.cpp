@@ -46,6 +46,11 @@ const double PI = 3.141;
 const double CAMERA_ORBIT_Y_OFFSET = 800.0;
 const double CAMERA_ORBIT_DISTANCE = 2400.0;
 
+bool orbitInvertX;
+bool orbitInvertY;
+
+bool freecamInvertX;
+bool freecamInvertY;
 
 static double LerpAngle(double a, double b, double t) {
     double diff = fmod(b - a + PI, 2 * PI) - PI;
@@ -238,12 +243,12 @@ void __stdcall PhysicsLoop() {
             return;
         }
 
-        int input_rot_yaw = inputs.stepRight - inputs.stepLeft;
-        int input_rot_pitch = inputs.invRight - inputs.invLeft;
+        int input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
+        int input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);
 
         cameraYaw += -input_rot_yaw * 0.1;
         cameraPitch += input_rot_pitch * 0.05;
-        cameraPitch = min(max(cameraPitch, -0.9), 0.9);
+        cameraPitch = min(max(cameraPitch, 0.1), 0.9);
 
         double offsetX = cos(cameraPitch) * sin(cameraYaw) * CAMERA_ORBIT_DISTANCE;
         double offsetY = sin(cameraPitch) * CAMERA_ORBIT_DISTANCE;
@@ -253,22 +258,11 @@ void __stdcall PhysicsLoop() {
         cameraRotPos.position.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y + static_cast<int>(offsetY);
         cameraRotPos.position.z = croc->newRotPos.position.z + static_cast<int>(offsetZ);
 
-        cameraLookAt.x = croc->newRotPos.position.x;
-        cameraLookAt.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y;
-        cameraLookAt.z = croc->newRotPos.position.z;
-
         camera->OldRotPos = cameraRotPos;
         camera->newRotPos = cameraRotPos;
         api->AddressSetInt(ADDR_CAMERA_POS_X, cameraRotPos.position.x);
         api->AddressSetInt(ADDR_CAMERA_POS_Y, cameraRotPos.position.y);
         api->AddressSetInt(ADDR_CAMERA_POS_Z, cameraRotPos.position.z);
-
-        api->AddressSetInt(ADDR_CAMERA_LOOKAT_X, cameraLookAt.x);
-        api->AddressSetInt(ADDR_CAMERA_LOOKAT_Y, cameraLookAt.y);
-        api->AddressSetInt(ADDR_CAMERA_LOOKAT_Z, cameraLookAt.z);
-
-        api->AddressSetInt(ADDR_CAMERA_ROT_X, RadiansToGameRotation(-cameraPitch));
-        api->AddressSetInt(ADDR_CAMERA_ROT_Y, RadiansToGameRotation(-cameraYaw));
 
         break;
     }
@@ -277,8 +271,8 @@ void __stdcall PhysicsLoop() {
         int input_x = inputs.right - inputs.left;
         int input_z = -(inputs.down - inputs.up);
         int input_y = inputs.jump - inputs.attack;
-        int input_rot_yaw = inputs.stepRight - inputs.stepLeft;
-        int input_rot_pitch = inputs.invRight - inputs.invLeft;
+        int input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (freecamInvertX ? -1 : 1);
+        int input_rot_pitch = (inputs.invRight - inputs.invLeft) * (freecamInvertY ? -1 : 1);
 
         cameraYaw += input_rot_yaw * 0.1;
         cameraPitch += input_rot_pitch * 0.05;
@@ -333,6 +327,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         api = LoadModApi();
         if (!api) return FALSE;
+
+        orbitInvertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
+        orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
+
+        freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
+        freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
 
 		api->HookPhysics(PhysicsLoop);
 		api->RegisterMenuAction(hModule, toggleNoclipRegistration);
