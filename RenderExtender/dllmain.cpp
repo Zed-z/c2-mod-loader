@@ -143,11 +143,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api->HookFunction(hookAddr, hookLength, &OnDistancesWritten);
 
 
-        is_active = api->ReadIniInt(L"Config", L"Enabled", 1);
-        api->WriteIniInt(L"Config", L"Enabled", is_active);
-
-        render_multiplier = api->ReadIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);
-        api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
+        is_active = api->SetupIniInt(L"Config", L"Enabled", 1);
+        render_multiplier = api->SetupIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);
 
         // Register menu actions
         api->RegisterMenuAction(hModule, toggleExtenderRegistration);

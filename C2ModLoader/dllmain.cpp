@@ -61,47 +61,27 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         ClearLog();
 
         // Config
-        loaderEnabled = api->ReadIniBool(L"Config", L"LoaderEnabled", true);
-        api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
+        loaderEnabled = api->SetupIniBool(L"Config", L"LoaderEnabled", true);
+        skipLauncher = api->SetupIniBool(L"Config", L"SkipLauncher", false);
+        guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
+        showGui = api->SetupIniBool(L"GUI", L"ShowGui", false);
+        showLog = api->SetupIniBool(L"GUI", L"ShowLog", false);
+        showInputs = api->SetupIniBool(L"GUI", L"ShowInputs", false);
+        showObjectList = api->SetupIniBool(L"GUI", L"ShowObjectList", false);
+        incompatibleWarningShown = api->SetupIniBool(L"GUI", L"IncompatibleWarningShown", false);
 
-        skipLauncher = api->ReadIniBool(L"Config", L"SkipLauncher", false);
-        api->WriteIniBool(L"Config", L"SkipLauncher", skipLauncher);
+        showLogInfo = api->SetupIniBool(L"Logging", L"Info", true);
+        showLogDebug = api->SetupIniBool(L"Logging", L"Debug", false);
+        showLogWarning = api->SetupIniBool(L"Logging", L"Warning", true);
+        showLogError = api->SetupIniBool(L"Logging", L"Error", true);
 
-        guiEnabled = api->ReadIniBool(L"GUI", L"GuiEnabled", true);
-        api->WriteIniBool(L"GUI", L"GuiEnabled", guiEnabled);
+        showToastInfo = api->SetupIniBool(L"Toasts", L"Info", true);
+        showToastDebug = api->SetupIniBool(L"Toasts", L"Debug", false);
+        showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
+        showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
 
-        showGui = api->ReadIniBool(L"GUI", L"ShowGui", false);
-        api->WriteIniBool(L"GUI", L"ShowGui", showGui);
-
-        showLog = api->ReadIniBool(L"GUI", L"ShowLog", false);
-        api->WriteIniBool(L"GUI", L"ShowLog", showLog);
-
-        showInputs = api->ReadIniBool(L"GUI", L"ShowInputs", false);
-        api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
-
-        showObjectList = api->ReadIniBool(L"GUI", L"ShowObjectList", false);
-        api->WriteIniBool(L"GUI", L"ShowObjectList", showObjectList);
-
-        incompatibleWarningShown = api->ReadIniBool(L"GUI", L"IncompatibleWarningShown", false);
-        api->WriteIniBool(L"GUI", L"IncompatibleWarningShown", incompatibleWarningShown);
-
-        logInfo = api->ReadIniBool(L"Logging", L"LogInfo", true);
-        api->WriteIniBool(L"Logging", L"LogInfo", logInfo);
-
-        logDebug = api->ReadIniBool(L"Logging", L"LogDebug", false);
-        api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
-
-        logWarnings = api->ReadIniBool(L"Logging", L"LogWarnings", false);
-        api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
-
-        logErrors = api->ReadIniBool(L"Logging", L"LogErrors", true);
-        api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
-
-        freeMouse = api->ReadIniBool(L"Mouse", L"FreeMouse", true);
-        api->WriteIniBool(L"Mouse", L"FreeMouse", freeMouse);
-
-        logHooks = api->ReadIniBool(L"Mouse", L"LogHooks", false);
-        api->WriteIniBool(L"Mouse", L"LogHooks", logHooks);
+        freeMouse = api->SetupIniBool(L"Mouse", L"FreeMouse", true);
+        logHooks = api->SetupIniBool(L"Mouse", L"LogHooks", false);
 
         api->LogInfo("Game version: " + GameVersions[api->GetGameVersion()]);
 

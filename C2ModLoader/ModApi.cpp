@@ -59,25 +59,25 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const std::
 }
 
 void LogInfo(const std::string& message) {
-    if (!logInfo) return;
+    if (!showLogInfo) return;
     LogRaw(message, LogSeverity::Info, "INFO    | ");
 }
 
 
 void LogDebug(const std::string& message) {
-    if (!logDebug) return;
+    if (!showLogDebug) return;
     LogRaw(message, LogSeverity::Debug, "DEBUG   | ");
 }
 
 
 void LogWarning(const std::string& message) {
-    if (!logWarnings) return;
+    if (!showLogWarning) return;
     LogRaw(message, LogSeverity::Warning, "WARNING | ");
 }
 
 
 void LogError(const std::string& message) {
-    if (!logErrors) return;
+    if (!showLogError) return;
     LogRaw(message, LogSeverity::Error, "ERROR   | ");
 }
 
@@ -362,6 +362,12 @@ bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value
     return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
 }
 
+int SetupIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
+    int value = ReadIniInt(section, key, default_value);
+    WriteIniInt(section, key, value);
+    return value;
+}
+
 bool ReadIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
 
     // Get module path
@@ -384,6 +390,12 @@ bool WriteIniBool(const std::wstring& section, const std::wstring& key, bool val
     return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
 }
 
+bool SetupIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
+    int value = ReadIniBool(section, key, default_value);
+    WriteIniBool(section, key, value);
+    return value;
+}
+
 void ReadIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
 
     // Get module path
@@ -404,6 +416,10 @@ bool WriteIniString(const std::wstring& section, const std::wstring& key, const 
     return WritePrivateProfileStringW(section.c_str(), key.c_str(), value, iniPath.c_str()) != 0;
 }
 
+void SetupIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
+    ReadIniString(section, key, default_value, buffer, buffer_size);
+    WriteIniString(section, key, buffer);
+}
 
 
 std::string GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
@@ -475,18 +491,22 @@ Inputs GetInputsReleased() {
 
 
 void ShowInfoToast(const std::string& message) {
+    if (!showToastInfo) return;
     ImGuiShowToast(message, LogSeverity::Info);
 }
 
 void ShowDebugToast(const std::string& message) {
+    if (!showToastDebug) return;
     ImGuiShowToast(message, LogSeverity::Debug);
 }
 
 void ShowWarningToast(const std::string& message) {
+    if (!showToastWarning) return;
     ImGuiShowToast(message, LogSeverity::Warning);
 }
 
 void ShowErrorToast(const std::string& message) {
+    if (!showToastError) return;
     ImGuiShowToast(message, LogSeverity::Error);
 }
 
@@ -531,10 +551,13 @@ ModApi g_ModApi = {
     InjectCode,
     HookFunction,
     HookPhysics,
+    SetupIniInt,
     ReadIniInt,
     WriteIniInt,
+    SetupIniBool,
     ReadIniBool,
     WriteIniBool,
+    SetupIniString,
     ReadIniString,
     WriteIniString,
     GetGameVersion,

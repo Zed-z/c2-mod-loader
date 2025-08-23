@@ -12,11 +12,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadModApi();
         if (!api) return FALSE;
 
-        fullHealthOnRetry = api->ReadIniInt(L"Config", L"FullHealthOnRetry", true);
-        api->WriteIniInt(L"Config", L"FullHealthOnRetry", fullHealthOnRetry);
-
-        fullHealthOnLevelEntry = api->ReadIniInt(L"Config", L"FullHealthOnLevelEntry", true);
-        api->WriteIniInt(L"Config", L"FullHealthOnLevelEntry", fullHealthOnLevelEntry);
+        fullHealthOnRetry = api->SetupIniInt(L"Config", L"FullHealthOnRetry", true);
+        fullHealthOnLevelEntry = api->SetupIniInt(L"Config", L"FullHealthOnLevelEntry", true);
 
         // Instead of setting current lives to 5 on game over,
         // Get the live limit (Croc2.exe+2062CC) of the current slot (ecx)

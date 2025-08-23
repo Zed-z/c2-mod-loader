@@ -15,10 +15,14 @@ extern bool incompatibleWarningShown;
 
 extern bool showGui;
 extern bool showLog;
-extern bool logInfo;
-extern bool logDebug;
-extern bool logWarnings;
-extern bool logErrors;
+extern bool showLogInfo;
+extern bool showLogDebug;
+extern bool showLogWarning;
+extern bool showLogError;
+extern bool showToastInfo;
+extern bool showToastDebug;
+extern bool showToastWarning;
+extern bool showToastError;
 extern bool showInputs;
 extern bool showObjectList;
 

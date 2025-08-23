@@ -14,24 +14,19 @@ bool cheatsMusicSelect = false;
 void SetupCheats() {
 	cheatsValue = api->AddressGetInt(ADDR_CHEATS);
 
-	cheatsDebugMenu = api->ReadIniBool(L"Cheats", L"DebugMenu", false);
-	api->WriteIniBool(L"Cheats", L"DebugMenu", cheatsDebugMenu);
+	cheatsDebugMenu = api->SetupIniBool(L"Cheats", L"DebugMenu", false);
 	setDebugMenu(cheatsDebugMenu);
 
-	cheatsPositionBar = api->ReadIniBool(L"Cheats", L"PositionBar", false);
-	api->WriteIniBool(L"Cheats", L"PositionBar", cheatsPositionBar);
+	cheatsPositionBar = api->SetupIniBool(L"Cheats", L"PositionBar", false);
 	setPositionBar(cheatsPositionBar);
 
-	cheatsInvulnerability = api->ReadIniBool(L"Cheats", L"Invulnerability", false);
-	api->WriteIniBool(L"Cheats", L"Invulnerability", cheatsInvulnerability);
+	cheatsInvulnerability = api->SetupIniBool(L"Cheats", L"Invulnerability", false);
 	setInvulnerability(cheatsInvulnerability);
 
-	cheatsBonusCrystals = api->ReadIniBool(L"Cheats", L"BonusCrystals", false);
-	api->WriteIniBool(L"Cheats", L"BonusCrystals", cheatsBonusCrystals);
+	cheatsBonusCrystals = api->SetupIniBool(L"Cheats", L"BonusCrystals", false);
 	setBonusCrystals(cheatsBonusCrystals);
 
-	cheatsMusicSelect = api->ReadIniBool(L"Cheats", L"MusicSelect", false);
-	api->WriteIniBool(L"Cheats", L"MusicSelect", cheatsMusicSelect);
+	cheatsMusicSelect = api->SetupIniBool(L"Cheats", L"MusicSelect", false);
 	setMusicSelect(cheatsMusicSelect);
 }
 

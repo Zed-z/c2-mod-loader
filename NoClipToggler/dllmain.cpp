@@ -250,11 +250,11 @@ void __stdcall PhysicsLoop() {
         double offsetZ = cos(cameraPitch) * cos(cameraYaw) * CAMERA_ORBIT_DISTANCE;
 
         cameraRotPos.position.x = croc->newRotPos.position.x + static_cast<int>(offsetX);
-        cameraRotPos.position.y = CAMERA_ORBIT_Y_OFFSET + croc->newRotPos.position.y + static_cast<int>(offsetY);
+        cameraRotPos.position.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y + static_cast<int>(offsetY);
         cameraRotPos.position.z = croc->newRotPos.position.z + static_cast<int>(offsetZ);
 
         cameraLookAt.x = croc->newRotPos.position.x;
-        cameraLookAt.y = CAMERA_ORBIT_Y_OFFSET + croc->newRotPos.position.y;
+        cameraLookAt.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y;
         cameraLookAt.z = croc->newRotPos.position.z;
 
         camera->OldRotPos = cameraRotPos;
@@ -287,19 +287,19 @@ void __stdcall PhysicsLoop() {
         double forwards_x = -cos(cameraYaw);
         double forwards_z = -sin(cameraYaw);
 
-        cameraRotPos.position.x += forwards_x * input_x * 100;
-        cameraRotPos.position.z += forwards_z * input_x * 100;
+        cameraRotPos.position.x += static_cast<int>(forwards_x * input_x * 100);
+        cameraRotPos.position.z += static_cast<int>(forwards_z * input_x * 100);
 
         double sidewards_x = cos(cameraYaw + PI / 2);
         double sidewards_z = sin(cameraYaw + PI / 2);
 
-        cameraRotPos.position.x += sidewards_x * input_z * 100;
-        cameraRotPos.position.y += input_y * 100;
-        cameraRotPos.position.z += sidewards_z * input_z * 100;
+        cameraRotPos.position.x += static_cast<int>(sidewards_x * input_z * 100);
+        cameraRotPos.position.y += static_cast<int>(input_y * 100);
+        cameraRotPos.position.z += static_cast<int>(sidewards_z * input_z * 100);
 
-        cameraLookAt.x = cameraRotPos.position.x + (sin(-cameraYaw) * cos(-cameraPitch) * 100.0);
-        cameraLookAt.y = cameraRotPos.position.y + (sin(-cameraPitch) * 100.0);
-        cameraLookAt.z = cameraRotPos.position.z + (cos(-cameraYaw) * cos(-cameraPitch) * 100.0);
+        cameraLookAt.x = cameraRotPos.position.x + static_cast<int>(sin(-cameraYaw) * cos(-cameraPitch) * 100.0);
+        cameraLookAt.y = cameraRotPos.position.y + static_cast<int>(sin(-cameraPitch) * 100.0);
+        cameraLookAt.z = cameraRotPos.position.z + static_cast<int>(cos(-cameraYaw) * cos(-cameraPitch) * 100.0);
 
         camera->OldRotPos = cameraRotPos;
         camera->newRotPos = cameraRotPos;

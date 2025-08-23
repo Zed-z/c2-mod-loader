@@ -72,7 +72,7 @@ typedef int32_t StratEntityFlags;
 #define LOCAL_VAR_COUNT 20
 struct LocalVarsStruct {
 	int32_t vars[LOCAL_VAR_COUNT];
-	int32_t triggers[];
+	int32_t* triggers;
 };
 
 struct StratEntity {
@@ -193,10 +193,15 @@ typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BY
 typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall* func)());
 typedef bool(*HookPhysicsFunction)(void(__stdcall* func)());
 
+typedef int(*SetupIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
 typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
+
+typedef bool(*SetupIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool default_value);
 typedef bool(*ReadIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool default_value);
 typedef bool(*WriteIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool value);
+
+typedef void(*SetupIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
 typedef void(*ReadIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
 typedef bool(*WriteIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* value);
 
@@ -272,10 +277,15 @@ struct ModApi {
     HookFunctionFunction HookFunction;
     HookPhysicsFunction HookPhysics;
 
+	SetupIniIntFunction SetupIniInt;
     ReadIniIntFunction ReadIniInt;
     WriteIniIntFunction WriteIniInt;
+
+	SetupIniBoolFunction SetupIniBool;
     ReadIniBoolFunction ReadIniBool;
     WriteIniBoolFunction WriteIniBool;
+
+	SetupIniStringFunction SetupIniString;
     ReadIniStringFunction ReadIniString;
     WriteIniStringFunction WriteIniString;
 

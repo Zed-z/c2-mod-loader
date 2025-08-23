@@ -29,10 +29,17 @@ bool incompatibleWarningShown;
 
 bool showGui;
 bool showLog;
-bool logInfo;
-bool logDebug;
-bool logWarnings;
-bool logErrors;
+
+bool showLogInfo;
+bool showLogDebug;
+bool showLogWarning;
+bool showLogError;
+
+bool showToastInfo;
+bool showToastDebug;
+bool showToastWarning;
+bool showToastError;
+
 bool showInputs;
 bool showObjectList;
 
@@ -439,7 +446,7 @@ void RenderObjectList() {
 
     ImGui::Begin("Object List");
 
-    int itemWidth;
+    float itemWidth;
 
     uintptr_t rootObjectAddress = api->ResolveAddress(ADDR_ROOT_OBJ);
     uintptr_t crocObjectAddress = api->ResolveAddress(ADDR_CROC_OBJ);
@@ -476,11 +483,10 @@ void RenderObjectList() {
             else {
                 while (distanceNode != nullptr) {
 
-                    int playerDistance = std::sqrt(
+                    int playerDistance = static_cast<int>(std::sqrt(
                         std::pow(distanceNode->newPosition.x - croc->newPosition.x, 2)
                         + std::pow(distanceNode->newPosition.y - croc->newPosition.y, 2)
-                        + std::pow(distanceNode->newPosition.z - croc->newPosition.z, 2)
-                    );
+                        + std::pow(distanceNode->newPosition.z - croc->newPosition.z, 2)));
 
                     if (playerDistance > maxDistanceToPlayer) {
                         maxDistanceToPlayer = playerDistance;
@@ -495,11 +501,12 @@ void RenderObjectList() {
 
             while (node != nullptr) {
 
-                int playerDistance = (croc != nullptr) ? std::sqrt(
-                    std::pow(node->newPosition.x - croc->newPosition.x, 2)
-                    + std::pow(node->newPosition.y - croc->newPosition.y, 2)
-                    + std::pow(node->newPosition.z - croc->newPosition.z, 2)
-                ) : 0;
+                int playerDistance = (croc != nullptr)
+                    ? static_cast<int>(std::sqrt(
+                        std::pow(node->newPosition.x - croc->newPosition.x, 2)
+                        + std::pow(node->newPosition.y - croc->newPosition.y, 2)
+                        + std::pow(node->newPosition.z - croc->newPosition.z, 2)))
+                    : 0;
 
                 std::ostringstream ss;
                 ss << "(" << std::hex << std::uppercase << (uintptr_t)node << ") ";
@@ -518,25 +525,25 @@ void RenderObjectList() {
                     // Position
                     ImGui::Text("Position / Rotation");
 
-                    itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3;
+                    itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3);
 
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("PosX##posx") + ss.str()).c_str(), &(node->newPosition.x), 100, 1000));
+                    ImGui::InputInt((std::string("PosX##posx") + ss.str()).c_str(), &(node->newPosition.x), 100, 1000);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("PosY##posy") + ss.str()).c_str(), &(node->newPosition.y), 100, 1000));
+                    ImGui::InputInt((std::string("PosY##posy") + ss.str()).c_str(), &(node->newPosition.y), 100, 1000);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("PosZ##posz") + ss.str()).c_str(), &(node->newPosition.z), 100, 1000));
+                    ImGui::InputInt((std::string("PosZ##posz") + ss.str()).c_str(), &(node->newPosition.z), 100, 1000);
 
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("RotX##rotx") + ss.str()).c_str(), &(node->newRotation.x), 100, 1000));
+                    ImGui::InputInt((std::string("RotX##rotx") + ss.str()).c_str(), &(node->newRotation.x), 100, 1000);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("RotY##roty") + ss.str()).c_str(), &(node->newRotation.y), 100, 1000));
+                    ImGui::InputInt((std::string("RotY##roty") + ss.str()).c_str(), &(node->newRotation.y), 100, 1000);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("RotZ##rotz") + ss.str()).c_str(), &(node->newRotation.z), 100, 1000));
+                    ImGui::InputInt((std::string("RotZ##rotz") + ss.str()).c_str(), &(node->newRotation.z), 100, 1000);
 
                     ImGui::Text(("Distance from player: " + std::to_string(node->distanceToPlayer) + " (" + std::to_string(playerDistance) + ")").c_str());
 
@@ -546,45 +553,45 @@ void RenderObjectList() {
                         // Old position
                         ImGui::Text("Old Position / Rotation");
 
-                        itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3;
+                        itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3);
 
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosX##oldposx") + ss.str()).c_str(), &(node->OldRotPos.position.x), 100, 1000));
+                        ImGui::InputInt((std::string("PosX##oldposx") + ss.str()).c_str(), &(node->OldRotPos.position.x), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosY##oldposy") + ss.str()).c_str(), &(node->OldRotPos.position.y), 100, 1000));
+                        ImGui::InputInt((std::string("PosY##oldposy") + ss.str()).c_str(), &(node->OldRotPos.position.y), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosZ##oldposz") + ss.str()).c_str(), &(node->OldRotPos.position.z), 100, 1000));
+                        ImGui::InputInt((std::string("PosZ##oldposz") + ss.str()).c_str(), &(node->OldRotPos.position.z), 100, 1000);
 
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotX##oldrotx") + ss.str()).c_str(), &(node->OldRotPos.rotation.x), 100, 1000));
+                        ImGui::InputInt((std::string("RotX##oldrotx") + ss.str()).c_str(), &(node->OldRotPos.rotation.x), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotY##oldroty") + ss.str()).c_str(), &(node->OldRotPos.rotation.y), 100, 1000));
+                        ImGui::InputInt((std::string("RotY##oldroty") + ss.str()).c_str(), &(node->OldRotPos.rotation.y), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotZ##oldrotz") + ss.str()).c_str(), &(node->OldRotPos.rotation.z), 100, 1000));
+                        ImGui::InputInt((std::string("RotZ##oldrotz") + ss.str()).c_str(), &(node->OldRotPos.rotation.z), 100, 1000);
 
                         // Start Position
                         ImGui::Text("Start Position");
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosX##startposx") + ss.str()).c_str(), &(node->StartRotPos.position.x), 100, 1000));
+                        ImGui::InputInt((std::string("PosX##startposx") + ss.str()).c_str(), &(node->StartRotPos.position.x), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosY##startposy") + ss.str()).c_str(), &(node->StartRotPos.position.y), 100, 1000));
+                        ImGui::InputInt((std::string("PosY##startposy") + ss.str()).c_str(), &(node->StartRotPos.position.y), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("PosZ##startposz") + ss.str()).c_str(), &(node->StartRotPos.position.z), 100, 1000));
+                        ImGui::InputInt((std::string("PosZ##startposz") + ss.str()).c_str(), &(node->StartRotPos.position.z), 100, 1000);
 
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotX##startrotx") + ss.str()).c_str(), &(node->StartRotPos.rotation.x), 100, 1000));
+                        ImGui::InputInt((std::string("RotX##startrotx") + ss.str()).c_str(), &(node->StartRotPos.rotation.x), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotY##startroty") + ss.str()).c_str(), &(node->StartRotPos.rotation.y), 100, 1000));
+                        ImGui::InputInt((std::string("RotY##startroty") + ss.str()).c_str(), &(node->StartRotPos.rotation.y), 100, 1000);
                         ImGui::SameLine();
                         ImGui::SetNextItemWidth(itemWidth);
-                        if (ImGui::InputInt((std::string("RotZ##startrotz") + ss.str()).c_str(), &(node->StartRotPos.rotation.z), 100, 1000));
+                        ImGui::InputInt((std::string("RotZ##startrotz") + ss.str()).c_str(), &(node->StartRotPos.rotation.z), 100, 1000);
                     }
 
                     // Model
@@ -602,16 +609,16 @@ void RenderObjectList() {
                     // Scale
                     ImGui::Text("Scale");
 
-                    itemWidth = ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 8 / 3;
+                    itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 8 / 3);
 
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("X##scalex") + ss.str()).c_str(), &(node->scale.x), 128, 4096));
+                    ImGui::InputInt((std::string("X##scalex") + ss.str()).c_str(), &(node->scale.x), 128, 4096);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("Y##scaley") + ss.str()).c_str(), &(node->scale.y), 128, 4096));
+                    ImGui::InputInt((std::string("Y##scaley") + ss.str()).c_str(), &(node->scale.y), 128, 4096);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(itemWidth);
-                    if (ImGui::InputInt((std::string("Z##scalez") + ss.str()).c_str(), &(node->scale.z), 128, 4096));
+                    ImGui::InputInt((std::string("Z##scalez") + ss.str()).c_str(), &(node->scale.z), 128, 4096);
 
                     // Actions
                     ImGui::Text("Actions");
@@ -686,7 +693,7 @@ void RenderObjectList() {
                     if (ImGui::CollapsingHeader(("Local Variables##localvars" + ss.str()).c_str())) {
 
                         ImGui::Text("Flags");
-                        if (ImGui::InputInt(("Flags 0" + std::string("##flags0") + ss.str()).c_str(), &(node->flags0), 0, 0));
+                        ImGui::InputInt(("Flags 0" + std::string("##flags0") + ss.str()).c_str(), &(node->flags0), 0, 0);
 
                         for (int i = 0; i < 32; i++) {
                             std::string checkboxLabel =
@@ -709,7 +716,7 @@ void RenderObjectList() {
                             }
                         }
 
-                        if (ImGui::InputInt(("Flags 1" + std::string("##flags1") + ss.str()).c_str(), &(node->flags1), 0, 0));
+                        ImGui::InputInt(("Flags 1" + std::string("##flags1") + ss.str()).c_str(), &(node->flags1), 0, 0);
 
                         for (int i = 0; i < 32; i++) {
                             std::string checkboxLabel =
@@ -734,7 +741,7 @@ void RenderObjectList() {
 
 
                         ImGui::Text("Local Variables");
-                        itemWidth = ImGui::GetContentRegionAvail().x / 2 - ImGui::GetStyle().ItemSpacing.x * 8 / 3;
+                        itemWidth = (ImGui::GetContentRegionAvail().x / 2 - ImGui::GetStyle().ItemSpacing.x * 8 / 3);
                         for (int i = 0; i < LOCAL_VAR_COUNT; i++) {
                             ImGui::SetNextItemWidth(itemWidth);
 
@@ -742,7 +749,7 @@ void RenderObjectList() {
                                 (i < 10 ? " " : "")
                                 + std::to_string(i) + std::string("##localvar") + std::to_string(i) + ss.str();
 
-                            if (ImGui::InputInt(label.c_str(), &(node->localVars->vars[i]), 0, 0));
+                            ImGui::InputInt(label.c_str(), &(node->localVars->vars[i]), 0, 0);
 
                             if (i % 2 == 0) {
                                 ImGui::SameLine();
@@ -809,17 +816,34 @@ void RenderMenuBar() {
             }
             if (ImGui::BeginMenu("Logging")) {
 
-                if (ImGui::MenuItem("Log Info", nullptr, &logInfo)) {
-                    api->WriteIniBool(L"Logging", L"LogInfo", logInfo);
+                if (ImGui::MenuItem("Show Info", nullptr, &showLogInfo)) {
+                    api->WriteIniBool(L"Logging", L"Info", showLogInfo);
                 }
-                if (ImGui::MenuItem("Log Debug", nullptr, &logDebug)) {
-                    api->WriteIniBool(L"Logging", L"LogDebug", logDebug);
+                if (ImGui::MenuItem("Show Debug", nullptr, &showLogDebug)) {
+                    api->WriteIniBool(L"Logging", L"Debug", showLogDebug);
                 }
-                if (ImGui::MenuItem("Log Warnings", nullptr, &logWarnings)) {
-                    api->WriteIniBool(L"Logging", L"LogWarnings", logWarnings);
+                if (ImGui::MenuItem("Show Warnings", nullptr, &showLogWarning)) {
+                    api->WriteIniBool(L"Logging", L"Warnings", showLogWarning);
                 }
-                if (ImGui::MenuItem("Log Errors", nullptr, &logErrors)) {
-                    api->WriteIniBool(L"Logging", L"LogErrors", logErrors);
+                if (ImGui::MenuItem("Show Errors", nullptr, &showLogError)) {
+                    api->WriteIniBool(L"Logging", L"Errors", showLogError);
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Toasts")) {
+
+                if (ImGui::MenuItem("Show Info", nullptr, &showToastInfo)) {
+                    api->WriteIniBool(L"Toasts", L"Info", showToastInfo);
+                }
+                if (ImGui::MenuItem("Show Debug", nullptr, &showToastDebug)) {
+                    api->WriteIniBool(L"Toasts", L"Debug", showToastDebug);
+                }
+                if (ImGui::MenuItem("Show Warnings", nullptr, &showToastWarning)) {
+                    api->WriteIniBool(L"Toasts", L"Warnings", showToastWarning);
+                }
+                if (ImGui::MenuItem("Show Errors", nullptr, &showToastError)) {
+                    api->WriteIniBool(L"Toasts", L"Errors", showToastError);
                 }
 
                 ImGui::EndMenu();

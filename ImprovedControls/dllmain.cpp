@@ -142,14 +142,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api = LoadModApi();
         if (!api) return FALSE;
 
-        type1flip = api->ReadIniBool(L"Config", L"Type1Flip", true);
-        api->WriteIniBool(L"Config", L"Type1Flip", type1flip);
-
-        hybridControls = api->ReadIniBool(L"Config", L"HybridControls", false);
-        api->WriteIniBool(L"Config", L"HybridControls", hybridControls);
-
-        limbusMode = api->ReadIniBool(L"Config", L"LimbusMode", false);
-        api->WriteIniBool(L"Config", L"LimbusMode", limbusMode);
+        type1flip = api->SetupIniBool(L"Config", L"Type1Flip", true);
+        hybridControls = api->SetupIniBool(L"Config", L"HybridControls", false);
+        limbusMode = api->SetupIniBool(L"Config", L"LimbusMode", false);
 
         api->HookPhysics(PhysicsStep);
 
