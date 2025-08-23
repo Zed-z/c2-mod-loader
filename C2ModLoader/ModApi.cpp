@@ -25,11 +25,10 @@
 #include <intrin.h>
 #pragma intrinsic(_ReturnAddress)
 
-void LogRaw(const std::string& message, const LogSeverity& severity, const std::string& prefix = "") {
+void LogRaw(const std::string& message, const LogSeverity& severity, const HMODULE& modHandle, const std::string& prefix = "") {
 
     // Get module path
-    HMODULE caller = GetCallingModule();
-    PathInfo pathInfo = GetModuleFilepath(caller);
+    PathInfo pathInfo = GetModuleFilepath(modHandle);
 
     // Get log path - ignore directory override
     HMODULE executable = GetModuleHandleA(NULL);
@@ -48,7 +47,7 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const std::
 
     // Format and write the timestamp and message
     std::wstringstream msg;
-    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << StringToWString(prefix)  << pathInfo.name << L"] " << StringToWString(message) << std::endl;
+    msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << StringToWString(prefix) << pathInfo.name << L"] " << StringToWString(message) << std::endl;
 
     // Write the log to file and buffer
     log << msg.str();
@@ -59,19 +58,19 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const std::
 }
 
 void LogInfo(const std::string& message) {
-    LogRaw(message, LogSeverity::Info, "INFO    | ");
+    LogRaw(message, LogSeverity::Info, GetCallingModule(), " INFO    | ");
 }
 
 void LogDebug(const std::string& message) {
-    LogRaw(message, LogSeverity::Debug, "DEBUG   | ");
+    LogRaw(message, LogSeverity::Debug, GetCallingModule(), "DEBUG   | ");
 }
 
 void LogWarning(const std::string& message) {
-    LogRaw(message, LogSeverity::Warning, "WARNING | ");
+    LogRaw(message, LogSeverity::Warning, GetCallingModule(), "WARNING | ");
 }
 
 void LogError(const std::string& message) {
-    LogRaw(message, LogSeverity::Error, "ERROR   | ");
+    LogRaw(message, LogSeverity::Error, GetCallingModule(), "ERROR   | ");
 }
 
 
