@@ -188,6 +188,20 @@
           <VariableType>4 Bytes</VariableType>
           <Address>0052A54C</Address>
         </CheatEntry>
+        <CheatEntry>
+          <ID>196</ID>
+          <Description>"Analog X"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0052A564</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>197</ID>
+          <Description>"Analog Y"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0052A574</Address>
+        </CheatEntry>
       </CheatEntries>
     </CheatEntry>
     <CheatEntry>
