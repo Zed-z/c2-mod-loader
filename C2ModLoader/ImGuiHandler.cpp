@@ -301,46 +301,53 @@ void RenderToasts() {
             alpha = toast.timeRemaining / 0.5f;
         }
 
-        ImVec4 toastColor;
-        switch (toast.severity) {
-        case LogSeverity::Info: toastColor = ImVec4(1, 1, 1, alpha); break;
-        case LogSeverity::Debug: toastColor = ImVec4(0.5f, 0.8f, 1, alpha); break;
-        case LogSeverity::Warning: toastColor = ImVec4(1, 1, 0.3f, alpha); break;
-        case LogSeverity::Error: toastColor = ImVec4(1, 0.3f, 0.3f, alpha); break;
+        if (
+			toast.severity == LogSeverity::Info && showToastInfo
+            || toast.severity == LogSeverity::Debug && showToastDebug
+            || toast.severity == LogSeverity::Warning && showToastWarning
+            || toast.severity == LogSeverity::Error && showToastError
+        ) {
+            ImVec4 toastColor;
+            switch (toast.severity) {
+            case LogSeverity::Info: toastColor = ImVec4(1, 1, 1, alpha); break;
+            case LogSeverity::Debug: toastColor = ImVec4(0.5f, 0.8f, 1, alpha); break;
+            case LogSeverity::Warning: toastColor = ImVec4(1, 1, 0.3f, alpha); break;
+            case LogSeverity::Error: toastColor = ImVec4(1, 0.3f, 0.3f, alpha); break;
+            }
+
+            ImGui::SetNextWindowBgAlpha(alpha * 0.85f);
+            ImGui::SetNextWindowPos(ImVec2(originX, originY), ImGuiCond_Always);
+            ImGui::SetNextWindowSize(ImVec2(toastWidth, 0), ImGuiCond_Always);
+
+            ImGuiWindowFlags flags =
+                ImGuiWindowFlags_NoDecoration
+                | ImGuiWindowFlags_AlwaysAutoResize
+                | ImGuiWindowFlags_NoSavedSettings
+                | ImGuiWindowFlags_NoFocusOnAppearing
+                | ImGuiWindowFlags_NoNav
+                | ImGuiWindowFlags_NoMove;
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
+            ImGui::PushStyleColor(ImGuiCol_Border, toastColor);
+            ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
+
+            // Text with wrapping
+            ImGui::PushFont(toastFont);
+            ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
+            ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
+            ImGui::TextUnformatted(toast.message.c_str());
+            ImGui::PopTextWrapPos();
+            ImGui::PopStyleColor();
+            ImGui::PopFont();
+
+            float toastHeight = ImGui::GetWindowSize().y;
+            ImGui::End();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+
+            // Add offset based on toast logHeight
+            originY += toastHeight + toastMargin;
         }
-
-        ImGui::SetNextWindowBgAlpha(alpha * 0.85f);
-        ImGui::SetNextWindowPos(ImVec2(originX, originY), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(toastWidth, 0), ImGuiCond_Always);
-
-        ImGuiWindowFlags flags =
-            ImGuiWindowFlags_NoDecoration
-            | ImGuiWindowFlags_AlwaysAutoResize
-            | ImGuiWindowFlags_NoSavedSettings
-            | ImGuiWindowFlags_NoFocusOnAppearing
-            | ImGuiWindowFlags_NoNav
-            | ImGuiWindowFlags_NoMove;
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
-        ImGui::PushStyleColor(ImGuiCol_Border, toastColor);
-        ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
-
-        // Text with wrapping
-        ImGui::PushFont(toastFont);
-        ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
-        ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
-        ImGui::TextUnformatted(toast.message.c_str());
-        ImGui::PopTextWrapPos();
-        ImGui::PopStyleColor();
-		ImGui::PopFont();
-
-        float toastHeight = ImGui::GetWindowSize().y;
-        ImGui::End();
-        ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
-
-		// Add offset based on toast logHeight
-        originY += toastHeight + toastMargin;
 
         // Erase toast if needed
         if (toast.timeRemaining <= 0.0f) {
@@ -368,9 +375,39 @@ void RenderLog() {
     //ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
 
     ImGui::Begin("Console Log");
+
+    if (ImGui::Checkbox("Show Info##log_showinfo", &showLogInfo)) {
+        api->WriteIniBool(L"Logging", L"Info", showLogInfo);
+    }
+	ImGui::SameLine();
+    if (ImGui::Checkbox("Show Debug##log_showdebug", &showLogDebug)) {
+        api->WriteIniBool(L"Logging", L"Debug", showLogDebug);
+    }
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Show Warnings##log_showwarning", &showLogWarning)) {
+        api->WriteIniBool(L"Logging", L"Warning", showLogWarning);
+    }
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Show Errors##log_showerror", &showLogError)) {
+        api->WriteIniBool(L"Logging", L"Error", showLogError);
+    }
+
     ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
+    bool autoScroll = false;
+    float scrollY = ImGui::GetScrollY();
+    float scrollMaxY = ImGui::GetScrollMaxY();
+
+    if (scrollY >= scrollMaxY - 1.0f)
+        autoScroll = true;
+
     for (const LogMessage& msg : logMessages) {
+
+        if (msg.severity == LogSeverity::Info && !showLogInfo) continue;
+        if (msg.severity == LogSeverity::Debug && !showLogDebug) continue;
+        if (msg.severity == LogSeverity::Warning && !showLogWarning) continue;
+		if (msg.severity == LogSeverity::Error && !showLogError) continue;
+
         ImVec4 logColor;
         switch (msg.severity) {
             case LogSeverity::Info: logColor = ImVec4(1, 1, 1, 1); break;
@@ -383,7 +420,7 @@ void RenderLog() {
         ImGui::PopStyleColor();
 	}
 
-    ImGui::SetScrollHereY(1.0f);
+    if (autoScroll) ImGui::SetScrollHereY(1.0f);
 
     ImGui::EndChild();
     ImGui::End();
@@ -823,10 +860,10 @@ void RenderMenuBar() {
                     api->WriteIniBool(L"Logging", L"Debug", showLogDebug);
                 }
                 if (ImGui::MenuItem("Show Warnings", nullptr, &showLogWarning)) {
-                    api->WriteIniBool(L"Logging", L"Warnings", showLogWarning);
+                    api->WriteIniBool(L"Logging", L"Warning", showLogWarning);
                 }
                 if (ImGui::MenuItem("Show Errors", nullptr, &showLogError)) {
-                    api->WriteIniBool(L"Logging", L"Errors", showLogError);
+                    api->WriteIniBool(L"Logging", L"Error", showLogError);
                 }
 
                 ImGui::EndMenu();
@@ -840,10 +877,10 @@ void RenderMenuBar() {
                     api->WriteIniBool(L"Toasts", L"Debug", showToastDebug);
                 }
                 if (ImGui::MenuItem("Show Warnings", nullptr, &showToastWarning)) {
-                    api->WriteIniBool(L"Toasts", L"Warnings", showToastWarning);
+                    api->WriteIniBool(L"Toasts", L"Warning", showToastWarning);
                 }
                 if (ImGui::MenuItem("Show Errors", nullptr, &showToastError)) {
-                    api->WriteIniBool(L"Toasts", L"Errors", showToastError);
+                    api->WriteIniBool(L"Toasts", L"Error", showToastError);
                 }
 
                 ImGui::EndMenu();

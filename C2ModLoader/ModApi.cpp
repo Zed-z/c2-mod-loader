@@ -59,25 +59,18 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const std::
 }
 
 void LogInfo(const std::string& message) {
-    if (!showLogInfo) return;
     LogRaw(message, LogSeverity::Info, "INFO    | ");
 }
 
-
 void LogDebug(const std::string& message) {
-    if (!showLogDebug) return;
     LogRaw(message, LogSeverity::Debug, "DEBUG   | ");
 }
 
-
 void LogWarning(const std::string& message) {
-    if (!showLogWarning) return;
     LogRaw(message, LogSeverity::Warning, "WARNING | ");
 }
 
-
 void LogError(const std::string& message) {
-    if (!showLogError) return;
     LogRaw(message, LogSeverity::Error, "ERROR   | ");
 }
 
@@ -491,22 +484,18 @@ Inputs GetInputsReleased() {
 
 
 void ShowInfoToast(const std::string& message) {
-    if (!showToastInfo) return;
     ImGuiShowToast(message, LogSeverity::Info);
 }
 
 void ShowDebugToast(const std::string& message) {
-    if (!showToastDebug) return;
     ImGuiShowToast(message, LogSeverity::Debug);
 }
 
 void ShowWarningToast(const std::string& message) {
-    if (!showToastWarning) return;
     ImGuiShowToast(message, LogSeverity::Warning);
 }
 
 void ShowErrorToast(const std::string& message) {
-    if (!showToastError) return;
     ImGuiShowToast(message, LogSeverity::Error);
 }
 
