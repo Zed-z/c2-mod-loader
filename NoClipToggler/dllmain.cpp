@@ -92,10 +92,7 @@ void __stdcall toggleFreecam() {
     case CameraMode::Orbit: {
 
         // Get camera position and lookat
-        cameraRotPos = camera->OldRotPos;
-        cameraLookAt.x = api->AddressGetInt(ADDR_CAMERA_LOOKAT_X);
-        cameraLookAt.y = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Y);
-        cameraLookAt.z = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Z);
+        cameraRotPos = camera->newRotPos;
 
         // Get rotation from lookat
         cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
@@ -109,7 +106,7 @@ void __stdcall toggleFreecam() {
     case CameraMode::Freecam: {
 
         // Get camera position and lookat
-        cameraRotPos = camera->OldRotPos;
+        cameraRotPos = camera->newRotPos;
         cameraLookAt.x = api->AddressGetInt(ADDR_CAMERA_LOOKAT_X);
         cameraLookAt.y = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Y);
         cameraLookAt.z = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Z);
@@ -196,6 +193,7 @@ void __stdcall PhysicsLoop() {
     // Inputs
     Inputs inputs = api->GetInputs();
     Inputs inputsPressed = api->GetInputsPressed();
+    Inputs inputsReleased = api->GetInputsReleased();
 
     // Entities
     StratEntity* camera = api->GetEntity(ADDR_CAMERA_OBJ);
@@ -227,6 +225,12 @@ void __stdcall PhysicsLoop() {
 
         if (inputs.flip) {
             return;
+        }
+        if (inputsReleased.flip) {
+            cameraRotPos = camera->newRotPos;
+            const double x = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y));
+            cameraYaw = ((x + 2048.0) / 4096.0) * (2 * PI);
+            cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
         }
 
         if (camera == nullptr) {
