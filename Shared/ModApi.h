@@ -10,17 +10,18 @@
 
 // Addresses --------------------------------------------------------
 
-#define ADDR_FOG_DISTANCE       { 0x4B7B48 }
-#define ADDR_RENDER_DISTANCE    { 0x4B7B18 }
+#define ADDR_FOG_DISTANCE { 0x4B7B48 }
+#define ADDR_RENDER_DISTANCE { 0x4B7B18 }
 
-#define ADDR_ROOT_OBJ           { 0x4A8C3C, { 0x14, 0x28, 0x00 } }
-#define ADDR_CROC_OBJ           { 0x4A8C3C, { 0x14, 0x30, 0x00 } }
-#define ADDR_CAMERA_OBJ         { 0x4A8C3C, { 0x14, 0x3C, 0x00 } }
-#define ADDR_DIALOG_OBJ         { 0x4A8C3C, { 0x14, 0x40, 0x00 } }
-#define ADDR_STRAT_COUNT        { 0x636160 }
+#define ADDR_ROOT_OBJ { 0x4A8C3C, { 0x14, 0x28, 0x00 } }
+#define ADDR_CROC_OBJ { 0x4A8C3C, { 0x14, 0x30, 0x00 } }
+#define ADDR_CAMERA_OBJ { 0x4A8C3C, { 0x14, 0x3C, 0x00 } }
+#define ADDR_DIALOG_OBJ { 0x4A8C3C, { 0x14, 0x40, 0x00 } }
+#define ADDR_STRAT_COUNT { 0x636160 }
 
-#define ADDR_CURRENT_SAVE_SLOT  { 0x6220FC }
-#define ADDR_SAVE_SLOT_OFFSET   0x2000
+#define ADDR_CURRENT_SAVE_SLOT { 0x6220FC }
+#define ADDR_SAVE_SLOT_BASE 0x6042CC
+#define ADDR_SAVE_SLOT_OFFSET 0x2000
 
 #define ADDR_INPUTS 0x52A590
 #define ADDR_INPUTS_PRESSED 0x52A554
@@ -152,6 +153,37 @@ struct StratEntity {
 	int32_t gap14[1];
 };
 
+struct SaveSlot {
+	uint32_t heartPots;
+	uint32_t health;
+	uint32_t crystals;
+};
+
+struct Inputs {
+	uint32_t raw;
+
+	bool pause;
+
+	bool up;
+	bool down;
+	bool left;
+	bool right;
+
+	bool effectiveUp;
+	bool effectiveDown;
+	bool effectiveLeft;
+	bool effectiveRight;
+
+	bool flip;
+	bool stepLeft;
+	bool stepRight;
+	bool jump;
+	bool attack;
+	bool invLeft;
+	bool invUse;
+	bool invRight;
+};
+
 // Api definition --------------------------------------------------------
 
 #define MAX_OFFSETS 256
@@ -228,31 +260,9 @@ typedef bool(*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistration
 
 typedef StratEntity*(*GetEntityFunction)(MemoryAddress address);
 
+typedef SaveSlot*(*GetSaveSlotFunction)(int slot_number);
+typedef SaveSlot*(*GetCurrentSaveSlotFunction)();
 
-struct Inputs {
-    uint32_t raw;
-
-    bool pause;
-
-    bool up;
-    bool down;
-    bool left;
-    bool right;
-
-    bool effectiveUp;
-    bool effectiveDown;
-    bool effectiveLeft;
-    bool effectiveRight;
-
-    bool flip;
-    bool stepLeft;
-    bool stepRight;
-    bool jump;
-    bool attack;
-    bool invLeft;
-    bool invUse;
-    bool invRight;
-};
 typedef Inputs(*GetInputsFunction)();
 typedef Inputs(*GetInputsPressedFunction)();
 typedef Inputs(*GetInputsReleasedFunction)();
@@ -302,6 +312,9 @@ struct ModApi {
     RegisterMenuActionFunction RegisterMenuAction;
     
     GetEntityFunction GetEntity;
+
+	GetSaveSlotFunction GetSaveSlot;
+	GetCurrentSaveSlotFunction GetCurrentSaveSlot;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();

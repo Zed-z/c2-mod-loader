@@ -7,6 +7,22 @@ ModApi* api = nullptr;
 bool fullHealthOnRetry = true;
 bool fullHealthOnLevelEntry = true;
 
+void __stdcall restoreHealth() {
+
+    SaveSlot* slot = api->GetCurrentSaveSlot();
+    if (slot == nullptr) {
+        api->ShowErrorToast("An error occurred!");
+        return;
+    }
+
+    slot->health = slot->heartPots;
+    api->ShowInfoToast("Health restored!");
+}
+
+MenuActionRegistration __stdcall restoreHealthRegistration() {
+    return { "Restore Health", "Set your health to the maximum value.", restoreHealth, true };
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         api = LoadModApi();
@@ -44,6 +60,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
             };
             api->InjectCode(0x418DB5, 6, injectedCode, sizeof(injectedCode), INJECT_BEFORE);
         }
+
+        api->RegisterMenuAction(hModule, restoreHealthRegistration);
     }
     return TRUE;
 }

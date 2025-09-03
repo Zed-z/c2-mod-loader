@@ -524,6 +524,21 @@ StratEntity* GetEntity(MemoryAddress address) {
 }
 
 
+SaveSlot* GetSaveSlot(int slot_number) {
+    uintptr_t addr = ADDR_SAVE_SLOT_BASE + ADDR_SAVE_SLOT_OFFSET * slot_number;
+    if (addr == 0) return nullptr;
+    if (IsBadReadPtr((void*)addr, sizeof(SaveSlot))) return nullptr;
+
+    SaveSlot* slot = (SaveSlot*)addr;
+    return slot;
+}
+
+
+SaveSlot* GetCurrentSaveSlot() {
+    return GetSaveSlot(AddressGetInt(ADDR_CURRENT_SAVE_SLOT));
+}
+
+
 // API
 ModApi g_ModApi = {
     LogInfo,
@@ -557,7 +572,9 @@ ModApi g_ModApi = {
     ShowWarningToast,
     ShowErrorToast,
     RegisterMenuAction,
-    GetEntity
+    GetEntity,
+    GetSaveSlot,
+    GetCurrentSaveSlot
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {
