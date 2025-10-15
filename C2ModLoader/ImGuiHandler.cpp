@@ -42,6 +42,7 @@ bool showToastError;
 
 bool showInputs;
 bool showObjectList;
+bool showCoords;
 
 static int logWidth = 1000;
 static int logHeight = 300;
@@ -845,6 +846,22 @@ void RenderObjectList() {
     ImGui::End();
 }
 
+void RenderCoords() {
+    if (!showCoords) return;
+
+    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+    if (!croc) return;
+
+    ImGui::Begin("Coords");
+    std::stringstream ss;
+    ss << "X: " << croc->newPosition.x << std::endl;
+    ss << "Y: " << croc->newPosition.y << std::endl;
+    ss << "Z: " << croc->newPosition.z << std::endl;
+    ss << "Rot: " << croc->newRotation.y << std::endl;
+    ImGui::Text(ss.str().c_str());
+    ImGui::End();
+}
+
 void RenderMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Mod Loader")) {
@@ -890,6 +907,9 @@ void RenderMenuBar() {
             }
             if (ImGui::MenuItem("Show Object List", nullptr, &showObjectList)) {
                 api->WriteIniBool(L"GUI", L"ShowObjectList", showObjectList);
+            }
+            if (ImGui::MenuItem("Show Coords", nullptr, &showCoords)) {
+                api->WriteIniBool(L"GUI", L"ShowCoords", showCoords);
             }
             ImGui::EndMenu();
         }
@@ -972,6 +992,7 @@ void ImGuiDraw() {
         RenderLog();
         RenderInputs();
         RenderObjectList();
+        RenderCoords();
         RenderMenuBar();
     }
     

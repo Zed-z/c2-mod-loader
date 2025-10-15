@@ -25,6 +25,7 @@ extern bool showToastWarning;
 extern bool showToastError;
 extern bool showInputs;
 extern bool showObjectList;
+extern bool showCoords;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);
 void ImGuiDraw();
@@ -52,4 +53,5 @@ void RenderToasts();
 void RenderInputs();
 void RenderLog();
 void RenderObjectList();
+void RenderCoords();
 void RenderMenuBar();
