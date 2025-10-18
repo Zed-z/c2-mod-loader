@@ -27,6 +27,7 @@ extern bool showInputs;
 extern bool showObjectList;
 extern bool showCoords;
 extern bool showLevelInfo;
+extern bool showSaveSlotList;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);
 void ImGuiDraw();

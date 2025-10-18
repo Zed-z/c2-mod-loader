@@ -20,8 +20,9 @@
 #define ADDR_STRAT_COUNT { 0x636160 }
 
 #define ADDR_CURRENT_SAVE_SLOT { 0x6220FC }
-#define ADDR_SAVE_SLOT_BASE 0x6042CC
+#define ADDR_SAVE_SLOT_BASE 0x6042C4
 #define ADDR_SAVE_SLOT_OFFSET 0x2000
+#define SAVE_SLOT_NUMBER 5
 
 #define ADDR_INPUTS 0x52A590
 #define ADDR_INPUTS_PRESSED 0x52A554
@@ -158,9 +159,21 @@ struct StratEntity {
 };
 
 struct SaveSlot {
+	char name[4];
+		uint8_t _pad1[4];
 	uint32_t heartPots;
 	uint32_t health;
 	uint32_t crystals;
+		uint8_t _pad2[8];
+	char tribe[16];
+		uint8_t _pad3[86];
+	uint32_t binoculars;
+	uint32_t keys;
+	uint32_t purpleGummis;
+	uint32_t blueGummis;
+	uint32_t greenGummis;
+		uint8_t _pad4[4];
+	uint32_t clockworkGobbos;
 };
 
 struct Inputs {

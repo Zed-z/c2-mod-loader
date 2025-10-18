@@ -44,6 +44,7 @@ bool showInputs;
 bool showObjectList;
 bool showCoords;
 bool showLevelInfo;
+bool showSaveSlotList;
 
 static int logWidth = 1000;
 static int logHeight = 300;
@@ -850,16 +851,21 @@ void RenderObjectList() {
 void RenderCoords() {
     if (!showCoords) return;
 
-    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
-    if (!croc) return;
-
     ImGui::Begin("Coords");
-    std::stringstream ss;
-    ss << "X: " << croc->newPosition.x << std::endl;
-    ss << "Y: " << croc->newPosition.y << std::endl;
-    ss << "Z: " << croc->newPosition.z << std::endl;
-    ss << "Rot: " << croc->newRotation.y << std::endl;
-    ImGui::Text(ss.str().c_str());
+
+    StratEntity* croc = api->GetEntity(ADDR_CROC_OBJ);
+    if (croc == nullptr) {
+        ImGui::Text("Unavailable!");
+    }
+    else {
+        std::stringstream ss;
+        ss << "X: " << croc->newPosition.x << std::endl;
+        ss << "Y: " << croc->newPosition.y << std::endl;
+        ss << "Z: " << croc->newPosition.z << std::endl;
+        ss << "Rot: " << croc->newRotation.y << std::endl;
+        ImGui::Text(ss.str().c_str());
+    }
+
     ImGui::End();
 }
 
@@ -874,6 +880,61 @@ void RenderLevelInfo() {
     ss << "Level: " << levelInfo.level << std::endl;
     ss << "Map: " << levelInfo.map << std::endl;
     ImGui::Text(ss.str().c_str());
+    ImGui::End();
+}
+
+void RenderSaveSlotList() {
+    if (!showSaveSlotList) return;
+
+    ImGui::Begin("Save Slot List");
+
+    for (int i = 0; i < SAVE_SLOT_NUMBER; i++) {
+        SaveSlot* slot = api->GetSaveSlot(i);
+        std::string slotId = std::string("slot") + std::to_string(i);
+        std::string slotName = std::string("Slot ") + std::to_string(i + 1) + " - " + slot->name;
+        /*if (i == api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT)) {
+            slotName += " (Current)";
+        }*/
+
+        if (ImGui::CollapsingHeader((slotName + "##" + slotId).c_str())) {
+            ImGui::Indent();
+
+            const float itemWidth = 128;
+
+            ImGui::Text("Info");
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputText((std::string("Name##name") + slotId).c_str(), slot->name, 4);
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputText((std::string("Tribe##tribe") + slotId).c_str(), slot->tribe, 16);
+
+            ImGui::Text("Stats");
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("HeartPots##heartpots") + slotId).c_str(), reinterpret_cast<int*>(&slot->heartPots));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Health##health") + slotId).c_str(), reinterpret_cast<int*>(&slot->health));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Crystals##crystals") + slotId).c_str(), reinterpret_cast<int*>(&slot->crystals));
+
+            ImGui::Text("Items");
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Binoculars##binoculars") + slotId).c_str(), reinterpret_cast<int*>(&slot->binoculars));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Keys##keys") + slotId).c_str(), reinterpret_cast<int*>(&slot->keys));
+
+            ImGui::Text("Inventory");
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Purple Gummis##purplegummis") + slotId).c_str(), reinterpret_cast<int*>(&slot->purpleGummis));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Blue Gummis##bluegummis") + slotId).c_str(), reinterpret_cast<int*>(&slot->blueGummis));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Green Gummis##greengummis") + slotId).c_str(), reinterpret_cast<int*>(&slot->greenGummis));
+            ImGui::SetNextItemWidth(itemWidth);
+            ImGui::InputInt((std::string("Clockwork Gobbos##clockworkgobbos") + slotId).c_str(), reinterpret_cast<int*>(&slot->clockworkGobbos));
+
+            ImGui::Unindent();
+        }
+    }
+
     ImGui::End();
 }
 
@@ -928,6 +989,9 @@ void RenderMenuBar() {
             }
             if (ImGui::MenuItem("Show Level Info", nullptr, &showLevelInfo)) {
                 api->WriteIniBool(L"GUI", L"ShowLevelInfo", showLevelInfo);
+            }
+            if (ImGui::MenuItem("Show Save Slot List", nullptr, &showSaveSlotList)) {
+                api->WriteIniBool(L"GUI", L"ShowSaveSlotList", showSaveSlotList);
             }
             ImGui::EndMenu();
         }
@@ -1013,6 +1077,7 @@ void ImGuiDraw() {
         RenderCoords();
         RenderMenuBar();
         RenderLevelInfo();
+        RenderSaveSlotList();
     }
     
     // Toast notifications
