@@ -26,6 +26,7 @@ extern bool showToastError;
 extern bool showInputs;
 extern bool showObjectList;
 extern bool showCoords;
+extern bool showLevelInfo;
 
 DWORD WINAPI ImGuiInitThread(LPVOID);
 void ImGuiDraw();

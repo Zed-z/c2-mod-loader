@@ -43,6 +43,7 @@ bool showToastError;
 bool showInputs;
 bool showObjectList;
 bool showCoords;
+bool showLevelInfo;
 
 static int logWidth = 1000;
 static int logHeight = 300;
@@ -862,6 +863,20 @@ void RenderCoords() {
     ImGui::End();
 }
 
+void RenderLevelInfo() {
+    if (!showLevelInfo) return;
+
+    LevelInfo levelInfo = api->GetLevelInfo();
+
+    ImGui::Begin("Level Info");
+    std::stringstream ss;
+    ss << "Tribe: " << levelInfo.tribe << std::endl;
+    ss << "Level: " << levelInfo.level << std::endl;
+    ss << "Map: " << levelInfo.map << std::endl;
+    ImGui::Text(ss.str().c_str());
+    ImGui::End();
+}
+
 void RenderMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Mod Loader")) {
@@ -910,6 +925,9 @@ void RenderMenuBar() {
             }
             if (ImGui::MenuItem("Show Coords", nullptr, &showCoords)) {
                 api->WriteIniBool(L"GUI", L"ShowCoords", showCoords);
+            }
+            if (ImGui::MenuItem("Show Level Info", nullptr, &showLevelInfo)) {
+                api->WriteIniBool(L"GUI", L"ShowLevelInfo", showLevelInfo);
             }
             ImGui::EndMenu();
         }
@@ -994,6 +1012,7 @@ void ImGuiDraw() {
         RenderObjectList();
         RenderCoords();
         RenderMenuBar();
+        RenderLevelInfo();
     }
     
     // Toast notifications
