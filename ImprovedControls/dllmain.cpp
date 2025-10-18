@@ -8,7 +8,7 @@ ModApi* api = nullptr;
 
 bool type1flip = false;
 bool hybridControls = false;
-bool limbusMode = false;
+bool autoMode = false;
 
 #include <bitset>
 
@@ -82,8 +82,8 @@ void __stdcall PhysicsStep() {
         }
     }
 
-    // Limbus controls
-    if (limbusMode) {
+    // Auto control mode
+    if (autoMode) {
 
         bool anyInput = inputsPressed.up || inputsPressed.down || inputsPressed.left || inputsPressed.right;
         int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
@@ -95,13 +95,13 @@ void __stdcall PhysicsStep() {
 
             // Keyboard is used - analog strength is 181
             if (analogStrength == 181) {
-				api->LogDebug("Using keyboard controls (Limbus Mode)");
+				api->LogDebug("Using keyboard controls (Auto Mode)");
                 SetControlScheme(CTRL_TYPE_2);
             }
 
             // Analog stick is being used
             else {
-				api->LogDebug("Using analog controls (Limbus Mode)");
+				api->LogDebug("Using analog controls (Auto Mode)");
                 SetControlScheme(CTRL_TYPE_1);
             }
 
@@ -144,7 +144,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         type1flip = api->SetupIniBool(L"Config", L"Type1Flip", true);
         hybridControls = api->SetupIniBool(L"Config", L"HybridControls", false);
-        limbusMode = api->SetupIniBool(L"Config", L"LimbusMode", false);
+        autoMode = api->SetupIniBool(L"Config", L"AutoMode", false);
 
         api->HookPhysics(PhysicsStep);
 

@@ -7,13 +7,11 @@
 extern ModApi* api;
 
 bool freeMouse;
-bool logHooks;
 
 typedef HCURSOR(WINAPI* SetCursorFunc)(HCURSOR);
 SetCursorFunc oSetCursor = nullptr;
 
 HCURSOR WINAPI hkSetCursor(HCURSOR hCursor) {
-    if (logHooks) api->LogDebug("hkSetCursor");
     return hCursor;
 }
 
@@ -23,8 +21,6 @@ ShowCursorFunc oShowCursor = nullptr;
 int WINAPI hkShowCursor(BOOL bShow) {
     // Initialize fake cursor display counter
     static int fakeCursorCount = 1;
-
-    if (logHooks) api->LogDebug("hkShowCursor");
 
     // Simulate the internal counter behavior
     if (bShow) {
@@ -41,7 +37,6 @@ typedef BOOL(WINAPI* SetCursorPosFunc)(int, int);
 SetCursorPosFunc oSetCursorPos = nullptr;
 
 BOOL WINAPI hkSetCursorPos(int X, int Y) {
-    if (logHooks) api->LogDebug("hkSetCursorPos");
     return TRUE;
 }
 
@@ -49,7 +44,6 @@ typedef BOOL(WINAPI* ClipCursorFunc)(const RECT*);
 ClipCursorFunc oClipCursor = nullptr;
 
 BOOL WINAPI hkClipCursor(const RECT* lpRect) {
-    if (logHooks) api->LogDebug("hkClipCursor");
     return TRUE;
 }
 
@@ -57,7 +51,6 @@ typedef HWND(WINAPI* SetCaptureFunc)(HWND);
 SetCaptureFunc oSetCapture = nullptr;
 
 HWND WINAPI hkSetCapture(HWND hWnd) {
-    if (logHooks) api->LogDebug("hkSetCapture");
     return NULL;
 }
 
@@ -65,7 +58,6 @@ typedef BOOL(WINAPI* ReleaseCaptureFunc)();
 ReleaseCaptureFunc oReleaseCapture = nullptr;
 
 BOOL WINAPI hkReleaseCapture() {
-    if (logHooks) api->LogDebug("hkReleaseCapture");
     return TRUE;
 }
 
@@ -96,7 +88,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 
     // Replace calls to "CreateDevice" with "add esp, 10h"
     uintptr_t ADDR_CALL_CREATEDEVICE_MOUSE{};
-    switch(gameVersion) {
+    switch (gameVersion) {
     case GAMEVER_US:
         ADDR_CALL_CREATEDEVICE_MOUSE = 0x400000 + 0x11482;
         break;

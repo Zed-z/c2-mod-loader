@@ -63,6 +63,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         // Config
         loaderEnabled = api->SetupIniBool(L"Config", L"LoaderEnabled", true);
         skipLauncher = api->SetupIniBool(L"Config", L"SkipLauncher", false);
+        freeMouse = api->SetupIniBool(L"Config", L"FreeMouse", true);
+
         guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
         showGui = api->SetupIniBool(L"GUI", L"ShowGui", false);
         showLog = api->SetupIniBool(L"GUI", L"ShowLog", false);
@@ -80,9 +82,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         showToastDebug = api->SetupIniBool(L"Toasts", L"Debug", false);
         showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
         showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
-
-        freeMouse = api->SetupIniBool(L"Mouse", L"FreeMouse", true);
-        logHooks = api->SetupIniBool(L"Mouse", L"LogHooks", false);
 
         api->LogInfo("Game version: " + GameVersions[api->GetGameVersion()]);
 
@@ -114,6 +113,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             LoadMods(mods);
         }
 
+        // Window title
+        CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
+            Sleep(1000);
+			std::wstring gameName = L"Croc 2";
+            HWND hwnd = FindWindow(NULL, gameName.c_str());
+            if (hwnd) {
+                std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";
+                SetWindowText(hwnd, newTitle.c_str());
+            }
+            return 0;
+            }, nullptr, 0, nullptr);
+        
+
         // Initialize API
         ApiSetup();
 
@@ -132,6 +144,27 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         }
 
         CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
+
+        // Camera pan effect
+        CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
+
+            double timer = 0;
+
+            while (true) {
+                Sleep(100);
+
+                LevelInfo levelInfo = api->GetLevelInfo();
+                if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
+                    StratEntity* camera = api->GetEntity(ADDR_ROOT_OBJ);
+                    if (camera != nullptr) {
+                        double camMod = sin(timer);
+                        camera->newRotPos = { 0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854 };
+                    }
+                }
+
+                timer += 0.1;
+            }
+            }, nullptr, 0, nullptr);
     }
     }
     return TRUE;

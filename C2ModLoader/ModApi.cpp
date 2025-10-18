@@ -539,6 +539,15 @@ SaveSlot* GetCurrentSaveSlot() {
 }
 
 
+LevelInfo GetLevelInfo() {
+    LevelInfo levelInfo;
+    levelInfo.tribe = AddressGetInt(ADDR_CURRENT_TRIBE);
+    levelInfo.level = AddressGetInt(ADDR_CURRENT_LEVEL);
+    levelInfo.map = AddressGetInt(ADDR_CURRENT_MAP);
+	return levelInfo;
+}
+
+
 // API
 ModApi g_ModApi = {
     LogInfo,
@@ -574,7 +583,8 @@ ModApi g_ModApi = {
     RegisterMenuAction,
     GetEntity,
     GetSaveSlot,
-    GetCurrentSaveSlot
+    GetCurrentSaveSlot,
+    GetLevelInfo
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi() {

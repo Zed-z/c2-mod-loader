@@ -44,6 +44,10 @@
 #define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
 #define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
 
+#define ADDR_CURRENT_TRIBE 0x4A8C44
+#define ADDR_CURRENT_LEVEL 0x4A8C48
+#define ADDR_CURRENT_MAP 0x4A8C4C
+
 // Game structs ----------------------------------------------------------
 
 struct Vec3i {
@@ -268,6 +272,14 @@ typedef Inputs(*GetInputsPressedFunction)();
 typedef Inputs(*GetInputsReleasedFunction)();
 
 
+struct LevelInfo {
+	int tribe;
+	int level;
+	int map;
+};
+typedef LevelInfo(*GetLevelInfoFunction)();
+
+
 struct ModApi {
 	LogFunction LogInfo;
 	LogFunction LogDebug;
@@ -315,6 +327,8 @@ struct ModApi {
 
 	GetSaveSlotFunction GetSaveSlot;
 	GetCurrentSaveSlotFunction GetCurrentSaveSlot;
+
+	GetLevelInfoFunction GetLevelInfo;
 };
 
 extern "C" __declspec(dllexport) ModApi * GetModApi();
