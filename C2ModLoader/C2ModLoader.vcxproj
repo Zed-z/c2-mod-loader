@@ -116,13 +116,21 @@
       <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;minhook.x32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)LICENSES\*" "$(OutDir)" /E /Y /I
-copy /Y "$(SolutionDir)LICENSE.txt" "$(OutDir)"
-copy /Y "$(SolutionDir)README.md" "$(OutDir)"
-copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)"
+      <Command>
 
 mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPath)";2
-</Command>
+
+if not exist "$(OutDir)package" mkdir "$(OutDir)package"
+xcopy "$(SolutionDir)ReleaseAssets\*" "$(OutDir)package" /E /Y /I
+xcopy "$(SolutionDir)LICENSES\*" "$(OutDir)package" /E /Y /I
+copy /Y "$(SolutionDir)LICENSE.txt" "$(OutDir)package"
+copy /Y "$(SolutionDir)README.md" "$(OutDir)package"
+copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)package"
+
+move /Y "$(OutDir)$(TargetFileName)" "$(OutDir)package\C2ModLoader.asi"
+move /Y "$(OutDir)*.asi" "$(OutDir)package\mods"
+
+    </Command>
     </PostBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\Shared</AdditionalIncludeDirectories>
