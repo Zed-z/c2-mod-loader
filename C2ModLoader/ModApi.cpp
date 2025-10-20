@@ -58,11 +58,11 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const HMODU
 }
 
 void LogInfo(const std::string& message) {
-    LogRaw(message, LogSeverity::Info, GetCallingModule(), " INFO    | ");
+    LogRaw(message, LogSeverity::Info, GetCallingModule(),    "INFO    | ");
 }
 
 void LogDebug(const std::string& message) {
-    LogRaw(message, LogSeverity::Debug, GetCallingModule(), "DEBUG   | ");
+    LogRaw(message, LogSeverity::Debug, GetCallingModule(),   "DEBUG   | ");
 }
 
 void LogWarning(const std::string& message) {
@@ -70,7 +70,7 @@ void LogWarning(const std::string& message) {
 }
 
 void LogError(const std::string& message) {
-    LogRaw(message, LogSeverity::Error, GetCallingModule(), "ERROR   | ");
+    LogRaw(message, LogSeverity::Error, GetCallingModule(),   "ERROR   | ");
 }
 
 
