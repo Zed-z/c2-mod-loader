@@ -1,5 +1,10 @@
 #include "Loader.h"
 
+#include <regex>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 extern ModApi* api;
 
 std::vector<Mod> mods;
@@ -48,15 +53,15 @@ std::vector<Mod> GetMods() {
 
     std::vector<Mod> mods;
 
-    std::wstring modFolderWstr(MOD_FOLDER_L);
+    std::wstring modDirectoryWstr(MOD_DIRECTORY_L);
 
     // Get disabled mods
     std::vector<std::wstring> disabledMods = GetDisabledMods();
 
     // Get mod files
-    std::wstring modFolder = modFolderWstr + L"\\*.asi";
+    std::wstring modDirectory = modDirectoryWstr + L"\\*.asi";
     WIN32_FIND_DATAW findFileData;
-    HANDLE hFind = FindFirstFile(modFolder.c_str(), &findFileData);
+    HANDLE hFind = FindFirstFile(modDirectory.c_str(), &findFileData);
 
     // No files found
     if (hFind == INVALID_HANDLE_VALUE) return mods;
@@ -66,7 +71,7 @@ std::vector<Mod> GetMods() {
         if (!(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 
             std::wstring wideModName(findFileData.cFileName);
-            std::wstring modPath = modFolderWstr + L"\\" + wideModName;
+            std::wstring modPath = modDirectoryWstr + L"\\" + wideModName;
 
             Mod mod;
             mod.info = GetFileVersionInfo(modPath);
@@ -85,6 +90,19 @@ void LoadMods(std::vector<Mod>& mods) {
 
     std::vector<Mod> failedMods;
 
+    // Prepare file overrides
+    try {
+        if (fs::exists(FILE_OVERRIDE_DIRECTORY_L)) {
+            fs::remove_all(FILE_OVERRIDE_DIRECTORY_L);
+        }
+        fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
+    }
+    catch (const fs::filesystem_error& e) {
+        api->LogError("Error creating file override directory: " + std::string(e.what()));
+        return;
+    }
+
+    // Load mods
     for (auto& mod : mods) {
 
         const std::string modName = WStringToString(mod.getName()) + " (" + WStringToString(mod.path.path) + ")";
@@ -102,6 +120,23 @@ void LoadMods(std::vector<Mod>& mods) {
 
         if (mod.info.apiVersion > API_VERSION) {
             api->LogError("Failed to load mod: " + modName + " due to incorrect API version: v" + std::to_string(mod.info.apiVersion));
+            failedMods.push_back(mod);
+            continue;
+        }
+
+        // Load file overrides
+        std::filesystem::path overridePath = std::regex_replace(mod.path.path, std::wregex(L".asi$"), L"");
+
+        try {
+            if (fs::exists(overridePath) && fs::is_directory(overridePath)) {
+                fs::copy(
+                    overridePath, FILE_OVERRIDE_DIRECTORY_L,
+                    fs::copy_options::recursive | fs::copy_options::update_existing | fs::copy_options::overwrite_existing
+                );
+            }
+        }
+        catch (const fs::filesystem_error& e) {
+            api->LogError("Failed loading file overrides: " + modName + " (" + std::string(e.what()) + ")");
             failedMods.push_back(mod);
             continue;
         }

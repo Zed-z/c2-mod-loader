@@ -24,8 +24,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         exePathStr = exePathStr.substr(0, pos + 1);
 
 
-        if (!FileExists(exePathStr + L"modfiles\\music\\JIceCave1.asf")) {
-            api->LogError("<game_dir>\\modfiles\\music\\JIceCave1.asf not found!");
+        if (!FileExists(exePathStr + FILE_OVERRIDE_DIRECTORY_L L"\\music\\JIceCave1.asf")) {
+            api->LogError(FILE_OVERRIDE_DIRECTORY "\\music\\JIceCave1.asf not found!");
             api->ShowErrorToast("JIceCave1.asf not found!");
         }
         else {
@@ -50,8 +50,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         }
 
         
-        if (!FileExists(exePathStr + L"modfiles\\music\\JHub34.asf")) {
-            api->LogError("<game_dir>\\modfiles\\music\\JHub34.asf not found!");
+        if (!FileExists(exePathStr + FILE_OVERRIDE_DIRECTORY_L L"\\music\\JHub34.asf")) {
+            api->LogError(FILE_OVERRIDE_DIRECTORY "\\music\\JHub34.asf not found!");
             api->ShowErrorToast("JHub34.asf not found!");
         }
         else {

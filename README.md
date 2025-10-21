@@ -42,6 +42,7 @@ Without it, the mod loader will continue to function, but you will not see the c
 1. Select the `Release x86` launch configuration
 1. Configure the project (`Right Click Project > Properties`):
     - `Advanced > Target File Extension`: .asi
+    - `C/C++ > Language > C++ Language Standard`: ISO C++17 Standard (/std:c++17)
     - `C/C++ > Code Generation > Runtime Library`: Multi-threaded (/MT)
     - `C/C++ > Precompiled Headers > Precompiled Header`: Not Using Precompiled Headers
     - `vcpkg > Use Static Libraries`: Yes

@@ -8,6 +8,12 @@
 #define STRINGIFY(x) STRINGIFY_(x)
 #define API_VERSION_STR STRINGIFY(API_VERSION)
 
+#define MOD_DIRECTORY "mods"
+#define MOD_DIRECTORY_L L"mods"
+
+#define FILE_OVERRIDE_DIRECTORY "mods\\overrides"
+#define FILE_OVERRIDE_DIRECTORY_L L"mods\\overrides"
+
 // Addresses --------------------------------------------------------
 
 #define ADDR_FOG_DISTANCE { 0x4B7B48 }
