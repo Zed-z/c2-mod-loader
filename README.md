@@ -75,8 +75,8 @@ Without it, the mod loader will continue to function, but you will not see the c
 
 ### B) From a template
 
-1. Pull the repository and duplicate the `HelloWorld` project folder
-1. Load the project into Visual Studio
+1. Pull the repository and run `python create_mod.py <ModNamePascalCase>`
+1. Load the newly created project into the Visual Studio solution
 1. Adjust the project's Resource File
     - Adjust the `Name`, `Author`, `Description`, `Version` fields
 1. Modify the code to your hearts content
@@ -84,7 +84,7 @@ Without it, the mod loader will continue to function, but you will not see the c
 ## Building
 
 1. Build the project with `Build > Build Solution / Build Project`
-1. You now have an `.asi` file in the `Release` folder, congratulations!
+1. You now have an `.asi` file in the `Release/` folder, congratulations!
 1. Put it in `mods/` to use
 
 # Third-Party Libraries
