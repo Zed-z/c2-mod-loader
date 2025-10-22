@@ -11,8 +11,8 @@
 #define MOD_DIRECTORY "mods"
 #define MOD_DIRECTORY_L L"mods"
 
-#define FILE_OVERRIDE_DIRECTORY "mods\\overrides"
-#define FILE_OVERRIDE_DIRECTORY_L L"mods\\overrides"
+#define FILE_OVERRIDE_DIRECTORY "mods\\.overrides"
+#define FILE_OVERRIDE_DIRECTORY_L L"mods\\.overrides"
 
 // Addresses --------------------------------------------------------
 

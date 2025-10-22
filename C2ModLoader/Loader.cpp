@@ -15,6 +15,27 @@ std::wstring Mod::getName() {
         : (this->path.name);
 }
 
+void SetupDirectories() {
+
+    // Mod directory
+    try {
+        fs::create_directories(MOD_DIRECTORY_L);
+    }
+    catch (const fs::filesystem_error& e) {
+        api->LogError("Error creating mod directory: " + std::string(e.what()));
+        return;
+    }
+
+    // File overrides
+    try {
+        fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
+    }
+    catch (const fs::filesystem_error& e) {
+        api->LogError("Error creating file override directory: " + std::string(e.what()));
+        return;
+    }
+}
+
 std::vector<std::wstring> GetDisabledMods() {
     std::vector<std::wstring> disabledMods;
 
