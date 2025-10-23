@@ -1,4 +1,6 @@
-# c2-mod-loader
+# Croc 2 Mod Loader
+
+![](Images/launcher.png)
 
 ASI Mod Loader for Croc 2
 
@@ -26,6 +28,62 @@ Additionally, provides a lightweight API for mod developers.
 In order to display custom GUIs, the mod loader needs the game to have [dgVoodoo2](https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/) applied.
 
 Without it, the mod loader will continue to function, but you will not see the custom GUI overlay.
+
+# Features
+
+## Mod loading
+
+Croc 2 Mod Loader can load `.asi` mod files that are able to change the game's behavior and ever override some assets!
+
+Mods are written in C++ with the help of the provided modding API.
+
+## Game launcher
+
+Shows a launcher before starting the game. There, you can enable and disable your mods and change their settings!
+
+## Mouse uncapture
+
+Optionally, the loader can overwrite some game code responsible for capturing the mouse in the game window and making it visible. When enabled, the game never captures your mouse and acts like any other window. Cursor freedom at last!
+
+Big thanks to hdc0 for the game insight that made this possible!
+
+## Custom UI
+
+With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings. Mods can also add options to the menu bar for easy access to different features!
+
+## Cheat code management
+
+Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game. With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!
+
+# Provided mods
+
+Alongside the loader, I'm providing a couple of mods. They feature little tweaks and improvements to the game and can be used to learn mod API usage.
+
+## Camera+
+
+## Coord Recall
+
+## Health Tweaks
+
+## Hello World
+
+## Improved Controls
+
+## Music Restorer
+
+## NoClip Toggler
+
+## Render Extender
+
+# Recommended mods
+
+Mods not made by me, but worth checking out.
+
+## Croc 2 FOV Fix
+
+A mod that fixes your FOV at widescreen resolutions to prevent stretching. A must have for playing on modern displays. It's a standalone game mod, but you can put it in the `mods/` folder to manage it with Croc 2 Mod Loader!
+
+You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2-fov-fix/)!
 
 # Mod development
 
