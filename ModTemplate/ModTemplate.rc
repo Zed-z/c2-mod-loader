@@ -17,7 +17,7 @@ BEGIN
             VALUE "Name", "Mod Template"
             VALUE "Author", "Author"
             VALUE "Description", "Mod Template Description"
-            VALUE "Version", "1.0"
+            VALUE "Version", "1.0.0"
             VALUE "Hyperlink" "Mod Hyperlink"
             VALUE "ApiVersion", API_VERSION_STR
         END
