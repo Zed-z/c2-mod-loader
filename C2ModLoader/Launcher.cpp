@@ -163,10 +163,11 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 
         // About window
         if (LOWORD(wParam) == ID_HELP_ABOUT) {
-            std::wstring message = L"About " LOADER_NAME_L L":\n\n"
-                L"Version: " LOADER_VERSION_L L" (API v" API_VERSION_STR L")\n\n"
-                LOADER_DESCRIPTION_L L"\n\n"
-                L"Created by: " AUTHOR_NAME_L "\n\n";
+            std::wstring message = LOADER_NAME_L
+                L"\nVersion: " LOADER_VERSION_L L" (API v" API_VERSION_STR L")"
+                L"\nCreated by: " AUTHOR_NAME_L
+                L"\n\n" LOADER_DESCRIPTION_L
+                L"\n\n" LOADER_HYPERLINK_L;
             MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
         }
 
@@ -225,11 +226,12 @@ LRESULT CALLBACK LauncherWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
             if (nmItem->iItem >= 0 && nmItem->iSubItem == COL_MOD_NAME) {
 				Mod& mod = mods[nmItem->iItem];
 
-                std::wstring message = L"About " + mod.getName() + L":\n\n"
-                    L"Version: " + mod.info.version + L" (API v" + std::to_wstring(mod.info.apiVersion) + L")\n\n" +
-                    mod.info.description + L"\n\n"
-                    L"Created by: " + mod.info.author + L"\n\n"
-                    L"File location: " + mod.path.path + L"\n\n";
+                std::wstring message = mod.getName()
+                    + (mod.info.version.length() > 0 ? L"\nVersion: " + mod.info.version + L" (API v" + std::to_wstring(mod.info.apiVersion) + L")" : L"")
+                    + (mod.info.author.length() > 0 ? L"\nCreated by: " + mod.info.author : L"")
+                    + (mod.info.description.length() > 0 ? L"\n\n" + mod.info.description : L"")
+                    + (mod.info.hyperlink.length() > 0 ? L"\n\n" + mod.info.hyperlink : L"")
+                    + L"\n\nFile location: " + mod.path.path;
                 MessageBoxW(NULL, message.c_str(), LOADER_NAME_L, MB_OK | MB_ICONINFORMATION);
             }
         }

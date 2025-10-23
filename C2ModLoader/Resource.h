@@ -6,11 +6,14 @@
 #define LOADER_VERSION "1.0"
 #define LOADER_VERSION_L L"1.0"
 
-#define AUTHOR_NAME "Zed-z (https://github.com/Zed-z/)"
-#define AUTHOR_NAME_L L"Zed-z (https://github.com/Zed-z/)"
+#define AUTHOR_NAME "Zed-z"
+#define AUTHOR_NAME_L L"Zed-z"
 
 #define LOADER_DESCRIPTION "Provides mod loading functionality and a lightweight API for mods."
 #define LOADER_DESCRIPTION_L L"Provides mod loading functionality and a lightweight API for mods."
+
+#define LOADER_HYPERLINK "https://github.com/Zed-z/c2-mod-loader"
+#define LOADER_HYPERLINK_L L"https://github.com/Zed-z/c2-mod-loader"
 
 #define LOG_FILE "C2ModLoader.log"
 #define LOG_FILE_L L"C2ModLoader.log"

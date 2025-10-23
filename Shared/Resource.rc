@@ -18,6 +18,7 @@ BEGIN
             VALUE "Author", "<MOD AUTHOR>"
             VALUE "Description", "<MOD DESCRIPTION>"
             VALUE "Version", "<MOD VERSION>"
+            VALUE "Hyperlink" "<MOD HYPERLINK>"
             VALUE "ApiVersion", API_VERSION_STR
         END
     END

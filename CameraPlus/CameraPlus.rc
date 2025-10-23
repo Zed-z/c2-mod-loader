@@ -15,9 +15,10 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "Name", "Camera+"
-            VALUE "Author", "Zed-z (https://github.com/Zed-z/)"
+            VALUE "Author", "Zed-z"
             VALUE "Description", "Adds extra camera modes."
             VALUE "Version", "1.0"
+            VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
         END
     END

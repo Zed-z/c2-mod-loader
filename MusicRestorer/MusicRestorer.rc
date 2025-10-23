@@ -15,9 +15,10 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "Name", "Music Restorer"
-            VALUE "Author", "Zed-z (https://github.com/Zed-z/)"
+            VALUE "Author", "Zed-z"
             VALUE "Description", "Restores missing music from the console version of the game. Requires providing your own JIceCave1.asf and JHub34.asf file."
             VALUE "Version", "1.0"
+            VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
         END
     END

@@ -68,6 +68,7 @@ struct FileVersionInfo {
     std::wstring author = L"";
     std::wstring description = L"";
     std::wstring version = L"";
+    std::wstring hyperlink = L"";
     int apiVersion = -1;
 };
 
@@ -92,13 +93,11 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
 
     // Lambda to query values
     auto queryValue = [&](const wchar_t* key) -> std::wstring {
-        wchar_t query[100];
-        swprintf(query, 100, L"\\StringFileInfo\\%s\\%s", langCode, key);
-
+        std::wstring query = std::wstring(L"\\StringFileInfo\\") + langCode + L"\\" + key;
         LPVOID value = nullptr;
         UINT size = 0;
-        if (VerQueryValueW(data.data(), query, &value, &size) && value) {
-            return std::wstring((wchar_t*)value);
+        if (VerQueryValueW(data.data(), query.c_str(), &value, &size) && value) {
+            return std::wstring(reinterpret_cast<wchar_t*>(value));
         }
 
         return L"";
@@ -109,6 +108,7 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
     info.author = queryValue(L"Author");
     info.description = queryValue(L"Description");
     info.version = queryValue(L"Version");
+    info.hyperlink = queryValue(L"Hyperlink");
 
     std::wstring apiVersionStr = queryValue(L"ApiVersion");
     info.apiVersion = apiVersionStr.empty() ? -1 : std::stoi(apiVersionStr);

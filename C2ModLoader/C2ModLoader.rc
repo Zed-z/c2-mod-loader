@@ -20,6 +20,7 @@ BEGIN
             VALUE "Author", AUTHOR_NAME
 	        VALUE "Description", LOADER_DESCRIPTION
             VALUE "Version", LOADER_VERSION
+            VALUE "Hyperlink" LOADER_HYPERLINK
             VALUE "ApiVersion", API_VERSION_STR
         END
     END
