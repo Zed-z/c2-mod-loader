@@ -91,6 +91,7 @@
 
 mt.exe -manifest "$(ProjectDir)C2ModLoader.manifest" -outputresource:"$(TargetPath)";2
 
+if exist "$(OutDir)package" rmdir /s /q "$(OutDir)package"
 if not exist "$(OutDir)package" mkdir "$(OutDir)package"
 if not exist "$(OutDir)package\mods" mkdir "$(OutDir)package\mods"
 if not exist "$(OutDir)package\mods\.overrides" mkdir "$(OutDir)package\mods\.overrides"
@@ -98,10 +99,9 @@ xcopy "$(SolutionDir)ReleaseAssets\*" "$(OutDir)package" /E /Y /I
 xcopy "$(SolutionDir)LICENSES\*" "$(OutDir)package" /E /Y /I
 copy /Y "$(SolutionDir)LICENSE.txt" "$(OutDir)package"
 copy /Y "$(SolutionDir)README.md" "$(OutDir)package"
-copy /Y "$(SolutionDir)Shared\ModApi.h" "$(OutDir)package"
 
-move /Y "$(OutDir)$(TargetFileName)" "$(OutDir)package\C2ModLoader.asi"
-move /Y "$(OutDir)*.asi" "$(OutDir)package\mods"
+copy/Y "$(OutDir)*.asi" "$(OutDir)package\mods"
+move /Y "$(OutDir)package\mods\$(TargetFileName)" "$(OutDir)package"
 
     </Command>
     </PostBuildEvent>
