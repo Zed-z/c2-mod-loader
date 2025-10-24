@@ -31,15 +31,11 @@ Without it, the mod loader will continue to function, but you will not see the c
 
 # Features
 
-## Mod loading
-
-Croc 2 Mod Loader can load `.asi` mod files that are able to change the game's behavior and ever override some assets!
-
-Mods are written in C++ with the help of the provided modding API.
-
 ## Game launcher
 
 Shows a launcher before starting the game. There, you can enable and disable your mods and change their settings!
+
+![](Images/launcher.png)
 
 ## Mouse uncapture
 
@@ -47,19 +43,38 @@ Optionally, the loader can overwrite some game code responsible for capturing th
 
 Big thanks to hdc0 for the game insight that made this possible!
 
-## Custom UI
+![](Images/mouseuncapture.png)
 
-With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings. Mods can also add options to the menu bar for easy access to different features!
+## Custom UI overlay
+
+With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings.
+
+![](Images/customui.png)
+
+## Mod loading
+
+Croc 2 Mod Loader can load `.asi` mod files that are able to change the game's behavior and even override some assets. Mods can also add options to the menu bar for easy access to different features!
+
+Mods are written in C++ with the help of the provided modding API.
+
+![](Images/modoptions.png)
 
 ## Cheat code management
 
 Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game. With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!
+
+![](Images/cheatcodes.png)
 
 # Provided mods
 
 Alongside the loader, I'm providing a couple of mods. They feature little tweaks and improvements to the game and can be used to learn mod API usage.
 
 ## Camera+
+
+Adds extra camera modes, such as a modern Orbit camera and a Free camera that allows you to freely look around the world!
+
+![](Images/CameraPlus/orbitcamera.png)
+![](Images/CameraPlus/freecamera.png)
 
 ## Coord Recall
 
