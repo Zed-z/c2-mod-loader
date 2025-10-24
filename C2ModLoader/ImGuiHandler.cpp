@@ -24,6 +24,7 @@ extern ModApi* api;
 // Variables for GUI
 std::vector<LogMessage> logMessages;
 ImFont* toastFont = nullptr;
+ImFont* labelFont = nullptr;
 
 bool incompatibleWarningShown;
 
@@ -131,7 +132,7 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             io.FontDefault = io.Fonts->Fonts.back();
 
             toastFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 24.0f);
-            
+            labelFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 32.0f);
 
             if (g_hWnd && !oWndProc) {
                 oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
@@ -1069,6 +1070,30 @@ void RenderMenuBar() {
 
 void ImGuiDraw() {
     ImGuiIO& io = ImGui::GetIO();
+
+    LevelInfo levelInfo = api->GetLevelInfo();
+    if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
+        char labelText[] = LOADER_NAME " v" LOADER_VERSION;
+        ImVec2 labelSize = labelFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelText);
+
+		float labelX = 64.0f;
+		float labelY = io.DisplaySize.y - 64.0f - labelSize.y; // Offset for bottom alignment
+		float labelStrokeWidth = 2.0f;
+
+        ImU32 labelColor = IM_COL32(254, 254, 200, 255);
+		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, 255);
+
+        ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY), labelColor, labelText);
+    }
 
     if (showGui) {
         RenderLog();
