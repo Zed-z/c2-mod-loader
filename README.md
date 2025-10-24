@@ -61,7 +61,9 @@ Mods are written in C++ with the help of the provided modding API.
 
 ## Cheat code management
 
-Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game. With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!
+Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game.
+
+With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!
 
 ![](Images/cheatcodes.png)
 
@@ -73,22 +75,64 @@ Alongside the loader, I'm providing a couple of mods. They feature little tweaks
 
 Adds extra camera modes, such as a modern Orbit camera and a Free camera that allows you to freely look around the world!
 
+Toggle with `STEP-LEFT + STEP-RIGHT + CAMERA/180` or the dedicated menu bar options!
+
 ![](Images/CameraPlus/orbitcamera.png)
 ![](Images/CameraPlus/freecamera.png)
 
 ## Coord Recall
 
+Allows you to save and teleport to up to 10 locations! Use either via the menu bar options or the following hotkeys:
+
+-   `F5 + [0-9]` to save
+-   `[0-9]` to recall
+
+![](Images/CoordRecall/coordrecall.png)
+
 ## Health Tweaks
+
+Annoyed at the game's strict health mechanics? Wish the challenge was a bit easier? You can configure the game to:
+
+-   Regain all your health on a game over
+-   Regain all your health when entering a level
 
 ## Hello World
 
+A dummy mod that logs a simple message. Good to test if the loader is working and not much else.
+
 ## Improved Controls
+
+Provides a couple of little improvements to the control scheme! You can enable:
+
+-   `Type 1 flip` to be able to do a 180 on Type 1 controls with a double press of the camera reset button!
+-   `Hybrid controls` to play around with an interesting mix of Type 1 and 2 controls?
+-   `Auto mode` to automatically switch between Type 1 and 2 in real time depending on whether you're using a keyboard or a controller!
+
+> [!CAUTION]
+> Having more than one of these enabled at once hasn't been tested and is not recommended.
 
 ## Music Restorer
 
+Restores missing/changed tracks from the PS1 release of the game, notably the alternative Ice Cave theme from "Save the Ice Trapped Gobbos"!
+
+> [!IMPORTANT]  
+> Requires `JHub34.asf` and `JIceCave1.asf` files in the `MusicRestorer/music/` folder right next to the mod `.asi` file!
+
 ## NoClip Toggler
 
+Allows you to toggle a NoClip state, where you can freely fly and pass through walls. Toggle with `STEP-LEFT + STEP-RIGHT + ATTACK` or the dedicated menu bar option!
+
+![](Images/NoClipToggler/nocliptoggler1.png)
+![](Images/NoClipToggler/nocliptoggler2.png)
+
 ## Render Extender
+
+Allows you to increase the game's render distance greatly. Change between 1-10x render distance on the fly!
+
+Toggle with `F1` and alter with `-`/`+` or the dedicated menu bar options!
+
+![](Images/RenderExtender/noextender.png)
+![](Images/RenderExtender/extender.png)
 
 # Recommended mods
 
