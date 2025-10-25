@@ -102,14 +102,10 @@ A dummy mod that logs a simple message. Good to test if the loader is working an
 
 ## Improved Controls
 
-Provides a couple of little improvements to the control scheme! You can enable:
+Provides a couple of little improvements to the control scheme! You can configure:
 
--   `Type 1 flip` to be able to do a 180 on Type 1 controls with a double press of the camera reset button!
--   `Hybrid controls` to play around with an interesting mix of Type 1 and 2 controls?
--   `Auto mode` to automatically switch between Type 1 and 2 in real time depending on whether you're using a keyboard or a controller!
-
-> [!CAUTION]
-> Having more than one of these enabled at once hasn't been tested and is not recommended.
+-   `Type 1 Flip` to be able to do a 180 on Type 1 controls with a double press of the camera reset button!
+-   `Type Switch Mode` to manually or automatically switch between Type 1 and 2 controls in real time!
 
 ## Music Restorer
 
@@ -204,18 +200,16 @@ You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2
 1. You now have an `.asi` file in the `Release/` folder, congratulations!
 1. Put it in `mods/` to use
 
-# Third-Party Libraries
+# Third-Party Licenses
 
 This project uses the following libraries:
 
 -   [Dear ImGui](https://github.com/ocornut/imgui) - Copyright (c) 2014-2025 Omar Cornut
 -   [MinHook](https://github.com/TsudaKageyu/minhook) - Copyright (c) 2009-2017 Tsuda Kageyu
 
-Licenses for the above mentioned libraries are included in `LICENSES/`.
+This project contains graphics API implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
 
-# Third-Party Code
-
--   This project includes implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
+Licenses for the above mentioned are included in `LICENSES/`.
 
 # Special thanks
 
