@@ -6,32 +6,17 @@
 
 ModApi* api = nullptr;
 
-bool type1flip = false;
-bool hybridControls = false;
-bool autoMode = false;
+bool type1Flip = false;
+bool type1FlipIsFlipping = false;
+int type1FlipTimer = 0;
 
-#include <bitset>
-
-int hybridControlsTimer = 0;
-bool type1flipIsFlipping = false;
-int type1flipTimer = 0;
-
-
-std::string InputsString(Inputs inputs) {
-	std::bitset<32> bits(inputs.raw);
-    std::ostringstream oss;
-    oss << "<"
-		<< "Bits: " << bits << ", "
-		<< "Up: " << inputs.up << ", Down: " << inputs.down
-		<< ", Left: " << inputs.left << ", Right: " << inputs.right << ", "
-        << "Flip: " << inputs.flip << ", Step Left: " << inputs.stepLeft
-        << ", Step Right: " << inputs.stepRight << ", Jump: " << inputs.jump
-        << ", Attack: " << inputs.attack << ", Inv Left: " << inputs.invLeft
-        << ", Inv Use: " << inputs.invUse << ", Inv Right: " << inputs.invRight
-        << ">";
-    return oss.str();
-}
-
+enum TypeSwitchMode {
+	None = 0,
+	Manual = 1,
+	Automatic = 2
+};
+std::string typeSwitchModeNames[] = { "None", "Manual", "Automatic" };
+TypeSwitchMode typeSwitchMode;
 
 int GetControlScheme() {
     int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
@@ -46,86 +31,65 @@ void SetControlScheme(int scheme) {
 }
 
 void __stdcall PhysicsStep() {
-    bool changeControls = GetAsyncKeyState(VK_CAPITAL) & 1;
-
     Inputs inputs = api->GetInputs();
     Inputs inputsPressed = api->GetInputsPressed();
 
     bool controlScheme = (bool)GetControlScheme();
 
-    if (changeControls) {
-        if (controlScheme == CTRL_TYPE_1) {
-			api->LogInfo("Changing control scheme to Type 2");
-        }
-        else {
-			api->LogInfo("Changing control scheme to Type 1");
-		}
-        SetControlScheme(!controlScheme);
-    }
-
-    //api->LogDebug(inputs.toString());
-
-    // Hybrid controls
-    if (hybridControls) {
-        if (inputs.raw) {
-            hybridControlsTimer++;
-        }
-        else {
-            hybridControlsTimer = 0;
-        }
-
-        if (hybridControlsTimer > PHYSICS_FPS) {
-            SetControlScheme(CTRL_TYPE_1);
-        }
-        else {
-            SetControlScheme(CTRL_TYPE_2);
-        }
-    }
-
     // Auto control mode
-    if (autoMode) {
+    switch (typeSwitchMode) {
+    case TypeSwitchMode::Manual: {
+        bool changeControls = GetAsyncKeyState(VK_CAPITAL) & 1;
 
+        if (changeControls) {
+            SetControlScheme(!controlScheme);
+            api->LogInfo("Control scheme: " + std::string(ControlSchemeNames[!controlScheme]));
+            api->ShowInfoToast("Control scheme: " + std::string(ControlSchemeNames[!controlScheme]));
+        }
+        break;
+    }
+    case TypeSwitchMode::Automatic: {
         bool anyInput = inputsPressed.up || inputsPressed.down || inputsPressed.left || inputsPressed.right;
         int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
 
         // Started moving
         if (anyInput) {
-			api->LogDebug("Input started: " + InputsString(inputsPressed));
-			api->LogDebug("Analog strength: " + std::to_string(analogStrength));
 
             // Keyboard is used - analog strength is 181
             if (analogStrength == 181) {
-				api->LogDebug("Using keyboard controls (Auto Mode)");
+                api->LogDebug("Using keyboard controls (Auto Mode)");
                 SetControlScheme(CTRL_TYPE_2);
             }
 
             // Analog stick is being used
             else {
-				api->LogDebug("Using analog controls (Auto Mode)");
+                api->LogDebug("Using analog controls (Auto Mode)");
                 SetControlScheme(CTRL_TYPE_1);
             }
 
-            api->LogDebug("Control scheme is: " + std::string(ControlSchemeNames[GetControlScheme()]));
+            api->LogDebug("Control scheme: " + std::string(ControlSchemeNames[GetControlScheme()]));
 
         }
+        break;
+    }
     }
 
     // Flip pressed
-    if (type1flip) {
+    if (type1Flip) {
 
-        if (!type1flipIsFlipping) {
+        if (!type1FlipIsFlipping) {
             if (inputsPressed.flip) {
                 if (controlScheme == CTRL_TYPE_1) {
                     SetControlScheme(CTRL_TYPE_2);
-                    type1flipIsFlipping = true;
-                    type1flipTimer = PHYSICS_FPS;
+                    type1FlipIsFlipping = true;
+                    type1FlipTimer = PHYSICS_FPS;
                 }
             }
         }
         else {
-            if (--type1flipTimer <= 0) {
+            if (--type1FlipTimer <= 0) {
                 SetControlScheme(CTRL_TYPE_1);
-                type1flipIsFlipping = false;
+                type1FlipIsFlipping = false;
             }
         }
     }
@@ -137,14 +101,47 @@ void __stdcall PhysicsStep() {
     }*/
 }
 
+void __stdcall toggleType1Flip() {
+    type1Flip = !type1Flip;
+	api->WriteIniBool(L"Config", L"Type1Flip", type1Flip);
+}
+
+MenuActionRegistration __stdcall toggleType1FlipRegistration() {
+    return { std::string("Type 1 Flip: ") + (type1Flip ? "Enabled" : "Disabled"), "Do a 180 with Type 1 controls by double pressing Camera / 180.", toggleType1Flip, true};
+}
+
+void __stdcall toggleTypeSwitchMode() {
+    switch (typeSwitchMode) {
+    case TypeSwitchMode::None:
+        typeSwitchMode = TypeSwitchMode::Manual;
+        break;
+    case TypeSwitchMode::Manual:
+        typeSwitchMode = TypeSwitchMode::Automatic;
+        break;
+    case TypeSwitchMode::Automatic:
+        typeSwitchMode = TypeSwitchMode::None;
+        break;
+    }
+    api->WriteIniInt(L"Config", L"TypeSwitchMode", (int)typeSwitchMode);
+
+    api->LogInfo("Type Switch Mode: " + typeSwitchModeNames[typeSwitchMode]);
+    api->ShowInfoToast("Type Switch Mode: " + typeSwitchModeNames[typeSwitchMode]);
+}
+
+MenuActionRegistration __stdcall toggleTypeSwitchRegistration() {
+    return { std::string("Type Switch: ") + typeSwitchModeNames[typeSwitchMode], "Enable manual [CAPSLOCK] or automatic control type switching.", toggleTypeSwitchMode, true};
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
         api = LoadModApi();
         if (!api) return FALSE;
 
-        type1flip = api->SetupIniBool(L"Config", L"Type1Flip", true);
-        hybridControls = api->SetupIniBool(L"Config", L"HybridControls", false);
-        autoMode = api->SetupIniBool(L"Config", L"AutoMode", false);
+        type1Flip = api->SetupIniBool(L"Config", L"Type1Flip", true);
+        typeSwitchMode = (TypeSwitchMode)api->SetupIniInt(L"Config", L"TypeSwitchMode", TypeSwitchMode::Automatic);
+
+        api->RegisterMenuAction(hModule, toggleType1FlipRegistration);
+        api->RegisterMenuAction(hModule, toggleTypeSwitchRegistration);
 
         api->HookPhysics(PhysicsStep);
 
