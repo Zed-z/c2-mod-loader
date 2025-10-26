@@ -10,7 +10,7 @@ uintptr_t addr_fog_distance, addr_render_distance;
 uintptr_t addr_base_fog_distance, addr_base_render_distance;
 int base_fog_distance, base_render_distance;
 
-bool is_active = false;
+bool is_active;
 #define RENDER_MULTIPLIER_DEFAULT 3
 #define RENDER_MULTIPLER_LIMIT 10
 int render_multiplier = RENDER_MULTIPLIER_DEFAULT;
@@ -143,7 +143,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
         api->HookFunction(hookAddr, hookLength, &OnDistancesWritten);
 
 
-        is_active = api->SetupIniInt(L"Config", L"Enabled", 1);
+        is_active = api->SetupIniBool(L"Config", L"Enabled", true);
         render_multiplier = api->SetupIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);
 
         // Register menu actions
