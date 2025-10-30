@@ -8,6 +8,7 @@ namespace fs = std::filesystem;
 extern ModApi* api;
 
 std::vector<Mod> mods;
+int modsLoaded = 0;
 
 std::wstring Mod::getName() {
     return (this->info.name.length() > 0)
@@ -173,6 +174,7 @@ void LoadMods(std::vector<Mod>& mods) {
 
         mod.handle = loaded;
         api->LogInfo("Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle));
+        modsLoaded++;
     }
 
     // Show message box when mods failed to load

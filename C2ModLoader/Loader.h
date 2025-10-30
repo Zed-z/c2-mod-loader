@@ -15,7 +15,7 @@ struct Mod {
 };
 
 extern std::vector<Mod> mods;
-
+extern int modsLoaded;
 
 void SetupDirectories();
 

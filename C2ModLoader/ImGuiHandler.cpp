@@ -1076,27 +1076,29 @@ void ImGuiDraw() {
     ImGuiIO& io = ImGui::GetIO();
 
     LevelInfo levelInfo = api->GetLevelInfo();
-    if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
-        char labelText[] = LOADER_NAME " v" LOADER_VERSION;
-        ImVec2 labelSize = labelFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelText);
+    if (levelInfo.tribe == 0 && levelInfo.level == 0) {
+        std::string labelText = std::string(LOADER_NAME " v" LOADER_VERSION) + "\n" + "Mods loaded: " + std::to_string(modsLoaded);
+		char* labelTextChar = const_cast<char*>(labelText.c_str());
+        ImVec2 labelSize = labelFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelTextChar);
 
 		float labelX = 64.0f;
 		float labelY = io.DisplaySize.y - 64.0f - labelSize.y; // Offset for bottom alignment
 		float labelStrokeWidth = 2.0f;
 
-        ImU32 labelColor = IM_COL32(254, 254, 200, 255);
-		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, 255);
+		int labelOpacity = levelInfo.map == 0 ? 255 : 63;
+        ImU32 labelColor = IM_COL32(254, 254, 200, labelOpacity);
+		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, labelOpacity);
 
         ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelText);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY), labelColor, labelText);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
     }
 
     if (showGui) {
