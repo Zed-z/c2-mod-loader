@@ -1039,6 +1039,10 @@ void RenderMenuBar() {
 
         if (ImGui::BeginMenu("Mods")) {
 
+            if (menuActionRegistrations.empty()) {
+                ImGui::MenuItem("(Empty)", nullptr, nullptr, false);
+			}
+
             for (const auto& registration : menuActionRegistrations) {
                 Mod* mod = GetModByHandle(registration.handle);
                 std::string category = WStringToString(mod->getName());
