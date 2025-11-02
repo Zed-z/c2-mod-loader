@@ -209,6 +209,8 @@ This project uses the following libraries:
 
 This project contains graphics API implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
 
+This project uses the [Scabber](https://ggbot.itch.io/scabber-font) font by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.
+
 Licenses for the above mentioned are included in `LICENSES/`.
 
 # Special thanks

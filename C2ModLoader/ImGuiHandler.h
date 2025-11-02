@@ -9,7 +9,7 @@
 #include "Loader.h"
 
 extern std::vector<LogMessage> logMessages;
-extern ImFont* toastFont;
+extern ImFont* uiFont;
 
 extern bool incompatibleWarningShown;
 

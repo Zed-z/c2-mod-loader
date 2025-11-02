@@ -43,3 +43,6 @@ BEGIN
         MENUITEM "About...", ID_HELP_ABOUT
     END
 END
+
+// Font
+IDR_UIFONT RCDATA "..\\Shared\\Scabber_Font_1_05\\Scabber.ttf"

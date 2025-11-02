@@ -141,7 +141,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         DisableThreadLibraryCalls(hModule);
 
         if (guiEnabled) {
-            CreateThread(nullptr, 0, ImGuiInitThread, nullptr, 0, nullptr);
+            CreateThread(nullptr, 0, ImGuiInitThread, hModule, 0, nullptr);
         }
 
         if (freeMouse) {

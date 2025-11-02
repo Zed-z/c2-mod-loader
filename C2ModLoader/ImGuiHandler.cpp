@@ -23,8 +23,7 @@ extern ModApi* api;
 
 // Variables for GUI
 std::vector<LogMessage> logMessages;
-ImFont* toastFont = nullptr;
-ImFont* labelFont = nullptr;
+ImFont* uiFont = nullptr;
 
 bool incompatibleWarningShown;
 
@@ -64,6 +63,7 @@ static ID3D11Device* g_Device = nullptr;
 static ID3D11DeviceContext* g_Context = nullptr;
 static ID3D11RenderTargetView* g_RenderTargetView = nullptr;
 static HWND g_hWnd = nullptr;
+static HMODULE g_hModule = nullptr;
 
 static bool g_ImguiInitialized = false;
 
@@ -131,8 +131,11 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             io.Fonts->AddFontDefault();
             io.FontDefault = io.Fonts->Fonts.back();
 
-            toastFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 24.0f);
-            labelFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 32.0f);
+            HRSRC hResource = FindResource(g_hModule, MAKEINTRESOURCE(IDR_UIFONT), RT_RCDATA);
+            HGLOBAL hData = LoadResource(g_hModule, hResource);
+            DWORD hDataSizeSize = SizeofResource(g_hModule, hResource);
+            void* hResourceData = LockResource(hData);
+            uiFont = io.Fonts->AddFontFromMemoryTTF(hResourceData, hDataSizeSize);
 
             if (g_hWnd && !oWndProc) {
                 oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
@@ -170,6 +173,8 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
 
 // Thread to wait for d3d11.dll, create a dummy device to locate Present, then hook it
 DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
+
+    g_hModule = (HMODULE)lpParam;
 
 	// Check if dgVoodoo is present
     // (ddraw.dll loaded from the game directory)
@@ -285,15 +290,21 @@ void RenderToasts() {
 
     ImGuiIO& io = ImGui::GetIO();
 
-	float toastWidth = 330.0f;
-	float toastMargin = 10.0f;
+    float displayScale = io.DisplaySize.y / 720.0f;
 
-    float margin = 20.0f;
-    float padding = 20.0f;
+	float toastWidth = 330.0f * displayScale;
+	float toastMargin = 10.0f * displayScale;
 
-    float originX = io.DisplaySize.x - toastWidth - margin;
-    float originY = margin;
-    
+    float margin = 20.0f * displayScale;
+    float padding = 20.0f * displayScale;
+
+    float originX = io.DisplaySize.x - toastWidth - margin * displayScale;
+    float originY = margin * displayScale;
+
+    float borderWidth = 2.0f * displayScale;
+    float windowRounding = 8.0f * displayScale;
+
+    float fontSize = 24.0f * displayScale;
 
     for (size_t i = 0; i < toastQueue.size(); ) {
         Toast& toast = toastQueue[i];
@@ -332,11 +343,13 @@ void RenderToasts() {
                 | ImGuiWindowFlags_NoMove;
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, borderWidth);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, windowRounding);
             ImGui::PushStyleColor(ImGuiCol_Border, toastColor);
             ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
 
             // Text with wrapping
-            ImGui::PushFont(toastFont);
+            ImGui::PushFont(uiFont, fontSize);
             ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
             ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
             ImGui::TextUnformatted(toast.message.c_str());
@@ -347,6 +360,8 @@ void RenderToasts() {
             float toastHeight = ImGui::GetWindowSize().y;
             ImGui::End();
             ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
             ImGui::PopStyleVar();
 
             // Add offset based on toast logHeight
@@ -1079,26 +1094,29 @@ void ImGuiDraw() {
     if (levelInfo.tribe == 0 && levelInfo.level == 0) {
         std::string labelText = std::string(LOADER_NAME " v" LOADER_VERSION) + "\n" + "Mods loaded: " + std::to_string(modsLoaded);
 		char* labelTextChar = const_cast<char*>(labelText.c_str());
-        ImVec2 labelSize = labelFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelTextChar);
+        ImVec2 labelSize = uiFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelTextChar);
 
-		float labelX = 64.0f;
-		float labelY = io.DisplaySize.y - 64.0f - labelSize.y; // Offset for bottom alignment
-		float labelStrokeWidth = 2.0f;
+		float displayScale = io.DisplaySize.y / 720.0f;
+		float fontSize = 32.0f * displayScale;
+
+		float labelX = 48.0f * displayScale;
+		float labelY = io.DisplaySize.y - (48.0f + labelSize.y * 2.0f) * displayScale; // Offset for bottom alignment
+		float labelStrokeWidth = 2.0f * displayScale;
 
 		int labelOpacity = levelInfo.map == 0 ? 255 : 63;
         ImU32 labelColor = IM_COL32(254, 254, 200, labelOpacity);
 		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, labelOpacity);
 
         ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-        drawList->AddText(labelFont, labelFont->FontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+        drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
     }
 
     if (showGui) {
