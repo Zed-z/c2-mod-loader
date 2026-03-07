@@ -1,0 +1,48 @@
+#include <windows.h>
+#include "Resource.h"
+#include "ModApi.h"
+
+// Version information
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0,0,0,0
+PRODUCTVERSION  0,0,0,0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_DLL
+FILESUBTYPE     0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "Name", LOADER_NAME
+            VALUE "Author", AUTHOR_NAME
+	        VALUE "Description", LOADER_DESCRIPTION
+            VALUE "Version", LOADER_VERSION
+            VALUE "Hyperlink" LOADER_HYPERLINK
+            VALUE "ApiVersion", API_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
+
+// Menu definition
+MENU_BAR MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Settings...", ID_FILE_SETTINGS
+        MENUITEM "Show Log", ID_FILE_LOG
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "About...", ID_HELP_ABOUT
+    END
+END
+
+// Font
+IDR_UIFONT RCDATA "Scabber_Font_1_05\\Scabber.ttf"

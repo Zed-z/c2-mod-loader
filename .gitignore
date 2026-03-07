@@ -396,3 +396,21 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+# CMake build artifacts
+build/
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ninja build system
+.ninja_deps
+.ninja_log
+
+# MinGW/compiler temporary files
+*.o
+*.a
+*.lib
+*.exp

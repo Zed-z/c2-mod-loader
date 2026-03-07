@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Release",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Croc2/Croc2.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Croc2",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build and Deploy (Release)"
+        },
+        {
+            "name": "Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Croc2/Croc2.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Croc2",
+            "environment": [],
+            "console": "integratedTerminal",
+            "symbolSearchPath": "${workspaceFolder}\\build\\Debug",
+            "preLaunchTask": "Build and Deploy (Debug)",
+            "logging": {
+                "moduleLoad": true
+            }
+        }
+    ]
+}
