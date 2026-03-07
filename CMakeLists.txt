@@ -3,13 +3,17 @@ project(C2ModLoader)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 # Configuration options
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configuration types" FORCE)
+if(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configuration types" FORCE)
+endif()
 
 # Default to Release if not specified
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
@@ -21,9 +25,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Game deployment paths
 set(CROC2_GAME_DIR "${CMAKE_SOURCE_DIR}/Croc2" CACHE PATH "Path to local Croc 2 game directory")
 set(CROC2_MODS_DIR "${CROC2_GAME_DIR}/mods")
-
-# Find required packages
-find_package(PkgConfig QUIET)
 
 # Add main loader
 add_subdirectory(C2ModLoader)
@@ -69,8 +70,11 @@ macro(add_mod_project MOD_NAME)
     )
     
     # Windows resource compiler
-    if(EXISTS "${RC_FILE}")
-        string(APPEND CMAKE_RC_FLAGS " /I \"${MOD_DIR}\" /I \"${CMAKE_SOURCE_DIR}/Shared\"")
+    if(MSVC AND EXISTS "${RC_FILE}")
+        target_compile_options(${MOD_NAME} PRIVATE
+            $<$<COMPILE_LANGUAGE:RC>:/I"${MOD_DIR}">
+            $<$<COMPILE_LANGUAGE:RC>:/I"${CMAKE_SOURCE_DIR}/Shared">
+        )
     endif()
     
     # Compile definitions

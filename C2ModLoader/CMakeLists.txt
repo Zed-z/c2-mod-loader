@@ -47,7 +47,10 @@ target_include_directories(C2ModLoader PRIVATE
 
 # Windows resource compiler
 enable_language(RC)
-string(APPEND CMAKE_RC_FLAGS " /I \"${CMAKE_CURRENT_SOURCE_DIR}\" /I \"${CMAKE_SOURCE_DIR}/Shared\"")
+target_compile_options(C2ModLoader PRIVATE
+    $<$<COMPILE_LANGUAGE:RC>:/I"${CMAKE_CURRENT_SOURCE_DIR}">
+    $<$<COMPILE_LANGUAGE:RC>:/I"${CMAKE_SOURCE_DIR}/Shared">
+)
 
 # Compile definitions
 target_compile_definitions(C2ModLoader PRIVATE

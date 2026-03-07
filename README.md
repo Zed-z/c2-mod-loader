@@ -144,30 +144,19 @@ You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2
 
 ## Prerequisites
 
-1. Install Visual Studio and vcpkg
-1. Install `imgui:x86-windows-static` and `minhook:x86-windows-static` with vcpkg
+1. Install Visual Studio with C++ desktop tools
+1. Install CMake and Ninja
 
 ## Project setup
 
 ### A) From scratch
 
-1. Create a `Dynamic-Link Library (DLL)` Project in Visual Studio
-1. Select the `Release x86` launch configuration
-1. Configure the project (`Right Click Project > Properties`):
-    - `Advanced > Target File Extension`: .asi
-    - `C/C++ > Language > C++ Language Standard`: ISO C++17 Standard (/std:c++17)
-    - `C/C++ > Code Generation > Runtime Library`: Multi-threaded (/MT)
-    - `C/C++ > Precompiled Headers > Precompiled Header`: Not Using Precompiled Headers
-    - `vcpkg > Use Static Libraries`: Yes
-    - Include the `ModApi.h` [header file](https://github.com/Zed-z/c2-mod-loader/blob/main/Shared/ModApi.h)
-        - If using the provided Visual Studio solution:
-            - `C/C++ > General > Additional Include Directories`: ..\Shared\
-            - `Resources > General > Additional Include Directories`: ..\Shared\
-            - `Right Click "Headers" > Add > Existing Item`: ..\Shared\ModApi.h
-    - Copy the `Shared\Resource.rc` file into your project folder and add it as a Resource File
-        - Adjust the `Name`, `Author`, `Description`, `Version` fields
-1. Add your desired code to the `DllMain()` function
-1. Example code template:
+1. Create a folder in the `Mods/` directory
+1. Add a required `dllmain.cpp` entry file
+1. Optionally add `Resource.rc` for file metadata (copy from `Mods/ModTemplate`)
+1. The toolchain should automatically build any additional `.cpp` files, including subdirectories
+1. Add your desired code to `DllMain()` in `dllmain.cpp`
+1. Example:
 
     ```c++
     #include "ModApi.h"
@@ -188,17 +177,16 @@ You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2
 
 ### B) From a template
 
-1. Pull the repository and run `python create_mod.py <ModNamePascalCase>`
-1. Load the newly created project into the Visual Studio solution
-1. Adjust the project's Resource File
-    - Adjust the `Name`, `Author`, `Description`, `Version` fields
-1. Modify the code to your hearts content
+1. Copy `ModTemplate/` located in the `Mods/` directory
+1. Adjust the copied `Resource.rc` metadata fields
+1. Modify code in `dllmain.cpp` as needed
+1. The toolchain should automatically build any additional `.cpp` files, including subdirectories
 
 ## Building
 
-1. Build the project with `Build > Build Solution / Build Project`
-1. You now have an `.asi` file in the `Release/` folder, congratulations!
-1. Put it in `mods/` to use
+1. Run `./build.ps1 -Configuration Release`
+1. Mods are autodetected from `Mods/` and built to `build/Release/*.asi`
+1. For automatic mod installation and game launching, put Croc 2 game files in `Croc2/mods/` and use the `-Deploy` or `-Launch` flags
 
 # Third-Party Licenses
 
