@@ -40,8 +40,10 @@ void __stdcall positionSave(int key) {
     saved_coords[key].coords = croc->newRotPos;
     saved_coords[key].saved = true;
 
-    api->ShowInfoToast("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString());
-    api->LogInfo("Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
+    std::string toastMessage = "Saved position " + std::to_string(key) + ": " + saved_coords[key].toString();
+    std::string logMessage = "Saved position " + std::to_string(key) + ": " + saved_coords[key].toString(true);
+    api->ShowInfoToast(toastMessage.c_str());
+    api->LogInfo(logMessage.c_str());
 }
 
 void __stdcall positionLoad(int key) {
@@ -56,8 +58,10 @@ void __stdcall positionLoad(int key) {
 
     croc->newRotPos = saved_coords[key].coords;
 
-    api->ShowInfoToast("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString());
-    api->LogInfo("Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true));
+    std::string toastMessage = "Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString();
+    std::string logMessage = "Recalled position " + std::to_string(key) + ": " + saved_coords[key].toString(true);
+    api->ShowInfoToast(toastMessage.c_str());
+    api->LogInfo(logMessage.c_str());
 }
 
 void __stdcall positionClear(int key) {
@@ -67,8 +71,9 @@ void __stdcall positionClear(int key) {
 
     std::ostringstream stream;
     stream << "Cleared position!";
-    api->LogInfo(stream.str());
-    api->ShowInfoToast(stream.str());
+    std::string message = stream.str();
+    api->LogInfo(message.c_str());
+    api->ShowInfoToast(message.c_str());
 }
 
 void __stdcall positionClearAll() {
@@ -80,8 +85,9 @@ void __stdcall positionClearAll() {
 
     std::ostringstream stream;
     stream << "Cleared all positions!";
-    api->LogInfo(stream.str());
-    api->ShowInfoToast(stream.str());
+    std::string message = stream.str();
+    api->LogInfo(message.c_str());
+    api->ShowInfoToast(message.c_str());
 }
 
 
@@ -120,8 +126,10 @@ DWORD WINAPI PatchThread(LPVOID) {
 void __stdcall slot##N##save() { positionSave(N); } \
 void __stdcall slot##N##load() { positionLoad(N); } \
 MenuActionRegistration __stdcall slot##N##registration() { \
+    static std::string label; \
     if (saved_coords[N].saved) { \
-        return { "Recall Slot " #N " - " + saved_coords[N].toString(), "Set your position from this slot.", slot##N##load, true }; \
+        label = "Recall Slot " #N " - " + saved_coords[N].toString(); \
+        return { label.c_str(), "Set your position from this slot.", slot##N##load, true }; \
     } else { \
         return { "Save Slot " #N " - EMPTY", "Save your position to this slot.", slot##N##save, true }; \
     } \
@@ -151,16 +159,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
         // Register menu actions
         api->RegisterMenuAction(hModule, slot0registration);
-		api->RegisterMenuAction(hModule, slot1registration);
-		api->RegisterMenuAction(hModule, slot2registration);
-		api->RegisterMenuAction(hModule, slot3registration);
-		api->RegisterMenuAction(hModule, slot4registration);
-		api->RegisterMenuAction(hModule, slot5registration);
-		api->RegisterMenuAction(hModule, slot6registration);
-		api->RegisterMenuAction(hModule, slot7registration);
-		api->RegisterMenuAction(hModule, slot8registration);
-		api->RegisterMenuAction(hModule, slot9registration);
-		api->RegisterMenuAction(hModule, slotClearAllRegistration);
+        api->RegisterMenuAction(hModule, slot1registration);
+        api->RegisterMenuAction(hModule, slot2registration);
+        api->RegisterMenuAction(hModule, slot3registration);
+        api->RegisterMenuAction(hModule, slot4registration);
+        api->RegisterMenuAction(hModule, slot5registration);
+        api->RegisterMenuAction(hModule, slot6registration);
+        api->RegisterMenuAction(hModule, slot7registration);
+        api->RegisterMenuAction(hModule, slot8registration);
+        api->RegisterMenuAction(hModule, slot9registration);
+        api->RegisterMenuAction(hModule, slotClearAllRegistration);
 
         DisableThreadLibraryCalls(hModule);
         CreateThread(nullptr, 0, PatchThread, nullptr, 0, nullptr);

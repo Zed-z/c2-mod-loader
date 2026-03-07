@@ -23,7 +23,8 @@ void SetupDirectories() {
         fs::create_directories(MOD_DIRECTORY_L);
     }
     catch (const fs::filesystem_error& e) {
-        api->LogError("Error creating mod directory: " + std::string(e.what()));
+        std::string message = "Error creating mod directory: " + std::string(e.what());
+        api->LogError(message.c_str());
         return;
     }
 
@@ -32,7 +33,8 @@ void SetupDirectories() {
         fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
     }
     catch (const fs::filesystem_error& e) {
-        api->LogError("Error creating file override directory: " + std::string(e.what()));
+        std::string message = "Error creating file override directory: " + std::string(e.what());
+        api->LogError(message.c_str());
         return;
     }
 }
@@ -120,7 +122,8 @@ void LoadMods(std::vector<Mod>& mods) {
         fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
     }
     catch (const fs::filesystem_error& e) {
-        api->LogError("Error creating file override directory: " + std::string(e.what()));
+        std::string message = "Error creating file override directory: " + std::string(e.what());
+        api->LogError(message.c_str());
         return;
     }
 
@@ -131,17 +134,20 @@ void LoadMods(std::vector<Mod>& mods) {
 
         // Skip due to settings
         if (!mod.enabled) {
-            api->LogInfo("Skipping mod: " + modName);
+            std::string message = "Skipping mod: " + modName;
+            api->LogInfo(message.c_str());
             continue;
         }
 
         // API version check
         if (mod.info.apiVersion == -1) {
-            api->LogWarning("Mod: " + modName + " does not have a defined API version, issues may arise!");
+            std::string message = "Mod: " + modName + " does not have a defined API version, issues may arise!";
+            api->LogWarning(message.c_str());
         }
 
-        if (mod.info.apiVersion > API_VERSION) {
-            api->LogError("Failed to load mod: " + modName + " due to incorrect API version: v" + std::to_string(mod.info.apiVersion));
+        if (mod.info.apiVersion != API_VERSION) {
+            std::string message = "Failed to load mod: " + modName + " due to a non-matching API version: v" + std::to_string(mod.info.apiVersion);
+            api->LogError(message.c_str());
             failedMods.push_back(mod);
             continue;
         }
@@ -158,7 +164,8 @@ void LoadMods(std::vector<Mod>& mods) {
             }
         }
         catch (const fs::filesystem_error& e) {
-            api->LogError("Failed loading file overrides: " + modName + " (" + std::string(e.what()) + ")");
+            std::string message = "Failed loading file overrides: " + modName + " (" + std::string(e.what()) + ")";
+            api->LogError(message.c_str());
             failedMods.push_back(mod);
             continue;
         }
@@ -167,13 +174,15 @@ void LoadMods(std::vector<Mod>& mods) {
         HMODULE loaded = LoadLibraryW(mod.path.path.c_str());
         if (!loaded) {
             DWORD err = GetLastError();
-            api->LogError("Failed to load mod: " + modName + " with error code: " + std::to_string(err));
+            std::string message = "Failed to load mod: " + modName + " with error code: " + std::to_string(err);
+            api->LogError(message.c_str());
             failedMods.push_back(mod);
             continue;
         }
 
         mod.handle = loaded;
-        api->LogInfo("Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle));
+        std::string message = "Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle);
+        api->LogInfo(message.c_str());
         modsLoaded++;
     }
 

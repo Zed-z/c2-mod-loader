@@ -57,20 +57,20 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const HMODU
     log.close();
 }
 
-void LogInfo(const std::string& message) {
-    LogRaw(message, LogSeverity::Info, GetCallingModule(),    "INFO    | ");
+void LogInfo(const char* message) {
+    LogRaw(message != nullptr ? message : "", LogSeverity::Info, GetCallingModule(),    "INFO    | ");
 }
 
-void LogDebug(const std::string& message) {
-    LogRaw(message, LogSeverity::Debug, GetCallingModule(),   "DEBUG   | ");
+void LogDebug(const char* message) {
+    LogRaw(message != nullptr ? message : "", LogSeverity::Debug, GetCallingModule(),   "DEBUG   | ");
 }
 
-void LogWarning(const std::string& message) {
-    LogRaw(message, LogSeverity::Warning, GetCallingModule(), "WARNING | ");
+void LogWarning(const char* message) {
+    LogRaw(message != nullptr ? message : "", LogSeverity::Warning, GetCallingModule(), "WARNING | ");
 }
 
-void LogError(const std::string& message) {
-    LogRaw(message, LogSeverity::Error, GetCallingModule(),   "ERROR   | ");
+void LogError(const char* message) {
+    LogRaw(message != nullptr ? message : "", LogSeverity::Error, GetCallingModule(),   "ERROR   | ");
 }
 
 
@@ -375,58 +375,63 @@ namespace {
 }
 
 
-int ReadIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
+int ReadIniInt(const wchar_t* section, const wchar_t* key, int default_value) {
     HMODULE caller = GetCallingModule();
-    return ReadIniIntForModule(section, key, default_value, caller);
+    return ReadIniIntForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", default_value, caller);
 }
 
-bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value) {
+bool WriteIniInt(const wchar_t* section, const wchar_t* key, int value) {
     HMODULE caller = GetCallingModule();
-    return WriteIniIntForModule(section, key, value, caller);
+    return WriteIniIntForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", value, caller);
 }
 
-int SetupIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
+int SetupIniInt(const wchar_t* section, const wchar_t* key, int default_value) {
     HMODULE caller = GetCallingModule();
-    int value = ReadIniIntForModule(section, key, default_value, caller);
-    WriteIniIntForModule(section, key, value, caller);
+    const wchar_t* resolvedSection = section != nullptr ? section : L"";
+    const wchar_t* resolvedKey = key != nullptr ? key : L"";
+    int value = ReadIniIntForModule(resolvedSection, resolvedKey, default_value, caller);
+    WriteIniIntForModule(resolvedSection, resolvedKey, value, caller);
     return value;
 }
 
-bool ReadIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
+bool ReadIniBool(const wchar_t* section, const wchar_t* key, bool default_value) {
     HMODULE caller = GetCallingModule();
-    return ReadIniBoolForModule(section, key, default_value, caller);
+    return ReadIniBoolForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", default_value, caller);
 }
 
-bool WriteIniBool(const std::wstring& section, const std::wstring& key, bool value) {
+bool WriteIniBool(const wchar_t* section, const wchar_t* key, bool value) {
     HMODULE caller = GetCallingModule();
-    return WriteIniBoolForModule(section, key, value, caller);
+    return WriteIniBoolForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", value, caller);
 }
 
-bool SetupIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
+bool SetupIniBool(const wchar_t* section, const wchar_t* key, bool default_value) {
     HMODULE caller = GetCallingModule();
-    int value = ReadIniBoolForModule(section, key, default_value, caller);
-    WriteIniBoolForModule(section, key, value, caller);
+    const wchar_t* resolvedSection = section != nullptr ? section : L"";
+    const wchar_t* resolvedKey = key != nullptr ? key : L"";
+    int value = ReadIniBoolForModule(resolvedSection, resolvedKey, default_value, caller);
+    WriteIniBoolForModule(resolvedSection, resolvedKey, value, caller);
     return value;
 }
 
-void ReadIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
+void ReadIniString(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
     HMODULE caller = GetCallingModule();
-    ReadIniStringForModule(section, key, default_value, buffer, buffer_size, caller);
+    ReadIniStringForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", default_value != nullptr ? default_value : L"", buffer, buffer_size, caller);
 }
 
-bool WriteIniString(const std::wstring& section, const std::wstring& key, const wchar_t* value) {
+bool WriteIniString(const wchar_t* section, const wchar_t* key, const wchar_t* value) {
     HMODULE caller = GetCallingModule();
-    return WriteIniStringForModule(section, key, value, caller);
+    return WriteIniStringForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", value != nullptr ? value : L"", caller);
 }
 
-void SetupIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
+void SetupIniString(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
     HMODULE caller = GetCallingModule();
-    ReadIniStringForModule(section, key, default_value, buffer, buffer_size, caller);
-    WriteIniStringForModule(section, key, buffer, caller);
+    const wchar_t* resolvedSection = section != nullptr ? section : L"";
+    const wchar_t* resolvedKey = key != nullptr ? key : L"";
+    const wchar_t* resolvedDefault = default_value != nullptr ? default_value : L"";
+    ReadIniStringForModule(resolvedSection, resolvedKey, resolvedDefault, buffer, buffer_size, caller);
+    WriteIniStringForModule(resolvedSection, resolvedKey, buffer, caller);
 }
 
-
-std::string GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
 
 int GetGameVersion() {
 
@@ -494,20 +499,20 @@ Inputs GetInputsReleased() {
 }
 
 
-void ShowInfoToast(const std::string& message) {
-    ImGuiShowToast(message, LogSeverity::Info);
+void ShowInfoToast(const char* message) {
+    ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Info);
 }
 
-void ShowDebugToast(const std::string& message) {
-    ImGuiShowToast(message, LogSeverity::Debug);
+void ShowDebugToast(const char* message) {
+    ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Debug);
 }
 
-void ShowWarningToast(const std::string& message) {
-    ImGuiShowToast(message, LogSeverity::Warning);
+void ShowWarningToast(const char* message) {
+    ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Warning);
 }
 
-void ShowErrorToast(const std::string& message) {
-    ImGuiShowToast(message, LogSeverity::Error);
+void ShowErrorToast(const char* message) {
+    ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Error);
 }
 
 

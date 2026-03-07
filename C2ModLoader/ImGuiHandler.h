@@ -8,6 +8,18 @@
 #include "imgui.h"
 #include "Loader.h"
 
+enum LogSeverity {
+    Info,
+    Debug,
+    Warning,
+    Error
+};
+
+struct LogMessage {
+	std::string text;
+	LogSeverity severity;
+};
+
 extern std::vector<LogMessage> logMessages;
 extern ImFont* uiFont;
 

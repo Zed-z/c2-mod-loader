@@ -85,7 +85,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
         showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
 
-        api->LogInfo("Game version: " + GameVersions[api->GetGameVersion()]);
+        std::string gameVersionMessage = std::string("Game version: ") + GameVersions[api->GetGameVersion()];
+        api->LogInfo(gameVersionMessage.c_str());
 
         // Quit if loader disabled
         if (!loaderEnabled) {

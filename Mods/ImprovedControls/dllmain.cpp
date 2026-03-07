@@ -43,8 +43,9 @@ void __stdcall PhysicsStep() {
 
         if (changeControls) {
             SetControlScheme(!controlScheme);
-            api->LogInfo("Control scheme: " + std::string(ControlSchemeNames[!controlScheme]));
-            api->ShowInfoToast("Control scheme: " + std::string(ControlSchemeNames[!controlScheme]));
+            std::string controlSchemeMessage = "Control scheme: " + std::string(ControlSchemeNames[!controlScheme]);
+            api->LogInfo(controlSchemeMessage.c_str());
+            api->ShowInfoToast(controlSchemeMessage.c_str());
         }
         break;
     }
@@ -67,7 +68,8 @@ void __stdcall PhysicsStep() {
                 SetControlScheme(CTRL_TYPE_1);
             }
 
-            api->LogDebug("Control scheme: " + std::string(ControlSchemeNames[GetControlScheme()]));
+            std::string controlSchemeMessage = "Control scheme: " + std::string(ControlSchemeNames[GetControlScheme()]);
+            api->LogDebug(controlSchemeMessage.c_str());
 
         }
         break;
@@ -107,7 +109,9 @@ void __stdcall toggleType1Flip() {
 }
 
 MenuActionRegistration __stdcall toggleType1FlipRegistration() {
-    return { std::string("Type 1 Flip: ") + (type1Flip ? "Enabled" : "Disabled"), "Do a 180 with Type 1 controls by double pressing Camera / 180.", toggleType1Flip, true};
+    static std::string label;
+    label = std::string("Type 1 Flip: ") + (type1Flip ? "Enabled" : "Disabled");
+    return { label.c_str(), "Do a 180 with Type 1 controls by double pressing Camera / 180.", toggleType1Flip, true};
 }
 
 void __stdcall toggleTypeSwitchMode() {
@@ -124,12 +128,15 @@ void __stdcall toggleTypeSwitchMode() {
     }
     api->WriteIniInt(L"Config", L"TypeSwitchMode", (int)typeSwitchMode);
 
-    api->LogInfo("Type Switch Mode: " + typeSwitchModeNames[typeSwitchMode]);
-    api->ShowInfoToast("Type Switch Mode: " + typeSwitchModeNames[typeSwitchMode]);
+    std::string typeSwitchMessage = "Type Switch Mode: " + typeSwitchModeNames[typeSwitchMode];
+    api->LogInfo(typeSwitchMessage.c_str());
+    api->ShowInfoToast(typeSwitchMessage.c_str());
 }
 
 MenuActionRegistration __stdcall toggleTypeSwitchRegistration() {
-    return { std::string("Type Switch: ") + typeSwitchModeNames[typeSwitchMode], "Enable manual [CAPSLOCK] or automatic control type switching.", toggleTypeSwitchMode, true};
+    static std::string label;
+    label = std::string("Type Switch: ") + typeSwitchModeNames[typeSwitchMode];
+    return { label.c_str(), "Enable manual [CAPSLOCK] or automatic control type switching.", toggleTypeSwitchMode, true};
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {

@@ -31,7 +31,8 @@ void __stdcall toggleExtender() {
 
     if (is_active) {
         api->LogInfo("Render distance extended!");
-        api->ShowInfoToast("Render distance extended! (x" + std::to_string(render_multiplier) + ")");
+        std::string toastMessage = "Render distance extended! (x" + std::to_string(render_multiplier) + ")";
+        api->ShowInfoToast(toastMessage.c_str());
     }
     else {
         api->LogInfo("Render distance reverted!");
@@ -44,8 +45,10 @@ void __stdcall decreaseExtender() {
         render_multiplier--;
         RenderApply();
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-        api->LogInfo("Render distance decreased to: x" + std::to_string(render_multiplier));
-        api->ShowInfoToast("Render distance: x" + std::to_string(render_multiplier));
+        std::string logMessage = "Render distance decreased to: x" + std::to_string(render_multiplier);
+        std::string toastMessage = "Render distance: x" + std::to_string(render_multiplier);
+        api->LogInfo(logMessage.c_str());
+        api->ShowInfoToast(toastMessage.c_str());
     }
 }
 
@@ -54,8 +57,10 @@ void __stdcall increaseExtender() {
         render_multiplier++;
         RenderApply();
         api->WriteIniInt(L"Config", L"RenderMultiplier", render_multiplier);
-        api->LogInfo("Render distance increased to: x" + std::to_string(render_multiplier));
-        api->ShowInfoToast("Render distance: x" + std::to_string(render_multiplier));
+        std::string logMessage = "Render distance increased to: x" + std::to_string(render_multiplier);
+        std::string toastMessage = "Render distance: x" + std::to_string(render_multiplier);
+        api->LogInfo(logMessage.c_str());
+        api->ShowInfoToast(toastMessage.c_str());
     }
 }
 
@@ -109,7 +114,8 @@ void __stdcall OnDistancesWritten() {
     base_fog_distance = *(int*)(base + 0xB7B48);
     base_render_distance = *(int*)(base + 0xB7B18);
 
-    api->LogDebug("Render distance changed to: " + std::to_string(base_render_distance));
+    std::string logMessage = "Render distance changed to: " + std::to_string(base_render_distance);
+    api->LogDebug(logMessage.c_str());
 
     // Reapply change
     RenderApply();
@@ -121,11 +127,15 @@ MenuActionRegistration __stdcall toggleExtenderRegistration() {
 }
 
 MenuActionRegistration __stdcall decreaseExtenderRegistration() {
-    return { "Decrease Distance", "Decrease render distance (currently: x" + std::to_string(render_multiplier) + ")", decreaseExtender, is_active && render_multiplier > 1};
+    static std::string tooltip;
+    tooltip = "Decrease render distance (currently: x" + std::to_string(render_multiplier) + ")";
+    return { "Decrease Distance", tooltip.c_str(), decreaseExtender, is_active && render_multiplier > 1};
 }
 
 MenuActionRegistration __stdcall increaseExtenderRegistration() {
-    return { "Increate Distance", "Increase render distance (currently: x" + std::to_string(render_multiplier) + ")", increaseExtender, is_active && render_multiplier < RENDER_MULTIPLER_LIMIT };
+    static std::string tooltip;
+    tooltip = "Increase render distance (currently: x" + std::to_string(render_multiplier) + ")";
+    return { "Increate Distance", tooltip.c_str(), increaseExtender, is_active && render_multiplier < RENDER_MULTIPLER_LIMIT };
 }
 
 

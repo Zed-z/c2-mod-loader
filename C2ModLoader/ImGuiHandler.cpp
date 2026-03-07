@@ -211,8 +211,10 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
 		std::string DDrawPathStr(DDrawPath);
 		std::string DDrawDir = DDrawPathStr.substr(0, DDrawPathStr.find_last_of("\\/"));
 
-        api->LogDebug("Game located at: " + gamePathStr);
-		api->LogDebug("ddraw.dll found at: " + DDrawPathStr);
+        std::string gamePathLog = "Game located at: " + gamePathStr;
+        std::string ddrawPathLog = "ddraw.dll found at: " + DDrawPathStr;
+        api->LogDebug(gamePathLog.c_str());
+		api->LogDebug(ddrawPathLog.c_str());
 
 		// Check if ddraw.dll is loaded from the game directory
         if (DDrawDir != gameDir) {
@@ -867,7 +869,8 @@ void RenderObjectList() {
                     node = node->next;
                 }
 
-                api->LogInfo("Object List: (" + std::to_string(stratCount) + ")\n" + ss.str());
+                std::string objectListLog = "Object List: (" + std::to_string(stratCount) + ")\n" + ss.str();
+                api->LogInfo(objectListLog.c_str());
             }
         }
         else {
@@ -1077,18 +1080,17 @@ void RenderMenuBar() {
 
             for (const auto& registration : menuActionRegistrations) {
                 Mod* mod = GetModByHandle(registration.handle);
-                std::string category = WStringToString(mod->getName());
+                std::string category = mod ? WStringToString(mod->getName()) : "Unknown";
 
                 if (ImGui::BeginMenu(category.c_str())) {
-
                     MenuActionRegistration action = registration.function();
 
                     ImGui::BeginDisabled(!action.enabled);
-                    if (ImGui::MenuItem(action.label.c_str())) {
+                    if (ImGui::MenuItem(action.label != nullptr ? action.label : "")) {
                         if (action.callback) action.callback();
                     }
-                    if (ImGui::IsItemHovered()) {
-                        ImGui::SetTooltip(action.tooltip.c_str());
+                    if (ImGui::IsItemHovered() && action.tooltip != nullptr && action.tooltip[0] != '\0') {
+                        ImGui::SetTooltip(action.tooltip);
                     }
                     ImGui::EndDisabled();
 

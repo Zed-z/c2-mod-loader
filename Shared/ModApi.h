@@ -1,8 +1,9 @@
 #pragma once
-#include <string>
+#include <cstdint>
+#include <cstddef>
 #include <Windows.h>
 
-#define API_VERSION 1
+#define API_VERSION 2
 
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
@@ -217,20 +218,11 @@ typedef struct {
 
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
-// Control scheme names for logging/display purposes
-// Usage example: ControlSchemeNames[CTRL_TYPE_1] -> "Type 1"
 constexpr const char* ControlSchemeNames[] = { "Type 2", "Type 1" };
 
 #define PHYSICS_FPS 30
 
-enum LogSeverity { Info, Debug, Warning, Error };
-
-struct LogMessage {
-	std::string text;
-	LogSeverity severity;
-};
-
-typedef void(*LogFunction)(const std::string& message);
+typedef void(*LogFunction)(const char* message);
 
 typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);
 typedef uintptr_t(*FindPatternFunction)(const void* pattern, size_t pattern_size, int occurrence);
@@ -248,35 +240,36 @@ typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BY
 typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall* func)());
 typedef bool(*HookPhysicsFunction)(void(__stdcall* func)());
 
-typedef int(*SetupIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
-typedef int(*ReadIniIntFunction)(const std::wstring& section, const std::wstring& key, int default_value);
-typedef bool(*WriteIniIntFunction)(const std::wstring& section, const std::wstring& key, int value);
+typedef int(*SetupIniIntFunction)(const wchar_t* section, const wchar_t* key, int default_value);
+typedef int(*ReadIniIntFunction)(const wchar_t* section, const wchar_t* key, int default_value);
+typedef bool(*WriteIniIntFunction)(const wchar_t* section, const wchar_t* key, int value);
 
-typedef bool(*SetupIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool default_value);
-typedef bool(*ReadIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool default_value);
-typedef bool(*WriteIniBoolFunction)(const std::wstring& section, const std::wstring& key, bool value);
+typedef bool(*SetupIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool default_value);
+typedef bool(*ReadIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool default_value);
+typedef bool(*WriteIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool value);
 
-typedef void(*SetupIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
-typedef void(*ReadIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
-typedef bool(*WriteIniStringFunction)(const std::wstring& section, const std::wstring& key, const wchar_t* value);
+typedef void(*SetupIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
+typedef void(*ReadIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
+typedef bool(*WriteIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* value);
 
 
 #define GAMEVER_UNKNOWN 0
 #define GAMEVER_US 1
 #define GAMEVER_EU 2
 #define GAMEVER_DEMO 3
-extern std::string GameVersions[]; // Use this to get game versions as strings for logging/display
+constexpr const char* GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
+
 typedef int(*GetGameVersionFunction)();
 
 
-typedef void(*ShowToastFunction)(const std::string& message);
+typedef void(*ShowToastFunction)(const char* message);
 
 
 struct MenuActionRegistration {
-    std::string label;
-    std::string tooltip;
-    void(__stdcall* callback)();
-    bool enabled;
+	const char* label;
+	const char* tooltip;
+	void(__stdcall* callback)();
+	bool enabled;
 };
 typedef MenuActionRegistration(__stdcall* MenuActionRegistrationFunction)();
 typedef bool(*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
