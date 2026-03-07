@@ -332,85 +332,97 @@ bool HookPhysics(void(__stdcall* func)()) {
 }
 
 
+// Anonymous namespace for INI helpers
+namespace {
+    std::wstring GetIniPathForModule(HMODULE caller) {
+        PathInfo pathInfo = GetModuleFilepath(caller);
+        return std::regex_replace(pathInfo.path, std::wregex(L".asi$"), L".ini");
+    }
+
+    int ReadIniIntForModule(const std::wstring& section, const std::wstring& key, int default_value, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        return GetPrivateProfileIntW(section.c_str(), key.c_str(), default_value, iniPath.c_str());
+    }
+
+    bool WriteIniIntForModule(const std::wstring& section, const std::wstring& key, int value, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        wchar_t valueStr[16];
+        _itow_s(value, valueStr, 10);
+        return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+    }
+
+    bool ReadIniBoolForModule(const std::wstring& section, const std::wstring& key, bool default_value, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        return (bool)GetPrivateProfileIntW(section.c_str(), key.c_str(), (int)default_value, iniPath.c_str());
+    }
+
+    bool WriteIniBoolForModule(const std::wstring& section, const std::wstring& key, bool value, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        wchar_t valueStr[16];
+        _itow_s((int)value, valueStr, 10);
+        return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+    }
+
+    void ReadIniStringForModule(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        GetPrivateProfileStringW(section.c_str(), key.c_str(), default_value, buffer, buffer_size, iniPath.c_str());
+    }
+
+    bool WriteIniStringForModule(const std::wstring& section, const std::wstring& key, const wchar_t* value, HMODULE caller) {
+        std::wstring iniPath = GetIniPathForModule(caller);
+        return WritePrivateProfileStringW(section.c_str(), key.c_str(), value, iniPath.c_str()) != 0;
+    }
+}
+
+
 int ReadIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    return GetPrivateProfileIntW(section.c_str(), key.c_str(), default_value, iniPath.c_str());
+    return ReadIniIntForModule(section, key, default_value, caller);
 }
 
 bool WriteIniInt(const std::wstring& section, const std::wstring& key, int value) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    wchar_t valueStr[16];
-    _itow_s(value, valueStr, 10);
-    return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+    return WriteIniIntForModule(section, key, value, caller);
 }
 
 int SetupIniInt(const std::wstring& section, const std::wstring& key, int default_value) {
-    int value = ReadIniInt(section, key, default_value);
-    WriteIniInt(section, key, value);
+    HMODULE caller = GetCallingModule();
+    int value = ReadIniIntForModule(section, key, default_value, caller);
+    WriteIniIntForModule(section, key, value, caller);
     return value;
 }
 
 bool ReadIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    return (bool)GetPrivateProfileIntW(section.c_str(), key.c_str(), (int)default_value, iniPath.c_str());
+    return ReadIniBoolForModule(section, key, default_value, caller);
 }
 
 bool WriteIniBool(const std::wstring& section, const std::wstring& key, bool value) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    wchar_t valueStr[16];
-    _itow_s((int)value, valueStr, 10);
-    return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+    return WriteIniBoolForModule(section, key, value, caller);
 }
 
 bool SetupIniBool(const std::wstring& section, const std::wstring& key, bool default_value) {
-    int value = ReadIniBool(section, key, default_value);
-    WriteIniBool(section, key, value);
+    HMODULE caller = GetCallingModule();
+    int value = ReadIniBoolForModule(section, key, default_value, caller);
+    WriteIniBoolForModule(section, key, value, caller);
     return value;
 }
 
 void ReadIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    GetPrivateProfileStringW(section.c_str(), key.c_str(), default_value, buffer, buffer_size, iniPath.c_str());
+    ReadIniStringForModule(section, key, default_value, buffer, buffer_size, caller);
 }
 
 bool WriteIniString(const std::wstring& section, const std::wstring& key, const wchar_t* value) {
-
-    // Get module path
     HMODULE caller = GetCallingModule();
-    PathInfo PathInfo = GetModuleFilepath(caller);
-    std::wstring iniPath = std::regex_replace(PathInfo.path, std::wregex(L".asi$"), L".ini");
-
-    return WritePrivateProfileStringW(section.c_str(), key.c_str(), value, iniPath.c_str()) != 0;
+    return WriteIniStringForModule(section, key, value, caller);
 }
 
 void SetupIniString(const std::wstring& section, const std::wstring& key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size) {
-    ReadIniString(section, key, default_value, buffer, buffer_size);
-    WriteIniString(section, key, buffer);
+    HMODULE caller = GetCallingModule();
+    ReadIniStringForModule(section, key, default_value, buffer, buffer_size, caller);
+    WriteIniStringForModule(section, key, buffer, caller);
 }
 
 
