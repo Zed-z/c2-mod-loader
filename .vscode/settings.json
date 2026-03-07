@@ -8,7 +8,6 @@
     "cmake.generator": "Ninja",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "[cpp]": {
-        "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
     "C_Cpp.codeAnalysis.runAutomatically": true

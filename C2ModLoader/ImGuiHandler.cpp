@@ -98,19 +98,9 @@ LRESULT CALLBACK WndProcHook(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 // This runs in the Present hook whenever we see a new swap-chain
 static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
 {
-    // First time or swap-chain changed?
-    if (!g_ImguiInitialized || pSwap != g_SwapChain)
+    // First time initialization
+    if (!g_ImguiInitialized)
     {
-        // If already initialized, tear it down
-        if (g_ImguiInitialized) {
-            ImGui_ImplDX11_Shutdown();
-            ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
-            if (g_RenderTargetView) { g_RenderTargetView->Release(); g_RenderTargetView = nullptr; }
-            g_Device = nullptr;
-            g_Context = nullptr;
-        }
-
         // Grab the real device & context from this swap-chain
         if (SUCCEEDED(pSwap->GetDevice(__uuidof(ID3D11Device), (void**)&g_Device))) {
             g_Device->GetImmediateContext(&g_Context);
@@ -145,6 +135,33 @@ static void InitOrRestoreImGui(IDXGISwapChain* pSwap)
             g_ImguiInitialized = true;
         }
     }
+    // Swap chain changed
+    else if (pSwap != g_SwapChain) {
+        // Shutdown ImGui backend
+        ImGui_ImplDX11_Shutdown();
+
+        // Release old render target, device and context
+        if (g_RenderTargetView) {
+            g_RenderTargetView->Release();
+            g_RenderTargetView = nullptr;
+        }
+        if (g_Context) {
+            g_Context->Release();
+            g_Context = nullptr;
+        }
+        if (g_Device) {
+            g_Device->Release();
+            g_Device = nullptr;
+        }
+
+        // Get new device and context from new swap chain
+        if (SUCCEEDED(pSwap->GetDevice(__uuidof(ID3D11Device), (void **)&g_Device))) {
+            g_Device->GetImmediateContext(&g_Context);
+            CreateRenderTarget(pSwap);
+            ImGui_ImplDX11_Init(g_Device, g_Context);
+            g_SwapChain = pSwap;
+        }
+    }
 }
 
 
@@ -162,7 +179,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain* pSwap, UINT sync, UINT flags)
     // Draw the GUI
     ImGuiDraw();
 
-    // Render on top of the game’s backbuffer
+    // Render on top of the gameï¿½s backbuffer
     ImGui::Render();
     g_Context->OMSetRenderTargets(1, &g_RenderTargetView, nullptr);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
