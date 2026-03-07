@@ -3,7 +3,7 @@
   <CheatEntries>
     <CheatEntry>
       <ID>7</ID>
-      <Description>"CheatsActive"</Description>
+      <Description>"Cheats"</Description>
       <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
@@ -68,13 +68,6 @@
       <Address>004B7950</Address>
     </CheatEntry>
     <CheatEntry>
-      <ID>22</ID>
-      <Description>"Cheats? Set to 4 to disable health loss"</Description>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>004B7964</Address>
-    </CheatEntry>
-    <CheatEntry>
       <ID>23</ID>
       <Description>"No description"</Description>
       <ShowAsSigned>0</ShowAsSigned>
@@ -83,25 +76,7 @@
     </CheatEntry>
     <CheatEntry>
       <ID>25</ID>
-      <Description>"Control Method 2"</Description>
-      <VariableType>4 Bytes</VariableType>
-      <Address>Croc2.exe+12A5F4</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>26</ID>
-      <Description>"Control Method 3"</Description>
-      <VariableType>4 Bytes</VariableType>
-      <Address>Croc2.exe+20438C</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>27</ID>
-      <Description>"No description"</Description>
-      <VariableType>4 Bytes</VariableType>
-      <Address>Croc2.exe+12A5F4</Address>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>28</ID>
-      <Description>"No description"</Description>
+      <Description>"Control Method Current"</Description>
       <VariableType>4 Bytes</VariableType>
       <Address>Croc2.exe+12A5F4</Address>
     </CheatEntry>
@@ -114,7 +89,7 @@
       <CheatEntries>
         <CheatEntry>
           <ID>29</ID>
-          <Description>"Inputs ???"</Description>
+          <Description>"Inputs Raw"</Description>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>Croc2.exe+12A588</Address>
@@ -1934,6 +1909,12 @@
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>Croc2.exe+204360</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Control Method"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+20438C</Address>
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
