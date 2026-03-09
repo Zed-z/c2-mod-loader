@@ -144,8 +144,7 @@ void LoadMods(std::vector<Mod>& mods) {
             std::string message = "Mod: " + modName + " does not have a defined API version, issues may arise!";
             api->LogWarning(message.c_str());
         }
-
-        if (mod.info.apiVersion != API_VERSION) {
+        else if (mod.info.apiVersion != API_VERSION) {
             std::string message = "Failed to load mod: " + modName + " due to a non-matching API version: v" + std::to_string(mod.info.apiVersion);
             api->LogError(message.c_str());
             failedMods.push_back(mod);
