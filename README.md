@@ -1,4 +1,4 @@
-# Croc 2 Mod Loader TODO TODO TODO UPDATE
+# Croc 2 Mod Loader
 
 ![](Images/launcher.png)
 
