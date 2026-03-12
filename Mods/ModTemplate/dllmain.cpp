@@ -1,5 +1,5 @@
 #include "ModApi.h"
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
 
 ModApi* api = nullptr;

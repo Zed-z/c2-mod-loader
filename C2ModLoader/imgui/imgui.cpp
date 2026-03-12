@@ -1168,7 +1168,7 @@ IMPLEMENTING SUPPORT for ImGuiBackendFlags_RendererHasTextures:
 #define NOMINMAX
 #endif
 #ifndef __MINGW32__
-#include <Windows.h>        // _wfopen, OpenClipboard
+#include <windows.h>        // _wfopen, OpenClipboard
 #else
 #include <windows.h>
 #endif

@@ -9,7 +9,7 @@
 #include "Loader.h"
 #include "CheatsManager.h"
 
-#include <Windows.h>
+#include <windows.h>
 #include <fstream>
 #include <string>
 #include <iostream>
@@ -19,6 +19,9 @@
 #include <ctime>
 #include <iomanip>
 #include <regex>
+#include <cmath>
+
+using std::sin;
 
 ModApi* api;
 
@@ -57,6 +60,36 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
     return 0;
 }
 
+static DWORD WINAPI WindowTitleCallback(LPVOID param) {
+    Sleep(1000);
+    std::wstring gameName = L"Croc 2";
+    HWND hwnd = FindWindow(NULL, gameName.c_str());
+    if (hwnd) {
+        std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";
+        SetWindowText(hwnd, newTitle.c_str());
+    }
+    return 0;
+}
+
+static DWORD WINAPI CameraPanCallback(LPVOID param) {
+    double timer = 0;
+
+    while (true) {
+        Sleep(100);
+
+        LevelInfo levelInfo = api->GetLevelInfo();
+        if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
+            StratEntity* camera = api->GetEntity(ADDR_ROOT_OBJ);
+            if (camera != nullptr) {
+                double camMod = sin(timer);
+                camera->newRotPos = { 0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854 };
+            }
+        }
+
+        timer += 0.1;
+    }
+}
+
 static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
     HMODULE hModule = (HMODULE)param;
 
@@ -87,16 +120,8 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
         LoadMods(mods);
     }
 
-    CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
-        Sleep(1000);
-        std::wstring gameName = L"Croc 2";
-        HWND hwnd = FindWindow(NULL, gameName.c_str());
-        if (hwnd) {
-            std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";
-            SetWindowText(hwnd, newTitle.c_str());
-        }
-        return 0;
-        }, nullptr, 0, nullptr);
+    // Window title
+    CreateThread(nullptr, 0, WindowTitleCallback, nullptr, 0, nullptr);
 
     ApiSetup();
     SetupCheats();
@@ -112,24 +137,7 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
     CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
 
     // Camera tilt on main menu
-    CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
-        double timer = 0;
-
-        while (true) {
-            Sleep(100);
-
-            LevelInfo levelInfo = api->GetLevelInfo();
-            if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
-                StratEntity* camera = api->GetEntity(ADDR_ROOT_OBJ);
-                if (camera != nullptr) {
-                    double camMod = sin(timer);
-                    camera->newRotPos = { 0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854 };
-                }
-            }
-
-            timer += 0.1;
-        }
-    }, nullptr, 0, nullptr);
+    CreateThread(nullptr, 0, CameraPanCallback, nullptr, 0, nullptr);
 
     if (g_mainThreadHandle) {
         ResumeThread(g_mainThreadHandle);

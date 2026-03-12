@@ -184,9 +184,27 @@ You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2
 
 ## Building
 
+### Windows
+
 1. Run `./build.ps1 -Configuration Release`
 1. Mods are autodetected from `Mods/` and built to `build/Release/*.asi`
 1. For automatic mod installation and game launching, put Croc 2 game files in `Croc2/mods/` and use the `-Deploy` or `-Launch` flags
+
+### Linux
+
+1. The build requires an installed 32-bit MinGW toolchain.
+
+    Ubuntu
+    ```console
+    $ sudo apt install mingw-w64
+    ```
+
+    Arch
+    ```console
+    $ sudo pacman -S mingw-w64
+    ```
+
+1. Run `build.sh`
 
 # Third-Party Licenses
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;

@@ -2,12 +2,15 @@
 #include "Utils.h"
 
 #include <fstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace LauncherIni {
 
 std::vector<ConfigEntry> ParseIniFile(const std::wstring& filePath) {
     std::vector<ConfigEntry> entries;
-    std::ifstream file(filePath);
+    std::ifstream file{fs::path(filePath)};
     if (!file.is_open()) return entries;
 
     std::string currentSection;

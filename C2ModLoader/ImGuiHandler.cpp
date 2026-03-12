@@ -1,4 +1,3 @@
-#pragma once
 #include "ModApi.h"
 #include "ImGuiHandler.h"
 #include "Utils.h"
@@ -6,8 +5,9 @@
 #include "CheatsManager.h"
 
 #include <bitset>
+#include <cmath>
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <d3d11.h>
 #include <dxgi.h>
@@ -18,6 +18,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+using std::sqrt, std::pow;
 
 extern ModApi* api;
 
@@ -289,7 +290,7 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
 
         // Hook via MinHook
         MH_Initialize();
-        MH_CreateHook(presentAddr, &hkPresent, reinterpret_cast<void**>(&oPresent));
+        MH_CreateHook(presentAddr, (void*)&hkPresent, reinterpret_cast<void**>(&oPresent));
         MH_EnableHook(presentAddr);
     }
 

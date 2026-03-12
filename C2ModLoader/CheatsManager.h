@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 #include <stdint.h>
 
 // https://www.speedrun.com/croc_2/forums/l2qjp

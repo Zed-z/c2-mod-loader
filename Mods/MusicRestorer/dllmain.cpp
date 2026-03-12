@@ -1,12 +1,14 @@
 #include "ModApi.h"
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
 static bool FileExists(const std::wstring& path) {
-    std::ifstream f(path);
+    std::ifstream f{fs::path(path)};
     return f.good();
 }
 

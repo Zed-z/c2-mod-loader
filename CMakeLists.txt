@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+if(LINUX)
+    set(CMAKE_RC_COMPILER "i686-w64-mingw32-windres")
+    set(CMAKE_INCLUDE_FLAG_RC "-I ")
+    set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> -O coff <SOURCE> <OBJECT>")
+    set(CMAKE_STATIC_LIBRARY_PREFIX "")
+    set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif()
 
 # Configuration options
 if(CMAKE_CONFIGURATION_TYPES)
@@ -34,12 +41,8 @@ macro(add_mod_project MOD_NAME)
     
     # Set mod directory (look in Mods/ subdirectory)
     set(MOD_DIR "${CMAKE_SOURCE_DIR}/Mods/${MOD_NAME}")
-    
-    # Enable RC compiler if on Windows
-    if(WIN32 AND NOT CMAKE_RC_COMPILER_WORKS)
-        enable_language(RC)
-    endif()
-    
+    enable_language(RC)
+
     # Find C++ sources recursively
     file(GLOB_RECURSE MOD_CPP_SOURCES CONFIGURE_DEPENDS "${MOD_DIR}/*.cpp")
     set(RC_FILE "${MOD_DIR}/Resource.rc")
@@ -51,7 +54,15 @@ macro(add_mod_project MOD_NAME)
     add_library(${MOD_NAME} SHARED
         ${SOURCES}
     )
-    
+
+    if(LINUX)
+        target_link_options(${MOD_NAME} PRIVATE
+            "-static-libgcc"
+            "-static-libstdc++"
+            "--static"
+        )
+    endif()
+
     # Set output extension to .asi
     set_target_properties(${MOD_NAME} PROPERTIES SUFFIX ".asi")
     
@@ -86,16 +97,22 @@ macro(add_mod_project MOD_NAME)
         _UNICODE
         _CRT_SECURE_NO_WARNINGS
     )
-    
+
     # Release build optimizations
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_compile_definitions(${MOD_NAME} PRIVATE NDEBUG)
-		target_compile_options(${MOD_NAME} PRIVATE /O2 /Gy)
-		target_link_options(${MOD_NAME} PRIVATE /OPT:REF /OPT:ICF)
+        if(MSVC)
+            target_compile_definitions(${MOD_NAME} PRIVATE NDEBUG)
+            target_compile_options(${MOD_NAME} PRIVATE /O2 /Gy)
+            target_link_options(${MOD_NAME} PRIVATE /OPT:REF /OPT:ICF)
+        elseif(LINUX)
+            target_compile_definitions(${MOD_NAME} PRIVATE NDEBUG)
+            target_compile_options(${MOD_NAME} PRIVATE -O2)
+            target_link_options(${MOD_NAME} PRIVATE -flto)
+        endif()
     else()
         target_compile_definitions(${MOD_NAME} PRIVATE _DEBUG)
     endif()
-    
+
     # Windows libraries
     target_link_libraries(${MOD_NAME} PRIVATE
         kernel32
@@ -111,6 +128,10 @@ macro(add_mod_project MOD_NAME)
         odbc32
         odbccp32
         ws2_32
+        comctl32
+        shlwapi
+        dwmapi
+        version
     )
 
     # Copy to Release folder
@@ -166,8 +187,10 @@ set(PACKAGE_ZIP "${CMAKE_BINARY_DIR}/${PACKAGE_ZIP_NAME}")
 # Create custom target for deployment and launch
 add_custom_target(Deploy
     COMMAND ${CMAKE_COMMAND} -E echo "Deploying mods to Croc 2 directory..."
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CROC2_MODS_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi ${CROC2_GAME_DIR}/C2ModLoader.asi
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<SHELL_PATH:${CROC2_MODS_DIR}>"
+    VERBATIM
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi" "$<SHELL_PATH:${CROC2_GAME_DIR}/C2ModLoader.asi>"
+    VERBATIM
     DEPENDS C2ModLoader ${MOD_LIST}
     COMMENT "Deploying all mods to game directory"
 )
@@ -175,7 +198,8 @@ add_custom_target(Deploy
 # Add copy commands for each mod dynamically
 foreach(MOD_NAME ${MOD_LIST})
     add_custom_command(TARGET Deploy POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/${MOD_NAME}.asi ${CROC2_MODS_DIR}/${MOD_NAME}.asi
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/${MOD_NAME}.asi "${CROC2_MODS_DIR}/${MOD_NAME}.asi"
+        VERBATIM
         COMMENT "Copying ${MOD_NAME}.asi to mods directory"
     )
 endforeach()
