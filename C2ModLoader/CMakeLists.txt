@@ -5,7 +5,9 @@ set(SOURCES
     CheatsManager.cpp
     dllmain.cpp
     ImGuiHandler.cpp
-    Launcher.cpp
+    Launcher/Launcher.cpp
+    Launcher/Backend.cpp
+    Launcher/IniConfig.cpp
     Loader.cpp
     ModApi.cpp
     MouseCaptureRemover.cpp
@@ -122,13 +124,6 @@ else()
 
     message(STATUS "Using MinHook via FetchContent")
 endif()
-
-# Embed manifest with mt.exe
-add_custom_command(TARGET C2ModLoader POST_BUILD
-	COMMAND mt.exe -manifest "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.manifest" 
-					-outputresource:"$<TARGET_FILE:C2ModLoader>"\;2
-	COMMENT "Embedding manifest into C2ModLoader.asi"
-)
 
 # Copy to Release folder
 add_custom_command(TARGET C2ModLoader POST_BUILD

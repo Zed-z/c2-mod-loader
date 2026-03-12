@@ -5,7 +5,7 @@
 #include "MouseCaptureRemover.h"
 #include "Utils.h"
 #include "Resource.h"
-#include "Launcher.h"
+#include "Launcher/Launcher.h"
 #include "Loader.h"
 #include "CheatsManager.h"
 
@@ -25,6 +25,10 @@ ModApi* api;
 bool loaderEnabled = true;
 bool skipLauncher = false;
 bool guiEnabled = true;
+
+static HANDLE g_mainThreadHandle = nullptr;
+
+namespace {
 
 // Keyboard input thread
 static DWORD WINAPI HotkeyThread(LPVOID) {
@@ -51,6 +55,80 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
         Sleep(20);
     }
     return 0;
+}
+
+static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
+    HMODULE hModule = (HMODULE)param;
+
+    if (g_mainThreadHandle) {
+        SuspendThread(g_mainThreadHandle);
+    }
+
+    if (!skipLauncher) {
+        bool result = Launcher::ShowLauncherWindow(hModule);
+        SaveDisabledMods(mods);
+        if (!result) {
+            api->LogInfo("Exiting modloader.");
+            ExitProcess(0);
+            return 0;
+        }
+    }
+
+    LoadMods(mods);
+
+    CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
+        Sleep(1000);
+        std::wstring gameName = L"Croc 2";
+        HWND hwnd = FindWindow(NULL, gameName.c_str());
+        if (hwnd) {
+            std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";
+            SetWindowText(hwnd, newTitle.c_str());
+        }
+        return 0;
+        }, nullptr, 0, nullptr);
+
+    ApiSetup();
+    SetupCheats();
+
+    if (guiEnabled) {
+        CreateThread(nullptr, 0, ImGuiInitThread, hModule, 0, nullptr);
+    }
+
+    if (freeMouse) {
+        CreateThread(nullptr, 0, MouseInitThread, nullptr, 0, nullptr);
+    }
+
+    CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
+
+    // Camera tilt on main menu
+    CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
+        double timer = 0;
+
+        while (true) {
+            Sleep(100);
+
+            LevelInfo levelInfo = api->GetLevelInfo();
+            if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
+                StratEntity* camera = api->GetEntity(ADDR_ROOT_OBJ);
+                if (camera != nullptr) {
+                    double camMod = sin(timer);
+                    camera->newRotPos = { 0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854 };
+                }
+            }
+
+            timer += 0.1;
+        }
+    }, nullptr, 0, nullptr);
+
+    if (g_mainThreadHandle) {
+        ResumeThread(g_mainThreadHandle);
+        CloseHandle(g_mainThreadHandle);
+        g_mainThreadHandle = nullptr;
+    }
+
+    return 0;
+}
+
 }
 
 // Entry point
@@ -100,77 +178,25 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         // Initialize mod lists
         mods = GetMods();
 
-        // Show launcher window
-        if (!skipLauncher) {
+        HANDLE duplicatedMainThread = nullptr;
+        DuplicateHandle(
+            GetCurrentProcess(),
+            GetCurrentThread(),
+            GetCurrentProcess(),
+            &duplicatedMainThread,
+            THREAD_SUSPEND_RESUME,
+            FALSE,
+            0
+        );
+        g_mainThreadHandle = duplicatedMainThread;
 
-            bool result = !ShowLauncherWindow(hModule);
-            SaveDisabledMods(mods);
-            if (result) {
-                api->LogInfo("Exiting modloader.");
-                ExitProcess(0);
-            }
-            
-            // Load mods
-            LoadMods(mods);
-        }
-        else {
-
-            // Load mods
-            LoadMods(mods);
-        }
-
-        // Window title
-        CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
-            Sleep(1000);
-			std::wstring gameName = L"Croc 2";
-            HWND hwnd = FindWindow(NULL, gameName.c_str());
-            if (hwnd) {
-                std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";
-                SetWindowText(hwnd, newTitle.c_str());
-            }
-            return 0;
-            }, nullptr, 0, nullptr);
-        
-
-        // Initialize API
-        ApiSetup();
-
-        // Initialize cheats
-        SetupCheats();
-
-        // Call other components
         DisableThreadLibraryCalls(hModule);
 
-        if (guiEnabled) {
-            CreateThread(nullptr, 0, ImGuiInitThread, hModule, 0, nullptr);
+        HANDLE hModLoaderThread = CreateThread(nullptr, 0, ModLoaderMainThread, hModule, 0, nullptr);
+        if (!hModLoaderThread && g_mainThreadHandle) {
+            CloseHandle(g_mainThreadHandle);
+            g_mainThreadHandle = nullptr;
         }
-
-        if (freeMouse) {
-            CreateThread(nullptr, 0, MouseInitThread, nullptr, 0, nullptr);
-        }
-
-        CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
-
-        // Camera pan effect
-        CreateThread(nullptr, 0, [](LPVOID) -> DWORD {
-
-            double timer = 0;
-
-            while (true) {
-                Sleep(100);
-
-                LevelInfo levelInfo = api->GetLevelInfo();
-                if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
-                    StratEntity* camera = api->GetEntity(ADDR_ROOT_OBJ);
-                    if (camera != nullptr) {
-                        double camMod = sin(timer);
-                        camera->newRotPos = { 0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854 };
-                    }
-                }
-
-                timer += 0.1;
-            }
-            }, nullptr, 0, nullptr);
     }
     }
     return TRUE;

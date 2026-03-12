@@ -70,6 +70,7 @@ struct FileVersionInfo {
     std::wstring version = L"";
     std::wstring hyperlink = L"";
     int apiVersion = -1;
+    std::wstring configTypes = L"";
 };
 
 inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
@@ -113,6 +114,8 @@ inline FileVersionInfo GetFileVersionInfo(const std::wstring filename) {
     std::wstring apiVersionStr = queryValue(L"ApiVersion");
     info.apiVersion = apiVersionStr.empty() ? -1 : std::stoi(apiVersionStr);
 
+    info.configTypes = queryValue(L"ConfigTypes");
+
     return info;
 }
 
@@ -129,12 +132,4 @@ inline void ClearLog() {
     if (!log.is_open()) return;
 
     log.close();
-}
-
-
-inline void OpenNotepad(std::wstring path) {
-    if (PathFileExistsW(path.c_str())) {
-        std::wstring cmd = L"notepad.exe " + path;
-        _wsystem(cmd.c_str());
-    }
 }

@@ -20,27 +20,14 @@ BEGIN
             VALUE "Author", AUTHOR_NAME
 	        VALUE "Description", LOADER_DESCRIPTION
             VALUE "Version", LOADER_VERSION
-            VALUE "Hyperlink" LOADER_HYPERLINK
+            VALUE "Hyperlink", LOADER_HYPERLINK
             VALUE "ApiVersion", API_VERSION_STR
+            VALUE "ConfigTypes", LOADER_CONFIG_TYPES
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
         VALUE "Translation", 0x0409, 1200
-    END
-END
-
-// Menu definition
-MENU_BAR MENU
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "Settings...", ID_FILE_SETTINGS
-        MENUITEM "Show Log", ID_FILE_LOG
-    END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "About...", ID_HELP_ABOUT
     END
 END
 

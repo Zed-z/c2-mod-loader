@@ -20,6 +20,7 @@ BEGIN
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
+            VALUE "ConfigTypes", "Config/Type1Flip:bool:1,Config/TypeSwitchMode:int:0"
         END
     END
     BLOCK "VarFileInfo"
