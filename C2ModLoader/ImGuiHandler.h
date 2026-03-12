@@ -23,8 +23,6 @@ struct LogMessage {
 extern std::vector<LogMessage> logMessages;
 extern ImFont* uiFont;
 
-extern bool incompatibleWarningShown;
-
 extern bool showGui;
 extern bool showLog;
 extern bool showLogInfo;

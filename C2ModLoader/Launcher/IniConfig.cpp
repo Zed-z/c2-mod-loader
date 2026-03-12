@@ -1,4 +1,5 @@
 #include "IniConfig.h"
+#include "Utils.h"
 
 #include <fstream>
 
@@ -33,19 +34,11 @@ std::vector<ConfigEntry> ParseIniFile(const std::wstring& filePath) {
 }
 
 void WriteIniFile(const std::wstring& filePath, const std::vector<ConfigEntry>& entries) {
-    std::ofstream file(filePath);
-    if (!file.is_open()) return;
-
-    std::string lastSection;
     for (const auto& entry : entries) {
-        if (entry.section != lastSection) {
-            if (!lastSection.empty()) {
-                file << "\n";
-            }
-            file << "[" << entry.section << "]\n";
-            lastSection = entry.section;
-        }
-        file << entry.key << "=" << entry.value << "\n";
+        const std::wstring section = StringToWString(entry.section);
+        const std::wstring key = StringToWString(entry.key);
+        const std::wstring value = StringToWString(entry.value);
+        WritePrivateProfileStringW(section.c_str(), key.c_str(), value.c_str(), filePath.c_str());
     }
 }
 

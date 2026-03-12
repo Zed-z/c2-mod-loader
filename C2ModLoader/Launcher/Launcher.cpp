@@ -24,6 +24,8 @@ extern ModApi* api;
 int minWindowWidth = 720;
 int minWindowHeight = 480;
 
+extern bool loaderEnabled;
+
 namespace {
     using ConfigEntry = LauncherIni::ConfigEntry;
 
@@ -37,6 +39,11 @@ namespace {
         std::string defaultValue;
     };
 
+    struct ParsedConfigHints {
+        std::vector<std::pair<std::string, ConfigHint>> ordered;
+        std::map<std::string, ConfigHint> lookup;
+    };
+
     int g_selectedMod = 0; // 0 = C2ModLoader, 1+ = mod index  
     std::vector<std::vector<ConfigEntry>> g_allConfigs;       // index 0 = loader, 1+ = mods
     std::vector<std::map<std::string, ConfigHint>> g_allHintMaps;
@@ -44,15 +51,20 @@ namespace {
     void SaveConfigForMod(int modIndex);
 
     std::wstring GetConfigPath(int modIndex) {
-        if (modIndex == 0) return CONFIG_FILE_L;
+        if (modIndex == 0) {// TODO: possibly overkill
+            wchar_t exePath[MAX_PATH] = {};
+            GetModuleFileNameW(GetModuleHandleA(NULL), exePath, MAX_PATH);
+            PathInfo exeInfo = GetPathInfo(std::wstring(exePath));
+            return exeInfo.directory + L"\\" + CONFIG_FILE_L;
+        }
         std::wstring path = mods[modIndex - 1].path.path;
         path.replace(path.length() - 4, 4, L".ini");
         return path;
     }
 
-    std::map<std::string, ConfigHint> ParseConfigHints(const std::wstring& configTypes) {
-        std::map<std::string, ConfigHint> hintMap;
-        if (configTypes.empty()) return hintMap;
+    ParsedConfigHints ParseConfigHints(const std::wstring& configTypes) {
+        ParsedConfigHints parsed;
+        if (configTypes.empty()) return parsed;
 
         std::string str = WStringToString(configTypes);
         std::istringstream ss(str);
@@ -72,15 +84,16 @@ namespace {
             if (hint.type == "bool" && (hint.defaultValue == "true" || hint.defaultValue == "True"))
                 hint.defaultValue = "1";
 
-            hintMap[keyPath] = hint;
+            parsed.ordered.push_back({ keyPath, hint });
+            parsed.lookup[keyPath] = hint;
         }
-        return hintMap;
+        return parsed;
     }
 
-    bool EnsureConfigDefaults(std::vector<ConfigEntry>& config, const std::map<std::string, ConfigHint>& hintMap) {
+    bool EnsureConfigDefaults(std::vector<ConfigEntry>& config, const std::vector<std::pair<std::string, ConfigHint>>& orderedHints) {
         bool changed = false;
 
-        for (const auto& [keyPath, hint] : hintMap) {
+        for (const auto& [keyPath, hint] : orderedHints) {
             size_t slashPos = keyPath.find('/');
             if (slashPos == std::string::npos || slashPos == 0 || slashPos + 1 >= keyPath.size()) {
                 continue;
@@ -115,11 +128,12 @@ namespace {
         for (int i = 0; i < count; ++i) {
             const std::wstring configTypes = (i == 0) ? LOADER_CONFIG_TYPES_L : mods[i - 1].info.configTypes;
             const std::wstring configPath  = GetConfigPath(i);
+            const ParsedConfigHints parsedHints = ParseConfigHints(configTypes);
 
-            g_allHintMaps[i] = ParseConfigHints(configTypes);
+            g_allHintMaps[i] = parsedHints.lookup;
             g_allConfigs[i]  = LauncherIni::ParseIniFile(configPath);
-
-            if (EnsureConfigDefaults(g_allConfigs[i], g_allHintMaps[i])) {
+            const bool defaultsAdded = EnsureConfigDefaults(g_allConfigs[i], parsedHints.ordered);
+            if (defaultsAdded) {
                 LauncherIni::WriteIniFile(configPath, g_allConfigs[i]);
             }
         }
@@ -130,7 +144,7 @@ namespace {
         std::map<std::string, size_t> sectionIndices;
 
         for (size_t i = 0; i < entries.size(); ++i) {
-            const std::string sectionName = entries[i].section.empty() ? "Configuration" : entries[i].section;
+            const std::string sectionName = entries[i].section.empty() ? "Uncategorized" : entries[i].section;
             auto it = sectionIndices.find(sectionName);
             if (it == sectionIndices.end()) {
                 sectionIndices[sectionName] = sections.size();
@@ -216,28 +230,6 @@ namespace {
 
     void SaveConfigForMod(int modIndex) {
         LauncherIni::WriteIniFile(GetConfigPath(modIndex), g_allConfigs[modIndex]);
-    }
-
-    bool GetLoaderEnabledSetting() {
-        for (const auto& entry : g_allConfigs[0]) {
-            if (_stricmp(entry.section.c_str(), "Config") == 0 && _stricmp(entry.key.c_str(), "LoaderEnabled") == 0) {
-                return entry.value == "1" || _stricmp(entry.value.c_str(), "true") == 0;
-            }
-        }
-        return true;
-    }
-
-    void SetLoaderEnabledSetting(bool enabled) {
-        const std::string newValue = enabled ? "1" : "0";
-        for (auto& entry : g_allConfigs[0]) {
-            if (_stricmp(entry.section.c_str(), "Config") == 0 && _stricmp(entry.key.c_str(), "LoaderEnabled") == 0) {
-                entry.value = newValue;
-                SaveConfigForMod(0);
-                return;
-            }
-        }
-        g_allConfigs[0].push_back({ "Config", "LoaderEnabled", newValue });
-        SaveConfigForMod(0);
     }
 
     void RenderSelectedItemDetails() {
@@ -382,7 +374,6 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
                 float checkboxOffset = availableWidth - 5.0f;
 
                 // Loader entry
-                bool loaderEnabled = GetLoaderEnabledSetting();
                 bool loaderSelected = (g_selectedMod == 0);
                 ImGui::AlignTextToFramePadding();
                 if (ImGui::Selectable((std::string(LOADER_NAME) + "##loader").c_str(), loaderSelected, 0, ImVec2(nameWidth, 0))) {
@@ -390,7 +381,8 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
                 }
                 ImGui::SameLine(checkboxOffset);
                 if (ImGui::Checkbox("##loaderCheckbox", &loaderEnabled)) {
-                    SetLoaderEnabledSetting(loaderEnabled);
+                    api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
+                    LoadAllConfigs();
                 }
 
                 // User mods
@@ -407,6 +399,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
                     ImGui::SameLine(checkboxOffset);
                     if (ImGui::Checkbox(("##checkbox" + std::to_string(i)).c_str(), &mods[i].enabled)) {
                         SaveDisabledMods(mods);
+                        LoadAllConfigs();
                     }
                     ImGui::EndDisabled();
                 }

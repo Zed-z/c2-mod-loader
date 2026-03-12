@@ -16,6 +16,51 @@ std::wstring Mod::getName() {
         : (this->path.name);
 }
 
+extern bool loaderEnabled;
+extern bool skipLauncher;
+extern bool freeMouse;
+extern bool guiEnabled;
+extern bool showGui;
+extern bool showLog;
+extern bool showInputs;
+extern bool showObjectList;
+extern bool showCoords;
+extern bool showLevelInfo;
+extern bool showSaveSlotList;
+extern bool showLogInfo;
+extern bool showLogDebug;
+extern bool showLogWarning;
+extern bool showLogError;
+extern bool showToastInfo;
+extern bool showToastDebug;
+extern bool showToastWarning;
+extern bool showToastError;
+
+void LoadConfig() {
+    loaderEnabled = api->SetupIniBool(L"Config", L"LoaderEnabled", true);
+    skipLauncher = api->SetupIniBool(L"Config", L"SkipLauncher", false);
+    freeMouse = api->SetupIniBool(L"Config", L"FreeMouse", true);
+
+    guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
+    showGui = api->SetupIniBool(L"GUI", L"ShowGui", false);
+    showLog = api->SetupIniBool(L"GUI", L"ShowLog", false);
+    showInputs = api->SetupIniBool(L"GUI", L"ShowInputs", false);
+    showObjectList = api->SetupIniBool(L"GUI", L"ShowObjectList", false);
+    showCoords = api->SetupIniBool(L"GUI", L"ShowCoords", false);
+    showLevelInfo = api->SetupIniBool(L"GUI", L"ShowLevelInfo", false);
+    showSaveSlotList = api->SetupIniBool(L"GUI", L"ShowSaveSlotList", false);
+
+    showLogInfo = api->SetupIniBool(L"Logging", L"Info", true);
+    showLogDebug = api->SetupIniBool(L"Logging", L"Debug", false);
+    showLogWarning = api->SetupIniBool(L"Logging", L"Warning", true);
+    showLogError = api->SetupIniBool(L"Logging", L"Error", true);
+
+    showToastInfo = api->SetupIniBool(L"Toasts", L"Info", true);
+    showToastDebug = api->SetupIniBool(L"Toasts", L"Debug", false);
+    showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
+    showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
+}
+
 void SetupDirectories() {
 
     // Mod directory
@@ -30,6 +75,9 @@ void SetupDirectories() {
 
     // File overrides
     try {
+        if (fs::exists(FILE_OVERRIDE_DIRECTORY_L)) {
+            fs::remove_all(FILE_OVERRIDE_DIRECTORY_L);
+        }
         fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
     }
     catch (const fs::filesystem_error& e) {
@@ -70,7 +118,6 @@ void SaveDisabledMods(std::vector<Mod> mods) {
     }
 
     api->WriteIniString(L"Config", L"DisabledMods", disabledModsStr.c_str());
-
 }
 
 std::vector<Mod> GetMods() {
@@ -113,19 +160,6 @@ std::vector<Mod> GetMods() {
 void LoadMods(std::vector<Mod>& mods) {
 
     std::vector<Mod> failedMods;
-
-    // Prepare file overrides
-    try {
-        if (fs::exists(FILE_OVERRIDE_DIRECTORY_L)) {
-            fs::remove_all(FILE_OVERRIDE_DIRECTORY_L);
-        }
-        fs::create_directories(FILE_OVERRIDE_DIRECTORY_L);
-    }
-    catch (const fs::filesystem_error& e) {
-        std::string message = "Error creating file override directory: " + std::string(e.what());
-        api->LogError(message.c_str());
-        return;
-    }
 
     // Load mods
     for (auto& mod : mods) {

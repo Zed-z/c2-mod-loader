@@ -14,6 +14,9 @@ struct Mod {
     std::wstring getName();
 };
 
+
+void LoadConfig();
+
 extern std::vector<Mod> mods;
 extern int modsLoaded;
 

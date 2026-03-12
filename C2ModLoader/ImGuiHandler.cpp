@@ -25,8 +25,6 @@ extern ModApi* api;
 std::vector<LogMessage> logMessages;
 ImFont* uiFont = nullptr;
 
-bool incompatibleWarningShown;
-
 bool showGui;
 bool showLog;
 
@@ -220,11 +218,13 @@ DWORD WINAPI ImGuiInitThread(LPVOID lpParam) {
         if (DDrawDir != gameDir) {
 			api->LogWarning("ddraw.dll is not loaded from the game directory! Custom GUI won't be displayed.");
 
-            if (!incompatibleWarningShown) {
-                MessageBoxW(NULL, L"Failed to initialize GUI! Make sure you're using dgVoodoo.\nMods will continue to work but custom GUI won't be displayed.\nNote: this warning won't be shown again.", LOADER_NAME_L, MB_OK | MB_ICONWARNING);
-                incompatibleWarningShown = true;
-                api->WriteIniBool(L"GUI", L"IncompatibleWarningShown", incompatibleWarningShown);
-            }
+            MessageBoxW(
+                NULL,
+                L"Failed to initialize GUI! Make sure you're using dgVoodoo.\n"
+                "Mods will continue to work but custom GUI won't be displayed.",
+                LOADER_NAME_L,
+                MB_OK | MB_ICONWARNING
+            );
 
             return 1;
         } else {
@@ -945,7 +945,7 @@ void RenderSaveSlotList() {
 
             ImGui::Text("Stats");
             ImGui::SetNextItemWidth(itemWidth);
-            ImGui::InputInt((std::string("HeartPots##heartpots") + slotId).c_str(), reinterpret_cast<int*>(&slot->heartPots));
+            ImGui::InputInt((std::string("Heart Pots##heartpots") + slotId).c_str(), reinterpret_cast<int*>(&slot->heartPots));
             ImGui::SetNextItemWidth(itemWidth);
             ImGui::InputInt((std::string("Health##health") + slotId).c_str(), reinterpret_cast<int*>(&slot->health));
             ImGui::SetNextItemWidth(itemWidth);
