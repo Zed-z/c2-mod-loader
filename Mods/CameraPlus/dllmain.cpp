@@ -1,6 +1,10 @@
 #include "ModApi.h"
-#include <Windows.h>
+#include <windows.h>
+#include <algorithm>
 #include <iostream>
+#include <cmath>
+
+using std::sin, std::cos, std::min, std::max;
 
 ModApi* api = nullptr;
 

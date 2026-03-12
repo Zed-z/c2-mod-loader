@@ -18,7 +18,7 @@ BEGIN
         BEGIN
             VALUE "Name", LOADER_NAME
             VALUE "Author", AUTHOR_NAME
-	        VALUE "Description", LOADER_DESCRIPTION
+            VALUE "Description", LOADER_DESCRIPTION
             VALUE "Version", LOADER_VERSION
             VALUE "Hyperlink", LOADER_HYPERLINK
             VALUE "ApiVersion", API_VERSION_STR
@@ -32,4 +32,4 @@ BEGIN
 END
 
 // Font
-IDR_UIFONT RCDATA "Scabber_Font_1_05\\Scabber.ttf"
+IDR_UIFONT RCDATA "Scabber_Font_1_05/Scabber.ttf"

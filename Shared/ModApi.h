@@ -1,7 +1,14 @@
 #pragma once
+/*
+ * Since windres invokes the C preprocessor,
+ * it's unable to find C++ headers, tell it not
+ * to include C++ headers
+ */
+#ifndef RC_INVOKED
 #include <cstdint>
 #include <cstddef>
-#include <Windows.h>
+#endif
+#include <windows.h>
 
 #define API_VERSION 2
 

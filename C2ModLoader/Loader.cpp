@@ -186,7 +186,7 @@ void LoadMods(std::vector<Mod>& mods) {
         }
 
         // Load file overrides
-        std::filesystem::path overridePath = std::regex_replace(mod.path.path, std::wregex(L".asi$"), L"");
+        fs::path overridePath = std::regex_replace(mod.path.path, std::wregex(L".asi$"), L"");
 
         try {
             if (fs::exists(overridePath) && fs::is_directory(overridePath)) {

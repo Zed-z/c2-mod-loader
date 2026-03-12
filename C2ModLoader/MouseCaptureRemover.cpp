@@ -1,5 +1,5 @@
 #include "ModApi.h"
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include "MinHook.h"
@@ -64,12 +64,12 @@ BOOL WINAPI hkReleaseCapture() {
 DWORD WINAPI InitHooks(LPVOID lpParam) {
     MH_Initialize();
 
-    MH_CreateHook(&SetCursor, &hkSetCursor, (void**)&oSetCursor);
-    MH_CreateHook(&ShowCursor, &hkShowCursor, (void**)&oShowCursor);
-    MH_CreateHook(&SetCursorPos, &hkSetCursorPos, (void**)&oSetCursorPos);
-    MH_CreateHook(&ClipCursor, &hkClipCursor, (void**)&oClipCursor);
-    MH_CreateHook(&SetCapture, &hkSetCapture, (void**)&oSetCapture);
-    MH_CreateHook(&ReleaseCapture, &hkReleaseCapture, (void**)&oReleaseCapture);
+    MH_CreateHook((void*)&SetCursor, (void*)&hkSetCursor, (void**)&oSetCursor);
+    MH_CreateHook((void*)&ShowCursor, (void*)&hkShowCursor, (void**)&oShowCursor);
+    MH_CreateHook((void*)&SetCursorPos, (void*)&hkSetCursorPos, (void**)&oSetCursorPos);
+    MH_CreateHook((void*)&ClipCursor, (void*)&hkClipCursor, (void**)&oClipCursor);
+    MH_CreateHook((void*)&SetCapture, (void*)&hkSetCapture, (void**)&oSetCapture);
+    MH_CreateHook((void*)&ReleaseCapture, (void*)&hkReleaseCapture, (void**)&oReleaseCapture);
 
     MH_EnableHook(MH_ALL_HOOKS);
     api->LogDebug("Mouse capture API hooks installed!");

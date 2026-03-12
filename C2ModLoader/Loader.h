@@ -2,8 +2,14 @@
 #include "Utils.h"
 #include "ModApi.h"
 
-#include <Windows.h>
+#include <windows.h>
 #include <sstream>
+
+#ifdef _MSC_VER
+#  define return_address(...) _ReturnAddress()
+#elif defined(__MINGW32__)
+#  define return_address(...) __builtin_return_address(0)
+#endif
 
 struct Mod {
     FileVersionInfo info;
@@ -87,7 +93,7 @@ inline HMODULE GetCallingModule() {
     }
 
     // Fallback to return address
-    return getModuleFromAddress((const void*)_ReturnAddress());
+    return getModuleFromAddress((const void*)return_address());
 }
 
 

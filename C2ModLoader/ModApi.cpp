@@ -6,7 +6,7 @@
 #include "Resource.h"
 #include "Loader.h"
 
-#include <Windows.h>
+#include <windows.h>
 #include <fstream>
 #include <string>
 #include <iostream>
@@ -18,12 +18,12 @@
 #include <algorithm>
 #include <regex>
 #include <cstdint>
+#include <filesystem>
 
-#include <Psapi.h>
-#pragma comment(lib, "Psapi.lib")
+#include <psapi.h>
+#pragma comment(lib, "psapi.lib")
 
-#include <intrin.h>
-#pragma intrinsic(_ReturnAddress)
+namespace fs = std::filesystem;
 
 void LogRaw(const std::string& message, const LogSeverity& severity, const HMODULE& modHandle, const std::string& prefix = "") {
 
@@ -33,10 +33,10 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const HMODU
     // Get log path - ignore directory override
     HMODULE executable = GetModuleHandleA(NULL);
     PathInfo executableFilepath = GetModuleFilepath(executable);
-    std::wstring logPath = executableFilepath.directory + L"\\" + StringToWString(LOG_FILE);
+    fs::path p(executableFilepath.directory + L"\\" + StringToWString(LOG_FILE));
 
     // Open log
-    std::wofstream log(logPath, std::ios::app);
+    std::wofstream log{p, std::ios::app};
     if (!log.is_open()) return;
 
     // Get current time

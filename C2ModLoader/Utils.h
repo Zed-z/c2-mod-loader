@@ -1,14 +1,17 @@
 #pragma once
-#include <Windows.h>
+#include <windows.h>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <filesystem>
 
 #include "Resource.h"
 #include "ModApi.h"
 
-#include <Shlwapi.h>
-#pragma comment(lib, "Shlwapi.lib")
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
+
+namespace fs = std::filesystem;
 
 extern ModApi* api;
 
@@ -62,7 +65,7 @@ inline PathInfo GetModuleFilepath(HMODULE module) {
 }
 
 
-#pragma comment(lib, "Version.lib")
+#pragma comment(lib, "version.lib")
 struct FileVersionInfo {
     std::wstring name = L"";
     std::wstring author = L"";
@@ -126,9 +129,7 @@ inline void ClearLog() {
     GetModuleFileNameW(GetModuleHandleA(NULL), modulePath, MAX_PATH);
     std::wstring path(modulePath);
     size_t pos = path.find_last_of(L"\\/");
-    std::wstring logPath = path.substr(0, pos) + L"\\" + LOG_FILE_L;
-
-    std::wofstream log(logPath, std::ios::trunc);
+    std::wofstream log{fs::path(path.substr(0, pos) + L"\\" + LOG_FILE_L), std::ios::trunc};
     if (!log.is_open()) return;
 
     log.close();

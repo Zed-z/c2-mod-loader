@@ -54,6 +54,15 @@ target_compile_options(C2ModLoader PRIVATE
     $<$<COMPILE_LANGUAGE:RC>:/I"${CMAKE_SOURCE_DIR}/Shared">
 )
 
+# Link libgcc statically
+if(LINUX)
+    target_link_options(C2ModLoader PRIVATE
+        "-static-libgcc"
+        "-static-libstdc++"
+        "--static"
+    )
+endif()
+
 # Compile definitions
 target_compile_definitions(C2ModLoader PRIVATE
     WIN32
@@ -67,9 +76,15 @@ target_compile_definitions(C2ModLoader PRIVATE
 
 # Release build optimizations
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(C2ModLoader PRIVATE NDEBUG)
-	target_compile_options(C2ModLoader PRIVATE /O2 /Gy)
-	target_link_options(C2ModLoader PRIVATE /OPT:REF /OPT:ICF)
+    if(MSVC)
+        target_compile_definitions(C2ModLoader PRIVATE NDEBUG)
+        target_compile_options(C2ModLoader PRIVATE /O2 /Gy)
+        target_link_options(C2ModLoader PRIVATE /OPT:REF /OPT:ICF)
+    elseif(LINUX)
+        target_compile_definitions(C2ModLoader PRIVATE NDEBUG)
+        target_compile_options(C2ModLoader PRIVATE -O2)
+        target_link_options(C2ModLoader PRIVATE -flto)
+    endif()
 else()
     target_compile_definitions(C2ModLoader PRIVATE _DEBUG)
 endif()
@@ -92,6 +107,10 @@ target_link_libraries(C2ModLoader PRIVATE
     odbc32
     odbccp32
     ws2_32
+    comctl32
+    shlwapi
+    dwmapi
+    version
 )
 
 # Find and link MinHook
