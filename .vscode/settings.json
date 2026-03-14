@@ -7,6 +7,7 @@
     "cmake.configureOnOpen": true,
     "cmake.generator": "Ninja",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },

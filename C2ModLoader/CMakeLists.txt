@@ -14,26 +14,38 @@ set(SOURCES
     Resource.rc
 )
 
-# ImGui Core
+# ImGui Core + Backends
 set(IMGUI_SOURCES
-    imgui/imgui.cpp
-    imgui/imgui_demo.cpp
-    imgui/imgui_draw.cpp
-    imgui/imgui_tables.cpp
-    imgui/imgui_widgets.cpp
+    libs/imgui/imgui.cpp
+    libs/imgui/imgui_demo.cpp
+    libs/imgui/imgui_draw.cpp
+    libs/imgui/imgui_tables.cpp
+    libs/imgui/imgui_widgets.cpp
+)
+set(IMGUI_BACKENDS
+    libs/imgui/backends/imgui_impl_dx11.cpp
+    libs/imgui/backends/imgui_impl_win32.cpp
 )
 
-# ImGui Backends for Windows + DirectX11
-set(IMGUI_BACKENDS
-    imgui/backends/imgui_impl_dx11.cpp
-    imgui/backends/imgui_impl_win32.cpp
+# MinHook
+set(MINHOOK_SOURCES
+    libs/minhook/src/buffer.c
+    libs/minhook/src/hook.c
+    libs/minhook/src/trampoline.c
 )
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    list(APPEND MINHOOK_SOURCES libs/minhook/src/hde/hde64.c)
+else()
+    list(APPEND MINHOOK_SOURCES libs/minhook/src/hde/hde32.c)
+endif()
 
 # Create DLL
 add_library(C2ModLoader SHARED
     ${SOURCES}
     ${IMGUI_SOURCES}
     ${IMGUI_BACKENDS}
+    ${MINHOOK_SOURCES}
 )
 
 # Set output extension to .asi
@@ -43,8 +55,11 @@ set_target_properties(C2ModLoader PROPERTIES SUFFIX ".asi")
 target_include_directories(C2ModLoader PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../Shared
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/src/hde
 )
 
 # Windows resource compiler
@@ -112,37 +127,6 @@ target_link_libraries(C2ModLoader PRIVATE
     dwmapi
     version
 )
-
-# Find and link MinHook
-find_path(MINHOOK_INCLUDE_DIR NAMES MinHook.h)
-find_library(MINHOOK_LIB NAMES minhook minhook.x32 MinHook libMinHook)
-
-if(MINHOOK_INCLUDE_DIR AND MINHOOK_LIB)
-    target_include_directories(C2ModLoader PRIVATE ${MINHOOK_INCLUDE_DIR})
-    target_link_libraries(C2ModLoader PRIVATE ${MINHOOK_LIB})
-    message(STATUS "Found MinHook include: ${MINHOOK_INCLUDE_DIR}")
-    message(STATUS "Found MinHook library: ${MINHOOK_LIB}")
-else()
-    include(FetchContent)
-    FetchContent_Declare(
-        minhook
-        GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
-        GIT_TAG v1.3.4
-    )
-    FetchContent_MakeAvailable(minhook)
-
-    if(TARGET minhook)
-        target_link_libraries(C2ModLoader PRIVATE minhook)
-    elseif(TARGET minhook::minhook)
-        target_link_libraries(C2ModLoader PRIVATE minhook::minhook)
-    elseif(TARGET libMinHook)
-        target_link_libraries(C2ModLoader PRIVATE libMinHook)
-    else()
-        message(FATAL_ERROR "MinHook target not found after FetchContent.")
-    endif()
-
-    message(STATUS "Using MinHook via FetchContent")
-endif()
 
 # Copy to Release folder
 add_custom_command(TARGET C2ModLoader POST_BUILD
