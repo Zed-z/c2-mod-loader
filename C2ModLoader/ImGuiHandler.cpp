@@ -24,6 +24,7 @@ extern ModApi* api;
 
 // Variables for GUI
 std::vector<LogMessage> logMessages;
+std::mutex logMutex;
 ImFont* uiFont = nullptr;
 
 bool showGui;
@@ -440,7 +441,13 @@ void RenderLog() {
     if (scrollY >= scrollMaxY - 1.0f)
         autoScroll = true;
 
-    for (const LogMessage& msg : logMessages) {
+    std::vector<LogMessage> logSnapshot;
+    {
+        std::lock_guard<std::mutex> lock(logMutex);
+        logSnapshot = logMessages;
+    }
+
+    for (const LogMessage& msg : logSnapshot) {
 
         if (msg.severity == LogSeverity::Info && !showLogInfo) continue;
         if (msg.severity == LogSeverity::Debug && !showLogDebug) continue;

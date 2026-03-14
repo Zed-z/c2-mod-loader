@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <deque>
+#include <mutex>
 
 #include "ModApi.h"
 #include "imgui.h"
@@ -21,6 +22,7 @@ struct LogMessage {
 };
 
 extern std::vector<LogMessage> logMessages;
+extern std::mutex logMutex;
 extern ImFont* uiFont;
 
 extern bool showGui;

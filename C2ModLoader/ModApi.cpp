@@ -22,6 +22,7 @@
 
 #include <psapi.h>
 #pragma comment(lib, "psapi.lib")
+#include <mutex>
 
 namespace fs = std::filesystem;
 
@@ -51,7 +52,10 @@ void LogRaw(const std::string& message, const LogSeverity& severity, const HMODU
 
     // Write the log to file and buffer
     log << msg.str();
-    logMessages.push_back({ WStringToString(msg.str()), severity });
+    {
+        std::lock_guard<std::mutex> lock(logMutex);
+        logMessages.push_back({ WStringToString(msg.str()), severity });
+    }
 
     // Close log
     log.close();

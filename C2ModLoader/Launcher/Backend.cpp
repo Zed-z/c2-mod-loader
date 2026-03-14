@@ -213,6 +213,7 @@ namespace {
 			break;
 
 		case WM_DESTROY:
+			g_hwnd = nullptr;
 			PostQuitMessage(0);
 			return 0;
 
