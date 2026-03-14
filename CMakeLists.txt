@@ -191,6 +191,8 @@ add_custom_target(Deploy
     VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi" "$<SHELL_PATH:${CROC2_GAME_DIR}/C2ModLoader.asi>"
     VERBATIM
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Shared/global.ini" "$<SHELL_PATH:${CROC2_GAME_DIR}/global.ini>"
+    VERBATIM
     DEPENDS C2ModLoader ${MOD_LIST}
     COMMENT "Deploying all mods to game directory"
 )

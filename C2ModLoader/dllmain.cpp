@@ -143,6 +143,55 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
         ResumeThread(g_mainThreadHandle);
         CloseHandle(g_mainThreadHandle);
         g_mainThreadHandle = nullptr;
+
+        // Wait for game window and focus it
+        struct FindCtx { DWORD pid; HWND result; };
+        FindCtx ctx{ GetCurrentProcessId(), nullptr };
+
+        for (int i = 0; i < 200 && !ctx.result; i++) {
+            Sleep(50); // Try for 10 seconds
+            EnumWindows([](HWND h, LPARAM lp) -> BOOL {
+                auto& c = *reinterpret_cast<FindCtx*>(lp);
+                DWORD wpid = 0;
+                GetWindowThreadProcessId(h, &wpid);
+                if (wpid != c.pid) return TRUE;
+                if (!IsWindowVisible(h) || GetWindow(h, GW_OWNER)) return TRUE;
+                c.result = h;
+                return FALSE;
+            }, reinterpret_cast<LPARAM>(&ctx));
+        }
+
+        if (ctx.result) {
+            api->LogDebug("Focusing game window.");
+            for (int i = 0; i < 20; i++) {
+                HWND fg = GetForegroundWindow();
+                if (fg == ctx.result) {
+                    break;
+                }
+
+                DWORD gameThread = GetWindowThreadProcessId(ctx.result, nullptr);
+                DWORD fgThread = fg ? GetWindowThreadProcessId(fg, nullptr) : 0;
+                bool attached = false;
+
+                if (fgThread && fgThread != gameThread) {
+                    attached = AttachThreadInput(gameThread, fgThread, TRUE) != FALSE;
+                }
+
+                ShowWindow(ctx.result, SW_SHOW);
+                SetWindowPos(ctx.result, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                SetWindowPos(ctx.result, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                BringWindowToTop(ctx.result);
+                SetForegroundWindow(ctx.result);
+                SetActiveWindow(ctx.result);
+                SetFocus(ctx.result);
+
+                if (attached) {
+                    AttachThreadInput(gameThread, fgThread, FALSE);
+                }
+
+                Sleep(25);
+            }
+        }
     }
 
     return 0;
