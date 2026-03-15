@@ -208,16 +208,13 @@ You can grab it [here](https://community.pcgamingwiki.com/files/file/2969-croc-2
 
 # Third-Party Licenses
 
-This project uses the following libraries:
+This project uses the following third party assets:
 
 -   [Dear ImGui](https://github.com/ocornut/imgui) - Copyright (c) 2014-2025 Omar Cornut
 -   [MinHook](https://github.com/TsudaKageyu/minhook) - Copyright (c) 2009-2017 Tsuda Kageyu
+-   [Scabber](https://ggbot.itch.io/scabber-font) by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.
 
-This project contains graphics API implementation code from [Dear ImGui](https://github.com/ocornut/imgui), licensed under the MIT License.
-
-This project uses the [Scabber](https://ggbot.itch.io/scabber-font) font by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.
-
-Licenses for the above mentioned are included in `LICENSES/`.
+Licenses for the above mentioned are included in their respective directories in this directory.
 
 # Special thanks
 

@@ -1,11 +1,58 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Generate license header
+set(EMBEDDED_LICENSE_FILES
+    "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Scabber_Font_1_05/License.txt"
+)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${EMBEDDED_LICENSE_FILES})
+
+function(append_embedded_license DISPLAY_NAME FILE_PATH OUT_VAR)
+    file(READ "${FILE_PATH}" _license_content)
+    # Strip UTF-8 BOM (EF BB BF)
+    string(ASCII 239 187 191 _utf8_bom)
+    string(REGEX REPLACE "^${_utf8_bom}" "" _license_content "${_license_content}")
+    string(REPLACE "\r\n" "\n" _license_content "${_license_content}")
+    string(APPEND _license_entry "        {\"${DISPLAY_NAME}\", R\"(\n${_license_content}\n)\"},\n")
+    set(${OUT_VAR} "${${OUT_VAR}}${_license_entry}" PARENT_SCOPE)
+endfunction()
+
+set(EMBEDDED_LICENSE_ENTRIES "")
+append_embedded_license("C2ModLoader" "${CMAKE_SOURCE_DIR}/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("Dear ImGui" "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("MinHook" "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("Scabber Font" "${CMAKE_CURRENT_SOURCE_DIR}/Scabber_Font_1_05/License.txt" EMBEDDED_LICENSE_ENTRIES)
+
+set(GENERATED_EMBEDDED_LICENSES_HEADER "${CMAKE_CURRENT_BINARY_DIR}/GeneratedEmbeddedLicenses.h")
+string(CONCAT GENERATED_EMBEDDED_LICENSES_CONTENT
+    "#pragma once\n"
+    "\n"
+    "#include \"EmbeddedLicenses.h\"\n"
+    "#include <vector>\n"
+    "\n"
+    "namespace Launcher {\n"
+    "\n"
+    "inline const std::vector<EmbeddedLicense>& GetGeneratedEmbeddedLicenses() {\n"
+    "    static const std::vector<EmbeddedLicense> licenses = {\n"
+    "${EMBEDDED_LICENSE_ENTRIES}"
+    "    };\n"
+    "\n"
+    "    return licenses;\n"
+    "}\n"
+    "\n"
+    "}\n"
+)
+file(WRITE "${GENERATED_EMBEDDED_LICENSES_HEADER}" "${GENERATED_EMBEDDED_LICENSES_CONTENT}")
+
 # Source files
 set(SOURCES
     CheatsManager.cpp
     dllmain.cpp
     ImGuiHandler.cpp
     Launcher/Launcher.cpp
+    Launcher/EmbeddedLicenses.cpp
     Launcher/Backend.cpp
     Launcher/IniConfig.cpp
     Loader.cpp
@@ -54,6 +101,7 @@ set_target_properties(C2ModLoader PROPERTIES SUFFIX ".asi")
 # Include directories
 target_include_directories(C2ModLoader PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../Shared
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends

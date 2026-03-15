@@ -1,5 +1,6 @@
 #include "Launcher.h"
 #include "Backend.h"
+#include "EmbeddedLicenses.h"
 #include "IniConfig.h"
 #include "ModApi.h"
 #include "Config.h"
@@ -44,11 +45,12 @@ namespace {
         std::map<std::string, ConfigHint> lookup;
     };
 
-    int g_selectedMod = 0; // 0 = C2ModLoader, 1+ = mod index  
-    std::vector<std::vector<ConfigEntry>> g_allConfigs;       // index 0 = loader, 1+ = mods
+    // 0 = loader, 1+ = mods
+    int g_selectedMod = 0;
+    std::vector<std::vector<ConfigEntry>> g_allConfigs;
     std::vector<std::map<std::string, ConfigHint>> g_allHintMaps;
 
-    void SaveConfigForMod(int modIndex);
+    std::vector<Launcher::EmbeddedLicense> licenses = Launcher::GetEmbeddedLicenses();
 
     std::wstring GetConfigPath(int modIndex) {
         if (modIndex == 0) {// TODO: possibly overkill
@@ -60,6 +62,10 @@ namespace {
         std::wstring path = mods[modIndex - 1].path.path;
         path.replace(path.length() - 4, 4, L".ini");
         return path;
+    }
+
+    void SaveConfigForMod(int modIndex) {
+        LauncherIni::WriteIniFile(GetConfigPath(modIndex), g_allConfigs[modIndex]);
     }
 
     ParsedConfigHints ParseConfigHints(const std::wstring& configTypes) {
@@ -228,10 +234,6 @@ namespace {
         }
     }
 
-    void SaveConfigForMod(int modIndex) {
-        LauncherIni::WriteIniFile(GetConfigPath(modIndex), g_allConfigs[modIndex]);
-    }
-
     void RenderSelectedItemDetails() {
 
         std::string name, version, author, description, hyperlink, filePath;
@@ -257,6 +259,9 @@ namespace {
         }
 
         ImGui::Text(name.c_str());
+        if (ImGui::IsItemHovered() && !filePath.empty()) {
+            ImGui::SetTooltip("%s", filePath.c_str());
+        }
         ImGui::Separator();
         ImGui::Spacing();
 
@@ -266,7 +271,23 @@ namespace {
         if (!version.empty() || apiVersion != -1) {
             ImGui::Text("Version: %s, API: v%d", version.c_str(), apiVersion);
         }
-        ImGui::BeginChild("DetailsPane", ImVec2(0.0f, 100.0f), true);
+        if (!hyperlink.empty()) {
+            ImGui::TextColored(ImVec4(0.25f, 0.5f, 1.0f, 1.0f), "Website URL");
+            if (ImGui::IsItemClicked()) {
+                ShellExecuteA(NULL, "open", hyperlink.c_str(), NULL, NULL, SW_SHOWNORMAL);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+                ImGui::SetTooltip("%s", hyperlink.c_str());
+            }
+        }
+
+        float descriptionHeight = ImGui::GetContentRegionAvail().y;
+        if (descriptionHeight < 100.0f) {
+            descriptionHeight = 100.0f;
+        }
+
+        ImGui::BeginChild("OverviewDescription", ImVec2(0.0f, descriptionHeight), true);
         if (!description.empty()) {
             ImGui::TextWrapped("%s", description.c_str());
         }
@@ -274,31 +295,37 @@ namespace {
             ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No description provided.");
         }
         ImGui::EndChild();
-        if (!hyperlink.empty()) {
-            ImGui::TextColored(ImVec4(0.0f, 0.5f, 1.0f, 1.0f), hyperlink.c_str());
-            if (ImGui::IsItemClicked()) {
-                ShellExecuteA(NULL, "open", hyperlink.c_str(), NULL, NULL, SW_SHOWNORMAL);
-            }
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-            }
-        }
-        if (!filePath.empty()) {
-            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "File: %s", filePath.c_str());
-        }
     }
 
     void RenderSelectedItemConfig() {
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::TextUnformatted("Configuration Options");
-        ImGui::Spacing();
-
         if (g_allConfigs[g_selectedMod].empty()) {
-            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No config file found.");
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No configuration available.");
         } else {
             RenderConfigSections();
         }
+    }
+
+    void RenderLicensesSection(bool fullHeight = false) {
+        if (licenses.empty()) return;
+
+        float panelHeight = fullHeight ? ImGui::GetContentRegionAvail().y : 260.0f;
+        if (panelHeight < 120.0f) {
+            panelHeight = 120.0f;
+        }
+
+        ImGui::BeginChild("LicensePanel", ImVec2(0.0f, panelHeight), false);
+        if (ImGui::BeginTabBar("LicenseTabs")) {
+            for (size_t i = 0; i < licenses.size(); ++i) {
+                if (ImGui::BeginTabItem(licenses[i].displayName)) {
+                    ImGui::BeginChild("LicenseContent", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_HorizontalScrollbar);
+                    ImGui::TextUnformatted(licenses[i].content);
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
+                }
+            }
+            ImGui::EndTabBar();
+        }
+        ImGui::EndChild();
     }
 
 }
@@ -308,6 +335,7 @@ namespace Launcher {
 bool ShowLauncherWindow(HINSTANCE hInstance) {
     bool start_game = false;
     bool close_launcher = false;
+    bool showLicensesOverlay = false;
 
     api->LogDebug("[Launcher] Setting up launcher window");
 
@@ -359,70 +387,136 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
         );
 
         float listWidth = 250.0f;
+        float footerHeight = 16.0f;
         float contentHeight = ImGui::GetContentRegionAvail().y;
+        if (!showLicensesOverlay) {
+            contentHeight -= (footerHeight + ImGui::GetStyle().ItemSpacing.y);
+            if (contentHeight < 0.0f) {
+                contentHeight = 0.0f;
+            }
+        }
 
-        ImGui::BeginChild("ListPane", ImVec2(listWidth, contentHeight), true);
-        {
-            ImGui::TextUnformatted("Mod List");
-
+        if (showLicensesOverlay) {
+            ImGui::BeginChild("LicensesOverlayPane", ImVec2(0, contentHeight), true);
+            if (ImGui::Button("Back")) {
+                showLicensesOverlay = false;
+            }
+            ImGui::SameLine();
+            ImGui::TextUnformatted("Licenses");
+            ImGui::Separator();
             ImGui::Spacing();
-
-            ImGui::BeginChild("ModList", ImVec2(listWidth - 16.0f, contentHeight - 80.0f), true);
+            RenderLicensesSection(true);
+            ImGui::EndChild();
+        } else {
+            ImGui::BeginChild("ListPane", ImVec2(listWidth, contentHeight), true);
             {
-                float availableWidth = ImGui::GetContentRegionAvail().x;
-                float nameWidth = availableWidth - 20.0f;
-                float checkboxOffset = availableWidth - 5.0f;
+                ImGui::TextUnformatted("Mod List");
 
-                // Loader entry
-                bool loaderSelected = (g_selectedMod == 0);
-                ImGui::AlignTextToFramePadding();
-                if (ImGui::Selectable((std::string(LOADER_NAME) + "##loader").c_str(), loaderSelected, 0, ImVec2(nameWidth, 0))) {
-                    g_selectedMod = 0;
-                }
-                ImGui::SameLine(checkboxOffset);
-                if (ImGui::Checkbox("##loaderCheckbox", &loaderEnabled)) {
-                    api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
-                    LoadAllConfigs();
-                }
+                ImGui::Spacing();
 
-                // User mods
-                for (size_t i = 0; i < mods.size(); ++i) {
-                    bool isSelected = (g_selectedMod == (int)(i + 1));
-                    std::string modName = WStringToString(mods[i].getName());
-                    std::string selectableName = modName + "##mod" + std::to_string(i);
-                    
-                    ImGui::BeginDisabled(!loaderEnabled);
+                ImGui::BeginChild("ModList", ImVec2(listWidth - 16.0f, contentHeight - 80.0f), true);
+                {
+                    float availableWidth = ImGui::GetContentRegionAvail().x;
+                    float nameWidth = availableWidth - 20.0f;
+                    float checkboxOffset = availableWidth - 5.0f;
+
+                    // Loader entry
+                    bool loaderSelected = (g_selectedMod == 0);
                     ImGui::AlignTextToFramePadding();
-                    if (ImGui::Selectable(selectableName.c_str(), isSelected, 0, ImVec2(nameWidth, 0))) {
-                        g_selectedMod = (int)(i + 1);
+                    if (ImGui::Selectable((std::string(LOADER_NAME) + "##loader").c_str(), loaderSelected, 0, ImVec2(nameWidth, 0))) {
+                        g_selectedMod = 0;
                     }
                     ImGui::SameLine(checkboxOffset);
-                    if (ImGui::Checkbox(("##checkbox" + std::to_string(i)).c_str(), &mods[i].enabled)) {
-                        SaveDisabledMods(mods);
+                    if (ImGui::Checkbox("##loaderCheckbox", &loaderEnabled)) {
+                        api->WriteIniBool(L"Config", L"LoaderEnabled", loaderEnabled);
                         LoadAllConfigs();
                     }
-                    ImGui::EndDisabled();
+
+                    // User mods
+                    for (size_t i = 0; i < mods.size(); ++i) {
+                        bool isSelected = (g_selectedMod == (int)(i + 1));
+                        std::string modName = WStringToString(mods[i].getName());
+                        std::string selectableName = modName + "##mod" + std::to_string(i);
+                        
+                        ImGui::BeginDisabled(!loaderEnabled);
+                        ImGui::AlignTextToFramePadding();
+                        if (ImGui::Selectable(selectableName.c_str(), isSelected, 0, ImVec2(nameWidth, 0))) {
+                            g_selectedMod = (int)(i + 1);
+                        }
+                        ImGui::SameLine(checkboxOffset);
+                        if (ImGui::Checkbox(("##checkbox" + std::to_string(i)).c_str(), &mods[i].enabled)) {
+                            SaveDisabledMods(mods);
+                            LoadAllConfigs();
+                        }
+                        ImGui::EndDisabled();
+                    }
+                }
+                ImGui::EndChild();
+
+                ImGui::Spacing();
+
+                if (ImGui::Button("Launch Game", ImVec2(listWidth - 16.0f, 32.0f))) {
+                    start_game = true;
+                    close_launcher = true;
+                }
+
+            }
+            ImGui::EndChild();
+
+            ImGui::SameLine();
+
+            ImGui::BeginChild("DetailsPane", ImVec2(0, contentHeight), true);
+            {
+                const bool hasConfig = !g_allConfigs[g_selectedMod].empty();
+                if (ImGui::BeginTabBar("DetailsTabs")) {
+                    if (ImGui::BeginTabItem("Overview")) {
+                        RenderSelectedItemDetails();
+                        ImGui::EndTabItem();
+                    }
+
+                    if (!hasConfig) ImGui::BeginDisabled();
+                    if (ImGui::BeginTabItem("Settings")) {
+                        RenderSelectedItemConfig();
+                        ImGui::EndTabItem();
+                    }
+                    if (!hasConfig) ImGui::EndDisabled();
+
+                    ImGui::EndTabBar();
                 }
             }
             ImGui::EndChild();
 
-            ImGui::Spacing();
+            ImGui::BeginChild("FooterBar", ImVec2(0, footerHeight), false);
+            {
+                float footerTextY = (footerHeight - ImGui::GetTextLineHeight()) * 0.5f;
+                if (footerTextY < 0.0f) {
+                    footerTextY = 0.0f;
+                }
 
-            if (ImGui::Button("Launch Game", ImVec2(listWidth - 16.0f, 32.0f))) {
-                start_game = true;
-                close_launcher = true;
+                const std::string footerLeft = std::string(LOADER_NAME) + " v" + std::string(LOADER_VERSION);
+                ImGui::SetCursorPosY(footerTextY);
+                ImGui::TextColored(ImVec4(0.75f, 0.75f, 0.75f, 1.0f), "%s", footerLeft.c_str());
+
+                const char* legalLink = "Licenses";
+                float linkWidth = ImGui::CalcTextSize(legalLink).x;
+                float rightX = ImGui::GetWindowContentRegionMax().x - linkWidth;
+                if (rightX > ImGui::GetCursorPosX()) {
+                    ImGui::SameLine(rightX);
+                } else {
+                    ImGui::SameLine();
+                }
+
+                ImGui::SetCursorPosY(footerTextY);
+                ImGui::TextColored(ImVec4(0.25f, 0.5f, 1.0f, 1.0f), "%s", legalLink);
+                if (ImGui::IsItemClicked()) {
+                    showLicensesOverlay = true;
+                }
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+                }
             }
+            ImGui::EndChild();
         }
-        ImGui::EndChild();
-
-        ImGui::SameLine();
-
-        ImGui::BeginChild("DetailsPane", ImVec2(0, contentHeight), true);
-        {
-            RenderSelectedItemDetails();
-            RenderSelectedItemConfig();
-        }
-        ImGui::EndChild();
 
         ImGui::End();
 

@@ -258,7 +258,7 @@ bool Initialize(HINSTANCE hInstance, const wchar_t* windowTitle, int minWidth, i
 	g_hwnd = CreateWindowW(
 		wc.lpszClassName,
 		windowTitle,
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		g_minWindowWidth,

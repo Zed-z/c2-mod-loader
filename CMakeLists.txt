@@ -181,7 +181,6 @@ message(STATUS "Game directory: ${CROC2_GAME_DIR}")
 # Packaging paths
 set(PACKAGE_DIR "${CMAKE_BINARY_DIR}/package")
 set(PACKAGE_MODS_DIR "${PACKAGE_DIR}/mods")
-set(PACKAGE_LICENSES_DIR "${PACKAGE_DIR}/LICENSES")
 set(PACKAGE_ZIP_NAME "package.zip")
 set(PACKAGE_ZIP "${CMAKE_BINARY_DIR}/${PACKAGE_ZIP_NAME}")
 
@@ -189,7 +188,6 @@ set(PACKAGE_ZIP "${CMAKE_BINARY_DIR}/${PACKAGE_ZIP_NAME}")
 add_custom_target(Deploy
     COMMAND ${CMAKE_COMMAND} -E echo "Deploying mods to Croc 2 directory..."
     COMMAND ${CMAKE_COMMAND} -E make_directory "$<SHELL_PATH:${CROC2_MODS_DIR}>"
-    VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi" "$<SHELL_PATH:${CROC2_GAME_DIR}/C2ModLoader.asi>"
     VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Shared/global.ini" "$<SHELL_PATH:${CROC2_GAME_DIR}/global.ini>"
@@ -212,10 +210,8 @@ add_custom_target(Package
     COMMAND ${CMAKE_COMMAND} -E echo "Creating release package..."
     COMMAND ${CMAKE_COMMAND} -E rm -rf ${PACKAGE_DIR}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_MODS_DIR}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_LICENSES_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi ${PACKAGE_DIR}/C2ModLoader.asi
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/Shared/global.ini ${PACKAGE_DIR}/global.ini
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/LICENSES ${PACKAGE_LICENSES_DIR}
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR} ${CMAKE_COMMAND} -E rm -f ${PACKAGE_ZIP_NAME}
     DEPENDS C2ModLoader ${MOD_LIST}
     COMMENT "Packaging C2ModLoader release artifacts"
@@ -229,7 +225,7 @@ foreach(MOD_NAME ${MOD_LIST})
 endforeach()
 
 add_custom_command(TARGET Package POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E chdir ${PACKAGE_DIR} ${CMAKE_COMMAND} -E tar cf ../${PACKAGE_ZIP_NAME} --format=zip C2ModLoader.asi global.ini mods LICENSES
+    COMMAND ${CMAKE_COMMAND} -E chdir ${PACKAGE_DIR} ${CMAKE_COMMAND} -E tar cf ../${PACKAGE_ZIP_NAME} --format=zip C2ModLoader.asi global.ini mods
     COMMENT "Creating package zip archive"
 )
 
