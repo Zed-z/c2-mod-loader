@@ -32,4 +32,4 @@ BEGIN
 END
 
 // Font
-IDR_UIFONT RCDATA "Scabber_Font_1_05/Scabber.ttf"
+IDR_UIFONT RCDATA "libs/scabber_font/Scabber.ttf"

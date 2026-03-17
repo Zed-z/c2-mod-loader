@@ -1,19 +1,19 @@
 #pragma once
-#include <windows.h>
-#include <vector>
-#include <string>
 #include <deque>
 #include <mutex>
+#include <string>
+#include <vector>
+#include <windows.h>
 
+#include "Loader.h"
 #include "ModApi.h"
 #include "imgui.h"
-#include "Loader.h"
 
 enum LogSeverity {
-    Info,
-    Debug,
-    Warning,
-    Error
+	Info,
+	Debug,
+	Warning,
+	Error
 };
 
 struct LogMessage {
@@ -23,7 +23,7 @@ struct LogMessage {
 
 extern std::vector<LogMessage> logMessages;
 extern std::mutex logMutex;
-extern ImFont* uiFont;
+extern ImFont *uiFont;
 
 extern bool showGui;
 extern bool showLog;
@@ -46,18 +46,18 @@ void ImGuiDraw();
 
 // Toast notifications
 struct Toast {
-    std::string message;
-    LogSeverity severity;
-    float timeRemaining;
+	std::string message;
+	LogSeverity severity;
+	float timeRemaining;
 };
 extern std::deque<Toast> toastQueue;
 
-void ImGuiShowToast(const std::string& message, const LogSeverity& severity, float duration = 2.0f);
+void ImGuiShowToast(const std::string &message, const LogSeverity &severity, float duration = 2.0f);
 
 // Menu actions
 struct MenuAction {
 	HMODULE handle;
-    MenuActionRegistrationFunction function;
+	MenuActionRegistrationFunction function;
 };
 
 extern std::vector<MenuAction> menuActionRegistrations;

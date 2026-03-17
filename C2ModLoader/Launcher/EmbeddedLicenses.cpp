@@ -3,8 +3,8 @@
 
 namespace Launcher {
 
-const std::vector<EmbeddedLicense>& GetEmbeddedLicenses() {
-    return GetGeneratedEmbeddedLicenses();
+const std::vector<EmbeddedLicense> &GetEmbeddedLicenses() {
+	return GetGeneratedEmbeddedLicenses();
 }
 
-}
+} // namespace Launcher

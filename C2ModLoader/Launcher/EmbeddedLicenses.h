@@ -5,10 +5,10 @@
 namespace Launcher {
 
 struct EmbeddedLicense {
-    const char* displayName;
-    const char* content;
+	const char *displayName;
+	const char *content;
 };
 
-const std::vector<EmbeddedLicense>& GetEmbeddedLicenses();
+const std::vector<EmbeddedLicense> &GetEmbeddedLicenses();
 
-}
+} // namespace Launcher

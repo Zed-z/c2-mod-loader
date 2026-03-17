@@ -1,7 +1,7 @@
 #include "CheatsManager.h"
 #include "ModApi.h"
 
-extern ModApi* api;
+extern ModApi *api;
 
 uint32_t cheatsValue = 0x00000000;
 
@@ -37,8 +37,7 @@ void ApplyCheats() {
 void setDebugMenu(bool enable) {
 	if (enable) {
 		cheatsValue |= 1;
-	}
-	else {
+	} else {
 		cheatsValue &= ~1;
 	}
 	api->WriteIniBool(L"Cheats", L"DebugMenu", cheatsDebugMenu);
@@ -48,8 +47,7 @@ void setDebugMenu(bool enable) {
 void setPositionBar(bool enable) {
 	if (enable) {
 		cheatsValue |= 2;
-	}
-	else {
+	} else {
 		cheatsValue &= ~2;
 	}
 	api->WriteIniBool(L"Cheats", L"PositionBar", cheatsPositionBar);
@@ -59,8 +57,7 @@ void setPositionBar(bool enable) {
 void setInvulnerability(bool enable) {
 	if (enable) {
 		cheatsValue |= 4;
-	}
-	else {
+	} else {
 		cheatsValue &= ~4;
 	}
 	api->WriteIniBool(L"Cheats", L"Invulnerability", cheatsInvulnerability);
@@ -70,8 +67,7 @@ void setInvulnerability(bool enable) {
 void setBonusCrystals(bool enable) {
 	if (enable) {
 		cheatsValue |= 16;
-	}
-	else {
+	} else {
 		cheatsValue &= ~16;
 	}
 	api->WriteIniBool(L"Cheats", L"BonusCrystals", cheatsBonusCrystals);
@@ -81,8 +77,7 @@ void setBonusCrystals(bool enable) {
 void setMusicSelect(bool enable) {
 	if (enable) {
 		cheatsValue |= 32;
-	}
-	else {
+	} else {
 		cheatsValue &= ~32;
 	}
 	api->WriteIniBool(L"Cheats", L"MusicSelect", cheatsMusicSelect);

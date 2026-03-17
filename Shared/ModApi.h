@@ -5,8 +5,8 @@
  * to include C++ headers
  */
 #ifndef RC_INVOKED
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #endif
 #include <windows.h>
 
@@ -24,16 +24,16 @@
 
 // Addresses --------------------------------------------------------
 
-#define ADDR_FOG_DISTANCE { 0x4B7B48 }
-#define ADDR_RENDER_DISTANCE { 0x4B7B18 }
+#define ADDR_FOG_DISTANCE {0x4B7B48}
+#define ADDR_RENDER_DISTANCE {0x4B7B18}
 
-#define ADDR_ROOT_OBJ { 0x4A8C3C, { 0x14, 0x28, 0x00 } }
-#define ADDR_CROC_OBJ { 0x4A8C3C, { 0x14, 0x30, 0x00 } }
-#define ADDR_CAMERA_OBJ { 0x4A8C3C, { 0x14, 0x3C, 0x00 } }
-#define ADDR_DIALOG_OBJ { 0x4A8C3C, { 0x14, 0x40, 0x00 } }
-#define ADDR_STRAT_COUNT { 0x636160 }
+#define ADDR_ROOT_OBJ {0x4A8C3C, {0x14, 0x28, 0x00}}
+#define ADDR_CROC_OBJ {0x4A8C3C, {0x14, 0x30, 0x00}}
+#define ADDR_CAMERA_OBJ {0x4A8C3C, {0x14, 0x3C, 0x00}}
+#define ADDR_DIALOG_OBJ {0x4A8C3C, {0x14, 0x40, 0x00}}
+#define ADDR_STRAT_COUNT {0x636160}
 
-#define ADDR_CURRENT_SAVE_SLOT { 0x6220FC }
+#define ADDR_CURRENT_SAVE_SLOT {0x6220FC}
 #define ADDR_SAVE_SLOT_BASE 0x6042C4
 #define ADDR_SAVE_SLOT_OFFSET 0x2000
 #define SAVE_SLOT_NUMBER 5
@@ -92,17 +92,17 @@ typedef int32_t StratEntityFlags;
 #define LOCAL_VAR_COUNT 20
 struct LocalVarsStruct {
 	int32_t vars[LOCAL_VAR_COUNT];
-	int32_t* triggers;
+	int32_t *triggers;
 };
 
 struct StratEntity {
-	StratEntity* next;
-	StratEntity* prev;
-	StratEntity* parent;
-	int32_t* InstrStream;
-	void* model;
-	void* animation;
-	const char* name;
+	StratEntity *next;
+	StratEntity *prev;
+	StratEntity *parent;
+	int32_t *InstrStream;
+	void *model;
+	void *animation;
+	const char *name;
 	int32_t distanceToPlayer;
 
 	union {
@@ -118,10 +118,10 @@ struct StratEntity {
 	Mat3x4i matrix0;
 	RotPos3i StartRotPos;
 
-	void* collPoints;
+	void *collPoints;
 	int16_t collExtent;
 	uint16_t collisionBoneCount;
-	void* collisionBones;
+	void *collisionBones;
 	Vec3i collisionOffset;
 	int32_t collRadius;
 
@@ -135,16 +135,16 @@ struct StratEntity {
 	StratEntityFlags flags0;
 	StratEntityFlags flags1;
 
-	void* map;
+	void *map;
 
-	LocalVarsStruct* localVars;
-	void* triggers;
+	LocalVarsStruct *localVars;
+	void *triggers;
 
 	int16_t wField0;
 	int16_t wField1;
 	int32_t field1;
 	int32_t triggerCount;
-	int32_t* StackPtr;
+	int32_t *StackPtr;
 
 	int32_t Fade;
 	int32_t animIndex0;
@@ -153,10 +153,10 @@ struct StratEntity {
 
 	int32_t verticalVelocity;
 
-	void* wpFirst;
-	void* wpLast;
-	void* wpCurrent;
-	void* wpField;
+	void *wpFirst;
+	void *wpLast;
+	void *wpCurrent;
+	void *wpField;
 
 	int16_t shadowSpriteIndex;
 	int16_t shadowSize;
@@ -174,19 +174,19 @@ struct StratEntity {
 
 struct SaveSlot {
 	char name[4];
-		uint8_t _pad1[4];
+	uint8_t _pad1[4];
 	uint32_t heartPots;
 	uint32_t health;
 	uint32_t crystals;
-		uint8_t _pad2[8];
+	uint8_t _pad2[8];
 	char tribe[16];
-		uint8_t _pad3[86];
+	uint8_t _pad3[86];
 	uint32_t binoculars;
 	uint32_t keys;
 	uint32_t purpleGummis;
 	uint32_t blueGummis;
 	uint32_t greenGummis;
-		uint8_t _pad4[4];
+	uint8_t _pad4[4];
 	uint32_t clockworkGobbos;
 };
 
@@ -219,85 +219,80 @@ struct Inputs {
 
 #define MAX_OFFSETS 256
 typedef struct {
-    uintptr_t base;
-    uintptr_t offsets[MAX_OFFSETS];
+	uintptr_t base;
+	uintptr_t offsets[MAX_OFFSETS];
 } MemoryAddress;
 
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
-constexpr const char* ControlSchemeNames[] = { "Type 2", "Type 1" };
+constexpr const char *ControlSchemeNames[] = {"Type 2", "Type 1"};
 
 #define PHYSICS_FPS 30
 
-typedef void(*LogFunction)(const char* message);
+typedef void (*LogFunction)(const char *message);
 
-typedef uintptr_t(*ResolveAddressFunction)(MemoryAddress address);
-typedef uintptr_t(*FindPatternFunction)(const void* pattern, size_t pattern_size, int occurrence);
+typedef uintptr_t (*ResolveAddressFunction)(MemoryAddress address);
+typedef uintptr_t (*FindPatternFunction)(const void *pattern, size_t pattern_size, int occurrence);
 
-typedef void(*AddressSetIntFunction)(uintptr_t address, int value);
-typedef int(*AddressGetIntFunction)(uintptr_t address);
+typedef void (*AddressSetIntFunction)(uintptr_t address, int value);
+typedef int (*AddressGetIntFunction)(uintptr_t address);
 
-typedef bool(*PatchBytesFunction)(uintptr_t address, const void* bytes, size_t size);
-typedef bool(*ReadBytesFunction)(uintptr_t address, void* out_buffer, size_t size);
+typedef bool (*PatchBytesFunction)(uintptr_t address, const void *bytes, size_t size);
+typedef bool (*ReadBytesFunction)(uintptr_t address, void *out_buffer, size_t size);
 
 #define INJECT_REPLACE 0
 #define INJECT_BEFORE 1
 #define INJECT_AFTER 2
-typedef bool(*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE* code, size_t code_length, int inject_type);
-typedef bool(*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall* func)());
-typedef bool(*HookPhysicsFunction)(void(__stdcall* func)());
+typedef bool (*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE *code, size_t code_length, int inject_type);
+typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall *func)());
+typedef bool (*HookPhysicsFunction)(void(__stdcall *func)());
 
-typedef int(*SetupIniIntFunction)(const wchar_t* section, const wchar_t* key, int default_value);
-typedef int(*ReadIniIntFunction)(const wchar_t* section, const wchar_t* key, int default_value);
-typedef bool(*WriteIniIntFunction)(const wchar_t* section, const wchar_t* key, int value);
+typedef int (*SetupIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
+typedef int (*ReadIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
+typedef bool (*WriteIniIntFunction)(const wchar_t *section, const wchar_t *key, int value);
 
-typedef bool(*SetupIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool default_value);
-typedef bool(*ReadIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool default_value);
-typedef bool(*WriteIniBoolFunction)(const wchar_t* section, const wchar_t* key, bool value);
+typedef bool (*SetupIniBoolFunction)(const wchar_t *section, const wchar_t *key, bool default_value);
+typedef bool (*ReadIniBoolFunction)(const wchar_t *section, const wchar_t *key, bool default_value);
+typedef bool (*WriteIniBoolFunction)(const wchar_t *section, const wchar_t *key, bool value);
 
-typedef void(*SetupIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
-typedef void(*ReadIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* default_value, wchar_t* buffer, DWORD buffer_size);
-typedef bool(*WriteIniStringFunction)(const wchar_t* section, const wchar_t* key, const wchar_t* value);
-
+typedef void (*SetupIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size);
+typedef void (*ReadIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size);
+typedef bool (*WriteIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *value);
 
 #define GAMEVER_UNKNOWN 0
 #define GAMEVER_US 1
 #define GAMEVER_EU 2
 #define GAMEVER_DEMO 3
-constexpr const char* GameVersions[] = { "UNKNOWN", "US", "EU", "DEMO" };
+constexpr const char *GameVersions[] = {"UNKNOWN", "US", "EU", "DEMO"};
 
-typedef int(*GetGameVersionFunction)();
+typedef int (*GetGameVersionFunction)();
 
-
-typedef void(*ShowToastFunction)(const char* message);
-
+typedef void (*ShowToastFunction)(const char *message);
 
 struct MenuActionRegistration {
-	const char* label;
-	const char* tooltip;
-	void(__stdcall* callback)();
+	const char *label;
+	const char *tooltip;
+	void(__stdcall *callback)();
 	bool enabled;
 };
-typedef MenuActionRegistration(__stdcall* MenuActionRegistrationFunction)();
-typedef bool(*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
+typedef MenuActionRegistration(__stdcall *MenuActionRegistrationFunction)();
+typedef bool (*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
 
-typedef StratEntity*(*GetEntityFunction)(MemoryAddress address);
+typedef StratEntity *(*GetEntityFunction)(MemoryAddress address);
 
-typedef SaveSlot*(*GetSaveSlotFunction)(int slot_number);
-typedef SaveSlot*(*GetCurrentSaveSlotFunction)();
+typedef SaveSlot *(*GetSaveSlotFunction)(int slot_number);
+typedef SaveSlot *(*GetCurrentSaveSlotFunction)();
 
-typedef Inputs(*GetInputsFunction)();
-typedef Inputs(*GetInputsPressedFunction)();
-typedef Inputs(*GetInputsReleasedFunction)();
-
+typedef Inputs (*GetInputsFunction)();
+typedef Inputs (*GetInputsPressedFunction)();
+typedef Inputs (*GetInputsReleasedFunction)();
 
 struct LevelInfo {
 	int tribe;
 	int level;
 	int map;
 };
-typedef LevelInfo(*GetLevelInfoFunction)();
-
+typedef LevelInfo (*GetLevelInfoFunction)();
 
 struct ModApi {
 	LogFunction LogInfo;
@@ -305,44 +300,44 @@ struct ModApi {
 	LogFunction LogWarning;
 	LogFunction LogError;
 
-    ResolveAddressFunction ResolveAddress;
-    FindPatternFunction FindPattern;
+	ResolveAddressFunction ResolveAddress;
+	FindPatternFunction FindPattern;
 
-    AddressSetIntFunction AddressSetInt;
-    AddressGetIntFunction AddressGetInt;
+	AddressSetIntFunction AddressSetInt;
+	AddressGetIntFunction AddressGetInt;
 
-    PatchBytesFunction PatchBytes;
-    ReadBytesFunction ReadBytes;
+	PatchBytesFunction PatchBytes;
+	ReadBytesFunction ReadBytes;
 
-    InjectCodeFunction InjectCode;
-    HookFunctionFunction HookFunction;
-    HookPhysicsFunction HookPhysics;
+	InjectCodeFunction InjectCode;
+	HookFunctionFunction HookFunction;
+	HookPhysicsFunction HookPhysics;
 
 	SetupIniIntFunction SetupIniInt;
-    ReadIniIntFunction ReadIniInt;
-    WriteIniIntFunction WriteIniInt;
+	ReadIniIntFunction ReadIniInt;
+	WriteIniIntFunction WriteIniInt;
 
 	SetupIniBoolFunction SetupIniBool;
-    ReadIniBoolFunction ReadIniBool;
-    WriteIniBoolFunction WriteIniBool;
+	ReadIniBoolFunction ReadIniBool;
+	WriteIniBoolFunction WriteIniBool;
 
 	SetupIniStringFunction SetupIniString;
-    ReadIniStringFunction ReadIniString;
-    WriteIniStringFunction WriteIniString;
+	ReadIniStringFunction ReadIniString;
+	WriteIniStringFunction WriteIniString;
 
-    GetGameVersionFunction GetGameVersion;
+	GetGameVersionFunction GetGameVersion;
 
-    GetInputsFunction GetInputs;
-    GetInputsPressedFunction GetInputsPressed;
-    GetInputsReleasedFunction GetInputsReleased;
+	GetInputsFunction GetInputs;
+	GetInputsPressedFunction GetInputsPressed;
+	GetInputsReleasedFunction GetInputsReleased;
 
-    ShowToastFunction ShowInfoToast;
-    ShowToastFunction ShowDebugToast;
-    ShowToastFunction ShowWarningToast;
-    ShowToastFunction ShowErrorToast;
-    RegisterMenuActionFunction RegisterMenuAction;
-    
-    GetEntityFunction GetEntity;
+	ShowToastFunction ShowInfoToast;
+	ShowToastFunction ShowDebugToast;
+	ShowToastFunction ShowWarningToast;
+	ShowToastFunction ShowErrorToast;
+	RegisterMenuActionFunction RegisterMenuAction;
+
+	GetEntityFunction GetEntity;
 
 	GetSaveSlotFunction GetSaveSlot;
 	GetCurrentSaveSlotFunction GetCurrentSaveSlot;
@@ -350,20 +345,22 @@ struct ModApi {
 	GetLevelInfoFunction GetLevelInfo;
 };
 
-extern "C" __declspec(dllexport) ModApi * GetModApi();
+extern "C" __declspec(dllexport) ModApi *GetModApi();
 
 // Api client --------------------------------------------------------
 
-inline ModApi* LoadModApi(const char* moduleName = "C2ModLoader.asi") {
+inline ModApi *LoadModApi(const char *moduleName = "C2ModLoader.asi") {
 #ifdef IS_MOD_LOADER
-    return nullptr;
+	return nullptr;
 #else
-    HMODULE hLoader = GetModuleHandleA(moduleName);
-    if (!hLoader) return nullptr;
+	HMODULE hLoader = GetModuleHandleA(moduleName);
+	if (!hLoader)
+		return nullptr;
 
-    auto getApi = (ModApi * (*)())GetProcAddress(hLoader, "GetModApi");
-    if (!getApi) return nullptr;
+	auto getApi = (ModApi * (*)()) GetProcAddress(hLoader, "GetModApi");
+	if (!getApi)
+		return nullptr;
 
-    return getApi();
+	return getApi();
 #endif
 }

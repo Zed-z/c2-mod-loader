@@ -1,7 +1,7 @@
 #pragma once
 
-#include <windows.h>
 #include <stdint.h>
+#include <windows.h>
 
 // https://www.speedrun.com/croc_2/forums/l2qjp
 
