@@ -29,7 +29,7 @@ set(GENERATED_EMBEDDED_LICENSES_HEADER "${CMAKE_CURRENT_BINARY_DIR}/GeneratedEmb
 string(CONCAT GENERATED_EMBEDDED_LICENSES_CONTENT
     "#pragma once\n"
     "\n"
-    "#include \"EmbeddedLicenses.h\"\n"
+    "#include \"Launcher/EmbeddedLicenses.h\"\n"
     "#include <vector>\n"
     "\n"
     "namespace Launcher {\n"

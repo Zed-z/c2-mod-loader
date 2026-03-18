@@ -3,8 +3,8 @@
 #define LOADER_NAME "Croc 2 Mod Loader"
 #define LOADER_NAME_L L"Croc 2 Mod Loader"
 
-#define LOADER_VERSION "1.0.1"
-#define LOADER_VERSION_L L"1.0.1"
+#define LOADER_VERSION "1.1.0"
+#define LOADER_VERSION_L L"1.1.0"
 
 #define AUTHOR_NAME "Zed-z"
 #define AUTHOR_NAME_L L"Zed-z"

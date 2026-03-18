@@ -33,6 +33,25 @@ static HANDLE g_mainThreadHandle = nullptr;
 
 namespace {
 
+struct FindCtx {
+	DWORD pid;
+	HWND result;
+};
+
+static BOOL CALLBACK FindGameWindowCallback(HWND h, LPARAM lp) {
+	auto &c = *reinterpret_cast<FindCtx *>(lp);
+	DWORD wpid = 0;
+	GetWindowThreadProcessId(h, &wpid);
+	if (wpid != c.pid) {
+		return TRUE;
+	}
+	if (!IsWindowVisible(h) || GetWindow(h, GW_OWNER)) {
+		return TRUE;
+	}
+	c.result = h;
+	return FALSE;
+}
+
 // Keyboard input thread
 static DWORD WINAPI HotkeyThread(LPVOID) {
 	DWORD pid = GetCurrentProcessId();
@@ -145,26 +164,10 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 		g_mainThreadHandle = nullptr;
 
 		// Wait for game window and focus it
-		struct FindCtx {
-			DWORD pid;
-			HWND result;
-		};
 		FindCtx ctx{GetCurrentProcessId(), nullptr};
-
 		for (int i = 0; i < 200 && !ctx.result; i++) {
 			Sleep(50); // Try for 10 seconds
-			EnumWindows([](HWND h, LPARAM lp) -> BOOL {
-				auto &c = *reinterpret_cast<FindCtx *>(lp);
-				DWORD wpid = 0;
-				GetWindowThreadProcessId(h, &wpid);
-				if (wpid != c.pid)
-					return TRUE;
-				if (!IsWindowVisible(h) || GetWindow(h, GW_OWNER))
-					return TRUE;
-				c.result = h;
-				return FALSE;
-			},
-				reinterpret_cast<LPARAM>(&ctx));
+			EnumWindows(FindGameWindowCallback, reinterpret_cast<LPARAM>(&ctx));
 		}
 
 		if (ctx.result) {
