@@ -19,7 +19,7 @@ bool noclipCameraFlag = false;
 
 RotPos3i cameraRotPos;
 double cameraYaw = 0;
-double cameraPitch = 0;
+double cameraPitch = 0.3;
 Vec3i cameraLookAt;
 
 const double PI = 3.141;
@@ -29,12 +29,29 @@ const double CAMERA_ORBIT_DISTANCE = 2400.0;
 
 bool orbitInvertX;
 bool orbitInvertY;
+bool orbitAutoTurn;
+int orbitAutoTurnStrength;
+int orbitAutoTurnMinSpeed;
+bool orbitHasLastCrocPos = false;
+Vec3i orbitLastCrocPos;
 
 bool freecamInvertX;
 bool freecamInvertY;
 
+void saveCameraMode() {
+	api->WriteIniInt(L"General", L"CameraMode", static_cast<int>(cameraMode));
+}
+
+CameraMode loadCameraMode() {
+	return static_cast<CameraMode>(api->SetupIniInt(L"General", L"CameraMode", static_cast<int>(CameraMode::Normal)));
+}
+
 static double LerpAngle(double a, double b, double t) {
-	double diff = fmod(b - a + PI, 2 * PI) - PI;
+	double diff = fmod(b - a + PI, 2 * PI);
+	if (diff < 0) {
+		diff += 2 * PI;
+	}
+	diff -= PI;
 	return a + diff * t;
 }
 
@@ -74,12 +91,14 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	} else {
 		cameraMode = mode;
 	}
+	saveCameraMode();
 
 	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
 	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
 
 	if (camera == nullptr) {
 		cameraMode = CameraMode::Normal;
+		saveCameraMode();
 		api->LogError("Camera not found!");
 		api->ShowErrorToast("No camera found!");
 		return;
@@ -87,6 +106,7 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 
 	if (croc == nullptr) {
 		cameraMode = CameraMode::Normal;
+		saveCameraMode();
 		api->LogError("Croc not found!");
 		api->ShowErrorToast("Croc not found!");
 		return;
@@ -104,6 +124,7 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 
 		// Get camera position and lookat
 		cameraRotPos = camera->newRotPos;
+		orbitHasLastCrocPos = false;
 
 		// Get rotation from lookat
 		cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
@@ -193,6 +214,7 @@ void __stdcall PhysicsLoop() {
 
 		if (camera == nullptr) {
 			cameraMode = CameraMode::Normal;
+			saveCameraMode();
 			api->LogError("No camera found!");
 			api->ShowErrorToast("No camera found!");
 			return;
@@ -200,6 +222,7 @@ void __stdcall PhysicsLoop() {
 
 		if (croc == nullptr) {
 			cameraMode = CameraMode::Normal;
+			saveCameraMode();
 			api->LogError("No player found!");
 			api->ShowErrorToast("No player found!");
 			return;
@@ -211,6 +234,25 @@ void __stdcall PhysicsLoop() {
 		cameraYaw += -input_rot_yaw * 0.1;
 		cameraPitch += input_rot_pitch * 0.05;
 		cameraPitch = min(max(cameraPitch, 0.1), 0.9);
+
+		if (!orbitHasLastCrocPos) {
+			orbitLastCrocPos = croc->newRotPos.position;
+			orbitHasLastCrocPos = true;
+		}
+
+		const int moveX = croc->newRotPos.position.x - orbitLastCrocPos.x;
+		const int moveZ = croc->newRotPos.position.z - orbitLastCrocPos.z;
+		const double moveDistanceSq = (double)moveX * (double)moveX + (double)moveZ * (double)moveZ;
+		const double minMoveDistanceSq = (double)orbitAutoTurnMinSpeed * (double)orbitAutoTurnMinSpeed;
+
+		if (orbitAutoTurn && input_rot_yaw == 0 && moveDistanceSq >= minMoveDistanceSq) {
+			const double moveYaw = atan2((double)moveX, (double)moveZ);
+			const double targetYaw = moveYaw + PI;
+			const double yawLerpSpeed = ((double)orbitAutoTurnStrength / 100.0) * 0.08;
+			cameraYaw = LerpAngle(cameraYaw, targetYaw, yawLerpSpeed);
+		}
+
+		orbitLastCrocPos = croc->newRotPos.position;
 
 		double offsetX = cos(cameraPitch) * sin(cameraYaw) * CAMERA_ORBIT_DISTANCE;
 		double offsetY = sin(cameraPitch) * CAMERA_ORBIT_DISTANCE;
@@ -293,8 +335,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		if (!api)
 			return FALSE;
 
+		CameraMode _camMode = loadCameraMode();
+		cameraMode = _camMode;
+		// cameraSet(_camMode);
+
 		orbitInvertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
 		orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
+		orbitAutoTurn = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
+		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
+		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
 
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
