@@ -129,6 +129,32 @@ bool EnsureConfigDefaults(std::vector<ConfigEntry> &config, const std::vector<st
 	return changed;
 }
 
+std::string NormalizeConfigValue(std::string value, const std::string &type) {
+	if (type == "bool") {
+		if (_stricmp(value.c_str(), "true") == 0)
+			return "1";
+		if (_stricmp(value.c_str(), "false") == 0)
+			return "0";
+		return value;
+	}
+
+	if (type == "int") {
+		try {
+			return std::to_string(std::stoi(value));
+		} catch (...) {
+			return value;
+		}
+	}
+
+	return value;
+}
+
+bool IsConfigValueDefault(const ConfigEntry &entry, const ConfigHint &hint) {
+	const std::string currentValue = NormalizeConfigValue(entry.value, hint.type);
+	const std::string defaultValue = NormalizeConfigValue(hint.defaultValue, hint.type);
+	return currentValue == defaultValue;
+}
+
 void LoadAllConfigs() {
 	const int count = 1 + (int)mods.size();
 	g_allConfigs.resize(count);
@@ -176,9 +202,10 @@ void RenderConfigSections() {
 		std::string headerLabel = section.name + "##section" + std::to_string(sectionIndex);
 
 		if (ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 2)) {
+			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 3)) {
 				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 180.0f);
 				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+				ImGui::TableSetupColumn("Reset", ImGuiTableColumnFlags_WidthFixed, 72.0f);
 
 				for (size_t entryIndex : section.entryIndices) {
 					ConfigEntry &entry = config[entryIndex];
@@ -193,16 +220,18 @@ void RenderConfigSections() {
 					strncpy_s(buffer, entry.value.c_str(), sizeof(buffer) - 1);
 
 					ImGui::PushID(static_cast<int>(entryIndex));
-					ImGui::SetNextItemWidth(-FLT_MIN);
 					const std::string hintKey = entry.section + "/" + entry.key;
 					const auto hintIt = hintMap.find(hintKey);
 					const std::string type = (hintIt != hintMap.end()) ? hintIt->second.type : "string";
+					bool valueChanged = false;
+
+					ImGui::SetNextItemWidth(-FLT_MIN);
 
 					if (type == "bool") {
 						bool val = (entry.value == "1" || _stricmp(entry.value.c_str(), "true") == 0);
 						if (ImGui::Checkbox("##value", &val)) {
 							entry.value = val ? "1" : "0";
-							SaveConfigForMod(g_selectedMod);
+							valueChanged = true;
 						}
 					} else if (type == "int") {
 						int val = 0;
@@ -215,13 +244,29 @@ void RenderConfigSections() {
 						}
 						if (ImGui::InputInt("##value", &val)) {
 							entry.value = std::to_string(val);
-							SaveConfigForMod(g_selectedMod);
+							valueChanged = true;
 						}
 					} else {
 						if (ImGui::InputText("##value", buffer, sizeof(buffer))) {
 							entry.value = buffer;
+							valueChanged = true;
+						}
+					}
+
+					if (valueChanged) {
+						SaveConfigForMod(g_selectedMod);
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					if (hintIt != hintMap.end()) {
+						ImGui::BeginDisabled(IsConfigValueDefault(entry, hintIt->second));
+						if (ImGui::Button("Reset##reset")) {
+							entry.value = hintIt->second.defaultValue;
 							SaveConfigForMod(g_selectedMod);
 						}
+						ImGui::EndDisabled();
+					} else {
+						ImGui::TextUnformatted("");
 					}
 					ImGui::PopID();
 				}
