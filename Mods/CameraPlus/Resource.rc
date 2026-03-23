@@ -20,7 +20,7 @@ BEGIN
             VALUE "Version", "1.1.0"
             VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
-            VALUE "ConfigTypes", "General/CameraMode:int:0,OrbitCamera/InvertX:bool:0,OrbitCamera/InvertY:bool:0,OrbitCamera/AutoTurn:bool:1,OrbitCamera/AutoTurnStrength:int:40,OrbitCamera/AutoTurnMinSpeed:int:100,Freecam/InvertX:bool:0,Freecam/InvertY:bool:0"
+            VALUE "ConfigTypes", "General/CameraMode:enum[Normal|Orbit|Freecam]=0,OrbitCamera/InvertX:bool=0,OrbitCamera/InvertY:bool=0,OrbitCamera/AutoTurn:bool=1,OrbitCamera/AutoTurnStrength:int=40,OrbitCamera/AutoTurnMinSpeed:int=100,Freecam/InvertX:bool=0,Freecam/InvertY:bool=0"
         END
     END
     BLOCK "VarFileInfo"

@@ -38,6 +38,7 @@ struct ConfigSectionView {
 struct ConfigHint {
 	std::string type;
 	std::string defaultValue;
+	std::vector<std::string> options; // Enum options for dropdowns
 };
 
 struct ParsedConfigHints {
@@ -78,20 +79,36 @@ ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
 	std::string token;
 
 	while (std::getline(ss, token, ',')) {
-		// Expected format: "Section/Key:type:default"
-		size_t firstColon = token.find(':');
-		if (firstColon == std::string::npos)
+		// Expected format: "Section/Key:type=default"
+		size_t colonPos = token.find(':');
+		if (colonPos == std::string::npos)
 			continue;
-		size_t secondColon = token.find(':', firstColon + 1);
-		if (secondColon == std::string::npos)
+		size_t equalsPos = token.find('=', colonPos + 1);
+		if (equalsPos == std::string::npos)
 			continue;
 
-		const std::string keyPath = token.substr(0, firstColon);
+		const std::string keyPath = token.substr(0, colonPos);
 		ConfigHint hint;
-		hint.type = token.substr(firstColon + 1, secondColon - firstColon - 1);
-		hint.defaultValue = token.substr(secondColon + 1);
+		hint.defaultValue = token.substr(equalsPos + 1);
+		hint.type = token.substr(colonPos + 1, equalsPos - colonPos - 1);
 		if (hint.type == "bool" && (hint.defaultValue == "true" || hint.defaultValue == "True"))
 			hint.defaultValue = "1";
+		if (hint.type.find("enum") == 0) {
+			std::istringstream ss(hint.type);
+			std::string token;
+			size_t openBracket = hint.type.find('[');
+			if (openBracket == std::string::npos)
+				continue;
+			size_t closeBracket = hint.type.find(']');
+			if (closeBracket == std::string::npos || closeBracket < openBracket)
+				continue;
+			const std::string optionsStr = hint.type.substr(openBracket + 1, closeBracket - openBracket - 1);
+			std::istringstream optionsSS(optionsStr);
+			while (std::getline(optionsSS, token, '|')) {
+				hint.options.push_back(token);
+			}
+			hint.type = "enum";
+		}
 
 		parsed.ordered.push_back({keyPath, hint});
 		parsed.lookup[keyPath] = hint;
@@ -138,7 +155,7 @@ std::string NormalizeConfigValue(std::string value, const std::string &type) {
 		return value;
 	}
 
-	if (type == "int") {
+	if (type == "int" || type == "enum") {
 		try {
 			return std::to_string(std::stoi(value));
 		} catch (...) {
@@ -244,6 +261,26 @@ void RenderConfigSections() {
 						}
 						if (ImGui::InputInt("##value", &val)) {
 							entry.value = std::to_string(val);
+							valueChanged = true;
+						}
+					} else if (type == "enum") {
+						int currentIndex = 0;
+						if (!entry.value.empty()) {
+							try {
+								currentIndex = std::stoi(entry.value);
+							} catch (...) {
+								currentIndex = 0;
+							}
+						}
+						if (currentIndex < 0 || currentIndex >= hintIt->second.options.size()) {
+							currentIndex = 0;
+						}
+						std::vector<const char *> optionsCStr;
+						for (const auto &option : hintIt->second.options) {
+							optionsCStr.push_back(option.c_str());
+						}
+						if (ImGui::Combo("##value", &currentIndex, optionsCStr.data(), static_cast<int>(optionsCStr.size()))) {
+							entry.value = std::to_string(currentIndex);
 							valueChanged = true;
 						}
 					} else {
