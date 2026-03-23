@@ -20,7 +20,7 @@ BEGIN
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
-            VALUE "ConfigTypes", "Config/Enabled:bool=1,Config/RenderMultiplier:int=3"
+            VALUE "ConfigTypes", "Config/Enabled[Enabled|Enable or disable render distance extension]:bool=1;Config/RenderMultiplier[Render Multiplier|The amount to multiply the render distance by]:int=3"
         END
     END
     BLOCK "VarFileInfo"

@@ -36,8 +36,11 @@ struct ConfigSectionView {
 };
 
 struct ConfigHint {
+	bool hidden = false;
 	std::string type;
 	std::string defaultValue;
+	std::string name;
+	std::string description;
 	std::vector<std::string> options; // Enum options for dropdowns
 };
 
@@ -78,8 +81,21 @@ ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
 	std::istringstream ss(str);
 	std::string token;
 
-	while (std::getline(ss, token, ',')) {
-		// Expected format: "Section/Key:type=default"
+	while (std::getline(ss, token, ';')) {
+		/*
+			Expected format: [_]Section/Key[Name|Description]:type[typeinfo]=default
+			_ - Mark as hidden
+			Name - Human readable name
+			Description - Description for tooltips
+			typeinfo - Additional info for certain types:
+				enum[Option1|Option2|Option3]
+		*/
+		bool hidden = false;
+		size_t hiddenMarkerPos = token.find('_');
+		if (hiddenMarkerPos != std::string::npos) {
+			token.erase(hiddenMarkerPos, 1);
+			hidden = true;
+		}
 		size_t colonPos = token.find(':');
 		if (colonPos == std::string::npos)
 			continue;
@@ -87,8 +103,26 @@ ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
 		if (equalsPos == std::string::npos)
 			continue;
 
-		const std::string keyPath = token.substr(0, colonPos);
+		std::string name, description;
+		std::string keyString = token.substr(0, colonPos);
+		size_t openBracketPos = keyString.find('[');
+		size_t closeBracketPos = keyString.find(']');
+		if (!(openBracketPos == std::string::npos || closeBracketPos == std::string::npos || closeBracketPos < openBracketPos)) {
+			const std::string nameDescStr = keyString.substr(openBracketPos + 1, closeBracketPos - openBracketPos - 1);
+			size_t pipePos = nameDescStr.find('|');
+			name = (pipePos == std::string::npos) ? nameDescStr : nameDescStr.substr(0, pipePos);
+			description = (pipePos == std::string::npos) ? "" : nameDescStr.substr(pipePos + 1);
+			keyString = keyString.substr(0, openBracketPos);
+		} else {
+			size_t slashPos = keyString.find('/');
+			name = (slashPos == std::string::npos) ? keyString : keyString.substr(slashPos + 1);
+			description = "";
+		}
+
 		ConfigHint hint;
+		hint.hidden = hidden;
+		hint.name = name;
+		hint.description = description;
 		hint.defaultValue = token.substr(equalsPos + 1);
 		hint.type = token.substr(colonPos + 1, equalsPos - colonPos - 1);
 		if (hint.type == "bool" && (hint.defaultValue == "true" || hint.defaultValue == "True"))
@@ -110,8 +144,8 @@ ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
 			hint.type = "enum";
 		}
 
-		parsed.ordered.push_back({keyPath, hint});
-		parsed.lookup[keyPath] = hint;
+		parsed.ordered.push_back({keyString, hint});
+		parsed.lookup[keyString] = hint;
 	}
 	return parsed;
 }
@@ -226,21 +260,30 @@ void RenderConfigSections() {
 
 				for (size_t entryIndex : section.entryIndices) {
 					ConfigEntry &entry = config[entryIndex];
+					const std::string hintKey = entry.section + "/" + entry.key;
+					const auto hintIt = hintMap.find(hintKey);
+					const std::string type = (hintIt != hintMap.end()) ? hintIt->second.type : "string";
+					const std::string name = (hintIt != hintMap.end()) ? hintIt->second.name : entry.key;
+					const std::string description = (hintIt != hintMap.end()) ? hintIt->second.description : "";
+					bool valueChanged = false;
+
+					if (hintIt != hintMap.end() && hintIt->second.hidden) {
+						continue;
+					}
 
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
 					ImGui::AlignTextToFramePadding();
-					ImGui::TextUnformatted(entry.key.c_str());
+					ImGui::TextUnformatted(name.c_str());
+					if (ImGui::IsItemHovered() && !description.empty()) {
+						ImGui::SetTooltip("%s", description.c_str());
+					}
 
 					ImGui::TableSetColumnIndex(1);
 					char buffer[256];
 					strncpy_s(buffer, entry.value.c_str(), sizeof(buffer) - 1);
 
 					ImGui::PushID(static_cast<int>(entryIndex));
-					const std::string hintKey = entry.section + "/" + entry.key;
-					const auto hintIt = hintMap.find(hintKey);
-					const std::string type = (hintIt != hintMap.end()) ? hintIt->second.type : "string";
-					bool valueChanged = false;
 
 					ImGui::SetNextItemWidth(-FLT_MIN);
 
