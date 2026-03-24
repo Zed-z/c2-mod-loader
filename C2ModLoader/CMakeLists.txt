@@ -55,6 +55,7 @@ set(SOURCES
     Launcher/EmbeddedLicenses.cpp
     Launcher/Backend.cpp
     Launcher/IniConfig.cpp
+    Launcher/Colors.cpp
     Loader.cpp
     ModApi.cpp
     MouseCaptureRemover.cpp

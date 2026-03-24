@@ -1,5 +1,6 @@
 #include "Launcher.h"
 #include "Backend.h"
+#include "Colors.h"
 #include "Config.h"
 #include "EmbeddedLicenses.h"
 #include "IniConfig.h"
@@ -398,7 +399,7 @@ void RenderSelectedItemDetails() {
 		ImGui::Text("Version: %s, API: v%d", version.c_str(), apiVersion);
 	}
 	if (!hyperlink.empty()) {
-		ImGui::TextColored(ImVec4(0.25f, 0.5f, 1.0f, 1.0f), "Website URL");
+		ImGui::TextColored(Launcher::GetStyle().link, "Website URL");
 		if (ImGui::IsItemClicked()) {
 			ShellExecuteA(NULL, "open", hyperlink.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		}
@@ -477,6 +478,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 	ImGuiIO &io = ImGui::GetIO();
 	(void)io;
 	ImGui::StyleColorsDark();
+	ApplyStyle();
 
 	ImGui_ImplWin32_Init(LauncherBackend::GetWindowHandle());
 	ImGui_ImplDX11_Init(LauncherBackend::GetDevice(), LauncherBackend::GetContext());
@@ -633,7 +635,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 				}
 
 				ImGui::SetCursorPosY(footerTextY);
-				ImGui::TextColored(ImVec4(0.25f, 0.5f, 1.0f, 1.0f), "%s", legalLink);
+				ImGui::TextColored(GetStyle().link, "%s", legalLink);
 				if (ImGui::IsItemClicked()) {
 					showLicensesOverlay = true;
 				}
