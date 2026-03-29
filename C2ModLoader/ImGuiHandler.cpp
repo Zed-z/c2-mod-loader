@@ -1,5 +1,6 @@
 #include "ImGuiHandler.h"
 #include "CheatsManager.h"
+#include "Launcher/Colors.h"
 #include "Loader.h"
 #include "ModApi.h"
 #include "Utils.h"
@@ -593,9 +594,10 @@ void RenderObjectList() {
 				// Header colors
 				float distanceModifier = maxDistanceToPlayer != -1 ? (1 - ((float)playerDistance / (float)maxDistanceToPlayer)) : 1;
 
-				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f * distanceModifier, 0.35f * distanceModifier, 0.5f * distanceModifier, 1.0f));		 // A darker blue/gray
-				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.3f * distanceModifier, 0.45f * distanceModifier, 0.6f * distanceModifier, 1.0f)); // Slightly lighter on hover
-				ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.4f * distanceModifier, 0.55f * distanceModifier, 0.7f * distanceModifier, 1.0f));	 // Even lighter when pressed
+				const Launcher::Style &style = Launcher::GetStyle();
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(style.header.x * distanceModifier, style.header.y * distanceModifier, style.header.z * distanceModifier, style.header.w));
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(style.headerHovered.x * distanceModifier, style.headerHovered.y * distanceModifier, style.headerHovered.z * distanceModifier, style.headerHovered.w));
+				ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(style.headerActive.x * distanceModifier, style.headerActive.y * distanceModifier, style.headerActive.z * distanceModifier, style.headerActive.w));
 
 				if (ImGui::CollapsingHeader(ss.str().c_str())) {
 					ImGui::Indent();
@@ -1110,6 +1112,8 @@ void RenderMenuBar() {
 }
 
 void ImGuiDraw() {
+	Launcher::ApplyStyle();
+
 	ImGuiIO &io = ImGui::GetIO();
 
 	LevelInfo levelInfo = api->GetLevelInfo();

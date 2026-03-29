@@ -12,6 +12,9 @@ void ApplyStyle() {
 	ImGuiStyle &imguiStyle = ImGui::GetStyle();
 
 	imguiStyle.Colors[ImGuiCol_WindowBg] = style.windowBg;
+	imguiStyle.Colors[ImGuiCol_TitleBg] = style.titleBg;
+	imguiStyle.Colors[ImGuiCol_TitleBgActive] = style.titleBgActive;
+	imguiStyle.Colors[ImGuiCol_TitleBgCollapsed] = style.titleBgCollapsed;
 	imguiStyle.Colors[ImGuiCol_Button] = style.primary;
 	imguiStyle.Colors[ImGuiCol_ButtonHovered] = style.primaryHovered;
 	imguiStyle.Colors[ImGuiCol_ButtonActive] = style.primaryActive;
@@ -24,6 +27,12 @@ void ApplyStyle() {
 	imguiStyle.Colors[ImGuiCol_FrameBg] = style.primary;
 	imguiStyle.Colors[ImGuiCol_FrameBgHovered] = style.primaryHovered;
 	imguiStyle.Colors[ImGuiCol_FrameBgActive] = style.primaryActive;
+	imguiStyle.Colors[ImGuiCol_ResizeGrip] = style.resizeGrip;
+	imguiStyle.Colors[ImGuiCol_ResizeGripHovered] = style.resizeGripHovered;
+	imguiStyle.Colors[ImGuiCol_ResizeGripActive] = style.resizeGripActive;
+	imguiStyle.Colors[ImGuiCol_Separator] = style.separator;
+	imguiStyle.Colors[ImGuiCol_SeparatorHovered] = style.separatorHovered;
+	imguiStyle.Colors[ImGuiCol_SeparatorActive] = style.separatorActive;
 	imguiStyle.Colors[ImGuiCol_CheckMark] = style.checkMark;
 }
 
