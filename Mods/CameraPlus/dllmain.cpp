@@ -1,8 +1,11 @@
 #include "ModApi.h"
+#include <Xinput.h>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <string>
 #include <windows.h>
+#pragma comment(lib, "Xinput.lib")
 
 using std::sin, std::cos, std::min, std::max;
 
@@ -37,6 +40,8 @@ Vec3i orbitLastCrocPos;
 
 bool freecamInvertX;
 bool freecamInvertY;
+
+bool splitSticks;
 
 void saveCameraMode() {
 	api->WriteIniInt(L"General", L"CameraMode", static_cast<int>(cameraMode));
@@ -179,7 +184,59 @@ void __stdcall cameraSetFreecam() {
 	cameraSet(CameraMode::Freecam);
 }
 
+int xinputLeftHorizontal = 0;
+int xinputLeftVertical = 0;
+int xinputRightHorizontal = 0;
+int xinputRightVertical = 0;
+
+float stickDeadzone = 0.25f;
+float stickScale = 128.0f;
+
+void PollXinput() {
+	XINPUT_STATE state;
+	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
+		short rawLeftX = state.Gamepad.sThumbLX;
+		short rawLeftY = state.Gamepad.sThumbLY;
+		short rawRightX = state.Gamepad.sThumbRX;
+		short rawRightY = state.Gamepad.sThumbRY;
+
+		float leftX = rawLeftX / 32768.0f;
+		float leftY = rawLeftY / 32768.0f;
+		float rightX = rawRightX / 32768.0f;
+		float rightY = rawRightY / 32768.0f;
+
+		if (std::abs(leftX) > stickDeadzone) {
+			xinputLeftHorizontal = -stickScale * leftX;
+		} else {
+			xinputLeftHorizontal = 0;
+		}
+
+		if (std::abs(leftY) > stickDeadzone) {
+			xinputLeftVertical = stickScale * leftY;
+		} else {
+			xinputLeftVertical = 0;
+		}
+
+		if (std::abs(rightX) > stickDeadzone) {
+			xinputRightHorizontal = stickScale * rightX;
+		} else {
+			xinputRightHorizontal = 0;
+		}
+
+		if (std::abs(rightY) > stickDeadzone) {
+			xinputRightVertical = -stickScale * rightY;
+		} else {
+			xinputRightVertical = 0;
+		}
+	}
+}
+
 void __stdcall PhysicsLoop() {
+
+	// Xinput
+	if (splitSticks) {
+		PollXinput();
+	}
 
 	// Inputs
 	Inputs inputs = api->GetInputs();
@@ -228,8 +285,14 @@ void __stdcall PhysicsLoop() {
 			return;
 		}
 
-		int input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
-		int input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);
+		float input_rot_yaw, input_rot_pitch;
+		if (splitSticks) {
+			input_rot_yaw = ((float)xinputRightHorizontal / stickScale) * (orbitInvertX ? -1 : 1);
+			input_rot_pitch = ((float)xinputRightVertical / stickScale) * (orbitInvertY ? -1 : 1);
+		} else {
+			input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
+			input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);
+		}
 
 		cameraYaw += -input_rot_yaw * 0.1;
 		cameraPitch += input_rot_pitch * 0.05;
@@ -272,11 +335,21 @@ void __stdcall PhysicsLoop() {
 	}
 	case CameraMode::Freecam: {
 
-		int input_x = inputs.right - inputs.left;
-		int input_z = -(inputs.down - inputs.up);
-		int input_y = inputs.jump - inputs.attack;
-		int input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (freecamInvertX ? -1 : 1);
-		int input_rot_pitch = (inputs.invRight - inputs.invLeft) * (freecamInvertY ? -1 : 1);
+		float input_x, input_y, input_z;
+		float input_rot_yaw, input_rot_pitch;
+		if (splitSticks) {
+			input_x = -((float)xinputLeftHorizontal / stickScale);
+			input_z = ((float)xinputLeftVertical / stickScale);
+			input_y = inputs.jump - inputs.attack;
+			input_rot_yaw = ((float)xinputRightHorizontal / stickScale) * (freecamInvertX ? -1 : 1);
+			input_rot_pitch = ((float)xinputRightVertical / stickScale) * (freecamInvertY ? -1 : 1);
+		} else {
+			input_x = inputs.right - inputs.left;
+			input_z = -(inputs.down - inputs.up);
+			input_y = inputs.jump - inputs.attack;
+			input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (freecamInvertX ? -1 : 1);
+			input_rot_pitch = (inputs.invRight - inputs.invLeft) * (freecamInvertY ? -1 : 1);
+		}
 
 		cameraYaw += input_rot_yaw * 0.1;
 		cameraPitch += input_rot_pitch * 0.05;
@@ -339,6 +412,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		cameraMode = _camMode;
 		// cameraSet(_camMode);
 
+		splitSticks = api->SetupIniBool(L"General", L"SplitSticks", false);
+
 		orbitInvertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
 		orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
 		orbitAutoTurn = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
@@ -352,6 +427,35 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		api->RegisterMenuAction(hModule, cameraNormalRegistration);
 		api->RegisterMenuAction(hModule, cameraOrbitRegistration);
 		api->RegisterMenuAction(hModule, cameraFreeRegistration);
+
+		if (splitSticks) {
+			/*
+				Inject before these lines, to replace analog input after
+				it's polled from directinput, but before further processing
+				Croc2.exe+2F1CA - 83 FD 7F              - cmp ebp,7F
+				Croc2.exe+2F1CD - 89 15 74A55200        - mov [Croc2.exe+12A574],edx
+			*/
+			uintptr_t hookAddress = 0x42F1CA;
+			uintptr_t analogYAddress = 0x52A574;
+			uintptr_t ptrX = (uintptr_t)&xinputLeftHorizontal;
+			uintptr_t ptrY = (uintptr_t)&xinputLeftVertical;
+			uint8_t hookCode[12];
+			int p = 0;
+
+			// mov ebp, [ptrX]
+			hookCode[p++] = 0x8B;
+			hookCode[p++] = 0x2D;
+			*(uintptr_t *)(hookCode + p) = ptrX;
+			p += 4;
+
+			// mov edx, [ptrY]
+			hookCode[p++] = 0x8B;
+			hookCode[p++] = 0x15;
+			*(uintptr_t *)(hookCode + p) = ptrY;
+			p += 4;
+
+			api->InjectCode(hookAddress, 9, hookCode, p, INJECT_BEFORE);
+		}
 
 		DisableThreadLibraryCalls(hModule);
 	}
