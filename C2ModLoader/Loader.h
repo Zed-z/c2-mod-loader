@@ -36,6 +36,9 @@ void LoadMods(std::vector<Mod> &mods);
 extern std::vector<void(__stdcall *)()> physicsCallbacks;
 void __stdcall RunPhysicsHooks();
 
+extern std::vector<void(__stdcall *)()> doorChangeCallbacks;
+void __stdcall RunDoorChangeHooks();
+
 void ApiSetup();
 
 namespace {

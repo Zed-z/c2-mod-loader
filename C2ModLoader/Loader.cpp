@@ -242,14 +242,31 @@ void __stdcall RunPhysicsHooks() {
 	}
 }
 
+std::vector<void(__stdcall *)()> doorChangeCallbacks;
+
+void __stdcall RunDoorChangeHooks() {
+	for (auto &callback : doorChangeCallbacks) {
+		callback();
+	}
+}
+
 void ApiSetup() {
 
 	// Hook physics callbacks
 	/*
-		Croc2.exe+4A591 - 39 1D 0CA24A00        - cmp [Croc2.exe+AA20C],ebx { (1) }
+		Croc2.exe+4A591 - 39 1D 0CA24A00 - cmp [Croc2.exe+AA20C], ebx {(1)}
 	*/
-	uintptr_t hookAddr = 0x0044A591;
-	size_t hookLength = 6;
+	uintptr_t physicsHook = 0x0044A591;
+	size_t physicsHookLength = 6;
 
-	api->HookFunction(hookAddr, hookLength, RunPhysicsHooks);
+	api->HookFunction(physicsHook, physicsHookLength, RunPhysicsHooks, INJECT_AFTER);
+
+	// Hook door change callbacks
+	/*
+		Croc2.exe + 7FBF0 - 89 3D 88784B00 - mov[Croc2.exe + B7888], edi{(0B199BBA)}
+	*/
+	uintptr_t doorChangeHook = 0x0047FBF0;
+	size_t doorChangeHookLength = 6;
+
+	api->HookFunction(doorChangeHook, doorChangeHookLength, RunDoorChangeHooks, INJECT_AFTER);
 }

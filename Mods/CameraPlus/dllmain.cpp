@@ -348,7 +348,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
 
-		api->HookPhysics(PhysicsLoop);
+		api->HookGame(GAME_HOOK_PHYSICS, PhysicsLoop);
 		api->RegisterMenuAction(hModule, cameraNormalRegistration);
 		api->RegisterMenuAction(hModule, cameraOrbitRegistration);
 		api->RegisterMenuAction(hModule, cameraFreeRegistration);

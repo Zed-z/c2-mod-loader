@@ -149,7 +149,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		api->RegisterMenuAction(hModule, toggleType1FlipRegistration);
 		api->RegisterMenuAction(hModule, toggleTypeSwitchRegistration);
 
-		api->HookPhysics(PhysicsStep);
+		api->HookGame(GAME_HOOK_PHYSICS, PhysicsStep);
 
 		DisableThreadLibraryCalls(hModule);
 	}

@@ -117,7 +117,7 @@
         </CheatEntry>
         <CheatEntry>
           <ID>33</ID>
-          <Description>"Stick strength?"</Description>
+          <Description>"Analog Strength"</Description>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>0052A54C</Address>
@@ -135,6 +135,13 @@
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>0052A574</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>243</ID>
+          <Description>"Device Limit"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe + 12A5A8</Address>
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
@@ -2066,6 +2073,26 @@
         </CheatEntry>
       </CheatEntries>
     </CheatEntry>
+    <CheatEntry>
+      <ID>241</ID>
+      <Description>"Current Door"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x004B7888</Address>
+    </CheatEntry>
   </CheatEntries>
-  <UserdefinedSymbols/>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>AnalogX</Name>
+      <Address>0052A564</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AnalogY</Name>
+      <Address>0052A574</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Analog Strength</Name>
+      <Address>0052A54C</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
 </CheatTable>

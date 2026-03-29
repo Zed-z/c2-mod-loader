@@ -59,6 +59,7 @@
 #define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
 #define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
 
+#define ADDR_DOOR_STRUCT 0x4B7888
 #define ADDR_CURRENT_TRIBE 0x4A8C44
 #define ADDR_CURRENT_LEVEL 0x4A8C48
 #define ADDR_CURRENT_MAP 0x4A8C4C
@@ -87,6 +88,59 @@ struct Mat3x4i {
 	int m[3][4];
 };
 
+enum DoorRotY : uint32_t {
+	DOOR_DOWN = 0x1,
+	DOOR_UP = 0x2,
+	DOOR_LEVEL = 0x4,
+	DOOR_START = 0x8,
+};
+
+enum WadFileType : int32_t {
+	WAD_TYPE_INVALID = -1,
+	WAD_TYPE_LEVEL = 0x0,
+	WAD_TYPE_BOSS = 0x1,
+	WAD_TYPE_SECRET = 0x2,
+	WAD_TYPE_INTERFACE = 0x3,
+};
+
+struct ColorBGRA32 {
+	uint8_t b, g, r, a;
+};
+
+using ModelStruct = void;
+
+struct DoorStruct {
+	Vec3i position;
+	union {
+		struct // For DOOR_LEVEL
+		{
+			int GotoTribe;
+			int GotoLevel;
+			int GotoMap;
+		};
+		Vec3i Goto; // For everything else
+	};
+	WadFileType GotoType;
+	DoorRotY GotoRotY;
+	DoorRotY ThisRotY;
+	int Fade;
+	ModelStruct *Background;
+	int BackgroundAddYRotation;
+	int BackgroundHeightAdjust;
+	int DrawMode;
+	int16_t MoveForward;
+	int16_t __padding;
+	int renderDistance;
+	int fogDistance;
+	int field5;
+	int field6;
+	ColorBGRA32 AmbientLight;
+	ColorBGRA32 BackColor;
+	uint16_t EffectFlags;
+	uint16_t ReverbType;
+	int MusicTrack;
+};
+
 typedef int32_t StratEntityFlags;
 
 #define LOCAL_VAR_COUNT 20
@@ -100,7 +154,7 @@ struct StratEntity {
 	StratEntity *prev;
 	StratEntity *parent;
 	int32_t *InstrStream;
-	void *model;
+	ModelStruct *model;
 	void *animation;
 	const char *name;
 	int32_t distanceToPlayer;
@@ -173,21 +227,32 @@ struct StratEntity {
 };
 
 struct SaveSlot {
-	char name[4];
-	uint8_t _pad1[4];
+	char name[8];
 	uint32_t heartPots;
 	uint32_t health;
 	uint32_t crystals;
-	uint8_t _pad2[8];
+	uint8_t _pad1[8];
 	char tribe[16];
-	uint8_t _pad3[86];
+	uint8_t _pad2[56];
+	uint32_t totalBossHearts;
+	uint32_t bossHearts;
+	uint8_t _pad3[8];
+	uint32_t goldenGobbos;
+	uint8_t _pad4[4];
+	uint32_t jigsawPieces;
+	uint32_t levelCrystals;
 	uint32_t binoculars;
 	uint32_t keys;
 	uint32_t purpleGummis;
 	uint32_t blueGummis;
 	uint32_t greenGummis;
-	uint8_t _pad4[4];
+	uint8_t _pad5[4];
 	uint32_t clockworkGobbos;
+	uint32_t unknownItem;
+	uint32_t wheels;
+	uint32_t itemCount;
+	uint32_t selectedItem;
+	uint8_t _pad6[16];
 };
 
 struct Inputs {
@@ -244,8 +309,11 @@ typedef bool (*ReadBytesFunction)(uintptr_t address, void *out_buffer, size_t si
 #define INJECT_BEFORE 1
 #define INJECT_AFTER 2
 typedef bool (*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE *code, size_t code_length, int inject_type);
-typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall *func)());
-typedef bool (*HookPhysicsFunction)(void(__stdcall *func)());
+typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall *func)(), int inject_type);
+
+#define GAME_HOOK_PHYSICS 0
+#define GAME_HOOK_DOOR_CHANGE 1
+typedef bool (*HookGameFunction)(int hook_type, void(__stdcall *func)());
 
 typedef int (*SetupIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
 typedef int (*ReadIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
@@ -311,7 +379,7 @@ struct ModApi {
 
 	InjectCodeFunction InjectCode;
 	HookFunctionFunction HookFunction;
-	HookPhysicsFunction HookPhysics;
+	HookGameFunction HookGame;
 
 	SetupIniIntFunction SetupIniInt;
 	ReadIniIntFunction ReadIniInt;

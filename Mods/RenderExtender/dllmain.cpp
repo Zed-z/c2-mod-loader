@@ -146,7 +146,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		addr_render_distance = api->ResolveAddress(ADDR_RENDER_DISTANCE);
 
 		// Hook function
-		api->HookFunction(hookAddr, hookLength, &OnDistancesWritten);
+		api->HookFunction(hookAddr, hookLength, &OnDistancesWritten, INJECT_AFTER);
 
 		is_active = api->SetupIniBool(L"Config", L"Enabled", true);
 		render_multiplier = api->SetupIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);

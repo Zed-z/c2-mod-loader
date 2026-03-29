@@ -942,15 +942,19 @@ void RenderSaveSlotList() {
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Health##health") + slotId).c_str(), reinterpret_cast<int *>(&slot->health));
 			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputInt((std::string("Crystals##crystals") + slotId).c_str(), reinterpret_cast<int *>(&slot->crystals));
+			ImGui::InputInt((std::string("Total Crystals##totalcrystals") + slotId).c_str(), reinterpret_cast<int *>(&slot->crystals));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Level Crystals##levelcrystals") + slotId).c_str(), reinterpret_cast<int *>(&slot->levelCrystals));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Golden Gobbos##goldengobbos") + slotId).c_str(), reinterpret_cast<int *>(&slot->goldenGobbos));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Jigsaw Pieces##jigsawpieces") + slotId).c_str(), reinterpret_cast<int *>(&slot->jigsawPieces));
 
-			ImGui::Text("Items");
+			ImGui::Text("Inventory");
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Binoculars##binoculars") + slotId).c_str(), reinterpret_cast<int *>(&slot->binoculars));
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Keys##keys") + slotId).c_str(), reinterpret_cast<int *>(&slot->keys));
-
-			ImGui::Text("Inventory");
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Purple Gummis##purplegummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->purpleGummis));
 			ImGui::SetNextItemWidth(itemWidth);
@@ -959,6 +963,12 @@ void RenderSaveSlotList() {
 			ImGui::InputInt((std::string("Green Gummis##greengummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->greenGummis));
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Clockwork Gobbos##clockworkgobbos") + slotId).c_str(), reinterpret_cast<int *>(&slot->clockworkGobbos));
+
+			ImGui::Text("Boss");
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Total Boss Hearts##totalbosshearts") + slotId).c_str(), reinterpret_cast<int *>(&slot->totalBossHearts));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Boss Hearts##bosshearts") + slotId).c_str(), reinterpret_cast<int *>(&slot->bossHearts));
 
 			ImGui::Unindent();
 		}
