@@ -59,6 +59,7 @@ set(SOURCES
     Loader.cpp
     ModApi.cpp
     MouseCaptureRemover.cpp
+    XinputManager.cpp
     Resource.rc
 )
 

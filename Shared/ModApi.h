@@ -362,6 +362,36 @@ struct LevelInfo {
 };
 typedef LevelInfo (*GetLevelInfoFunction)();
 
+struct XinputInput {
+	struct {
+		bool enabled;
+		float stickScale;
+		float triggerScale;
+	} config;
+	struct {
+		int x;
+		int y;
+	} leftStick, rightStick;
+	struct {
+		bool up;
+		bool down;
+		bool left;
+		bool right;
+	} dpad;
+	int leftTrigger;
+	int rightTrigger;
+	bool leftShoulder;
+	bool rightShoulder;
+	bool aButton;
+	bool bButton;
+	bool xButton;
+	bool yButton;
+	bool startButton;
+	bool backButton;
+};
+
+typedef XinputInput (*GetXinputStateFunction)();
+
 struct ModApi {
 	LogFunction LogInfo;
 	LogFunction LogDebug;
@@ -411,6 +441,8 @@ struct ModApi {
 	GetCurrentSaveSlotFunction GetCurrentSaveSlot;
 
 	GetLevelInfoFunction GetLevelInfo;
+
+	GetXinputStateFunction GetXinputState;
 };
 
 extern "C" __declspec(dllexport) ModApi *GetModApi();

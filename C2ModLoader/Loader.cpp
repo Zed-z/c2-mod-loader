@@ -1,4 +1,5 @@
 #include "Loader.h"
+#include "XinputManager.h"
 
 #include <filesystem>
 #include <regex>
@@ -269,4 +270,6 @@ void ApiSetup() {
 	size_t doorChangeHookLength = 6;
 
 	api->HookFunction(doorChangeHook, doorChangeHookLength, RunDoorChangeHooks, INJECT_AFTER);
+
+	XinputManager::Setup();
 }

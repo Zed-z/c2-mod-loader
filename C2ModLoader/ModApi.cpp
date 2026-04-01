@@ -5,6 +5,7 @@
 #include "Loader.h"
 #include "Resource.h"
 #include "Utils.h"
+#include "XinputManager.h"
 
 #include <algorithm>
 #include <chrono>
@@ -295,6 +296,7 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall *func)(), int 
 
 		memcpy(p, (void *)target, length);
 		p += length;
+		break;
 	}
 	case INJECT_AFTER: {
 		memcpy(p, (void *)target, length);
@@ -310,6 +312,7 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall *func)(), int 
 
 		*p++ = POPFD;
 		*p++ = POPAD;
+		break;
 	}
 	case INJECT_REPLACE: { // INJECT_REPLACE
 		*p++ = PUSHAD;
@@ -322,6 +325,7 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall *func)(), int 
 
 		*p++ = POPFD;
 		*p++ = POPAD;
+		break;
 	}
 	}
 
@@ -592,6 +596,10 @@ LevelInfo GetLevelInfo() {
 	return levelInfo;
 }
 
+XinputInput GetXinputState() {
+	return XinputManager::GetState();
+}
+
 // API
 ModApi g_ModApi = {
 	LogInfo,
@@ -628,7 +636,8 @@ ModApi g_ModApi = {
 	GetEntity,
 	GetSaveSlot,
 	GetCurrentSaveSlot,
-	GetLevelInfo};
+	GetLevelInfo,
+	GetXinputState};
 
 extern "C" __declspec(dllexport) ModApi *GetModApi() {
 	return &g_ModApi;
