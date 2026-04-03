@@ -1,10 +1,10 @@
 #include "XinputManager.h"
 #include "ModApi.h"
-#include <Xinput.h>
 #include <cmath>
 #include <string>
 #include <windows.h>
-#pragma comment(lib, "Xinput.lib")
+#include <xinput.h>
+#pragma comment(lib, "xinput.lib")
 
 extern ModApi *api;
 

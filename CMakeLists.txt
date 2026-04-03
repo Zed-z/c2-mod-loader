@@ -133,6 +133,7 @@ macro(add_mod_project MOD_NAME)
         shlwapi
         dwmapi
         version
+        xinput
     )
 
     # Copy to Release folder
