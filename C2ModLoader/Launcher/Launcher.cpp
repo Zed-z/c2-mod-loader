@@ -213,7 +213,9 @@ void LoadAllConfigs() {
 	g_allHintMaps.resize(count);
 
 	for (int i = 0; i < count; ++i) {
-		const std::wstring configTypes = (i == 0) ? LOADER_CONFIG_TYPES_L : mods[i - 1].info.configTypes;
+		const std::wstring configTypes = (i == 0)
+			? StringToWString(LOADER_CONFIG_TYPES)
+			: mods[i - 1].info.configTypes;
 		const std::wstring configPath = GetConfigPath(i);
 		const ParsedConfigHints parsedHints = ParseConfigHints(configTypes);
 

@@ -11,6 +11,7 @@ extern ModApi *api;
 namespace XinputManager {
 
 bool xinputEnabled;
+int xinputDeviceIndex;
 float stickDeadzone;
 float triggerDeadzone;
 
@@ -21,7 +22,7 @@ XinputInput input{};
 
 void PollInput() {
 	XINPUT_STATE state{};
-	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
+	if (XInputGetState(xinputDeviceIndex, &state) == ERROR_SUCCESS) {
 		short rawLeftX = state.Gamepad.sThumbLX;
 		short rawLeftY = state.Gamepad.sThumbLY;
 		short rawRightX = state.Gamepad.sThumbRX;
@@ -75,7 +76,6 @@ XinputInput GetState() {
 	Croc2.exe+2EEC3 - 8B 0D ACA55200        - mov ecx,[Croc2.exe+12A5AC]
 */
 void __stdcall PreInput() {
-	api->LogDebug("Polling Xinput...");
 	PollInput();
 }
 
@@ -115,6 +115,7 @@ void PatchAnalogInput() {
 void Setup() {
 	// Load config
 	xinputEnabled = api->SetupIniBool(L"Input", L"XinputEnabled", true);
+	xinputDeviceIndex = api->SetupIniInt(L"Input", L"DeviceIndex", 0);
 	stickDeadzone = api->SetupIniInt(L"Input", L"StickDeadzone", 25) / 100.0f;
 	triggerDeadzone = api->SetupIniInt(L"Input", L"TriggerDeadzone", 10) / 100.0f;
 
