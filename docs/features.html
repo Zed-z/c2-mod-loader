@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Features - Croc 2 Mod Loader</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header>
+		<div class="content">
+			<h1>Croc 2 Mod Loader</h1>
+			<nav>
+				<a href="index.html">Home</a>
+				<a href="features.html">Features</a>
+				<a href="mods.html">Mods</a>
+				<a href="https://github.com/Zed-z/c2-mod-loader/">GitHub</a>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<section>
+			<h1>Features</h1>
+			<p>Below are the main features built into Croc 2 Mod Loader.</p>
+		</section>
+		<section>
+			<h2>Game launcher</h2>
+			<p>Shows a launcher before starting the game. There, you can enable and disable your mods and change their settings!</p>
+			<img src="img/launcher.png" alt="Launcher Screenshot">
+		</section>
+		<section>
+			<h2>Mouse uncapture</h2>
+			<p>Optionally, the loader can overwrite some game code responsible for capturing the mouse in the game window and making it visible. When enabled, the game never captures your mouse and acts like any other window. Cursor freedom at last!</p>
+			<div class="note">Big thanks to hdc0 for the game insight that made this possible!</div>
+			<img src="img/mouseuncapture.png" alt="Mouse Uncapture Screenshot">
+		</section>
+		<section>
+			<h2>Custom UI overlay</h2>
+			<p>With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings.</p>
+			<img src="img/customui.png" alt="Custom UI Screenshot">
+		</section>
+		<section>
+			<h2>Mod loading</h2>
+			<p>Croc 2 Mod Loader can load <code>.asi</code> mod files that are able to change the game's behavior and even override some assets. Mods can also add options to the menu bar for easy access to different features!<br>
+			Mods are written in C++ with the help of the provided modding API.</p>
+			<img src="img/modoptions.png" alt="Mod Options Screenshot">
+		</section>
+		<section>
+			<h2>Cheat code management</h2>
+			<p>Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game.<br>
+			With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!</p>
+			<img src="img/cheatcodes.png" alt="Cheat Codes Screenshot">
+		</section>
+	</main>
+	<footer>
+		<div class="content">
+			<span>&copy; 2026 Croc 2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed-z and contributors</a></span>
+		</div>
+	</footer>
+</body>
+</html>

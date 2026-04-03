@@ -4,8 +4,85 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Croc 2 Mod Loader</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<h1>Croc 2 Mod Loader</h1>
+	<header>
+		<div class="content">
+			<h1>Croc 2 Mod Loader</h1>
+			<nav>
+				<a href="index.html">Home</a>
+				<a href="features.html">Features</a>
+				<a href="mods.html">Mods</a>
+				<a href="https://github.com/Zed-z/c2-mod-loader/">GitHub</a>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<section>
+			<h1>Croc 2 Mod Loader</h1>
+			<img src="img/launcher.png" alt="Launcher Screenshot">
+			<p>ASI Mod Loader for Croc 2
+			Will automatically load <code>.asi</code> files from the <code>mods/</code> folder.<br>
+			Additionally, provides a lightweight API for mod developers.</p>
+		</section>
+		<section>
+			<h2>Compatible versions</h2>
+			<ul>
+				<li>Tested on the US PC version.<br>
+					<b>SHA1:</b> <code>C7E9ED848E311706DDE83116FD122A0B28B99261</code></li>
+				<li>Your mileage may vary on other versions!</li>
+			</ul>
+		</section>
+		<section>
+			<h2>Installation instructions</h2>
+			<ol>
+				<li>Make sure you have <a href="https://aka.ms/vs/17/release/vc_redist.x86.exe">Microsoft Visual C++ Redistributable (x86)</a> installed</li>
+				<li>Download <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest/dinput-Win32.zip">dinput8.dll</a> from ThirteenAG's <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader">Ultimate ASI Loader</a></li>
+				<li>Download the mod loader files from <a href="https://github.com/Zed-z/c2-mod-loader/releases">Releases</a></li>
+				<li>Extract both and place them into the game's directory</li>
+				<li>You're done, the game will now load mods from the <code>mods/</code> folder!</li>
+				<li><b>EXTRA:</b> Unpack the provided example mods into the <code>mods/</code> folder after installation</li>
+			</ol>
+		</section>
+		<section>
+			<h2>Recommended: Custom GUI support</h2>
+			<p>To display custom GUIs, the mod loader needs the game to have <a href="https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/">dgVoodoo2</a> applied.<br>
+			Without it, the mod loader will continue to function, but you will not see the custom GUI overlay.</p>
+			<ul>
+				<li>Download dgVoodoo2 from <a href="https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/">here</a></li>
+				<li>Extract <code>dgVoodoo.exe</code> and <code>dgVoodoo.conf</code> into the game's directory</li>
+				<li>Additionally, extract the contents of the <code>MS/x86/</code> directory into the game's directory as well</li>
+				<li>Launch <code>dgVoodoo.exe</code></li>
+				<li>Configure the settings in the <i>General</i> and <i>DirectX</i> tabs as needed</li>
+				<li>If you encounter graphical issues, try an older version of dgVoodoo2, such as v2.82.1</li>
+			</ul>
+		</section>
+		<section>
+			<h2>Third-Party Licenses</h2>
+			<ul>
+				<li><a href="https://github.com/ocornut/imgui">Dear ImGui</a> - Copyright (c) 2014-2025 Omar Cornut</li>
+				<li><a href="https://github.com/TsudaKageyu/minhook">MinHook</a> - Copyright (c) 2009-2017 Tsuda Kageyu</li>
+				<li><a href="https://ggbot.itch.io/scabber-font">Scabber Font</a> by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.</li>
+			</ul>
+			<p>Licenses for the above mentioned are available on the GitHub repository.</p>
+		</section>
+		<section>
+			<h2>Special Thanks</h2>
+			<ul>
+				<li>Thanks to ThirteenAG for developing Ultimate ASI Loader (support <a href="https://ko-fi.com/thirteenag">here</a>)</li>
+				<li>Thanks to Dege for developing dgVoodoo2 (support <a href="https://dege.freeweb.hu/">here</a>)</li>
+				<li>Thanks to ocornut for developing Dear ImGui (support <a href="https://github.com/ocornut/imgui/wiki/Funding">here</a>)</li>
+				<li>Thanks to TsudaKageyu for developing Minhook (support <a href="https://github.com/TsudaKageyu">here</a>)</li>
+				<li>Thanks to Thermospore, hdc0, limbus, Ray and Rartrin from the Croc & Stuff Discord server for valuable insight about the game!</li>
+				<li>Thanks to Argonaut Games for developing Croc 2!</li>
+			</ul>
+		</section>
+	</main>
+	<footer>
+		<div class="content">
+			<span>&copy; 2026 Croc 2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed-z and contributors</a></span>
+		</div>
+	</footer>
 </body>
 </html>
