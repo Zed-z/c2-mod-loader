@@ -8,12 +8,42 @@
 
 extern ModApi *api;
 
+namespace {
+
+template <typename T>
+int sign(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+float applyStickDeadzone(float rawInput, float inner, float outer) {
+	float absVal = std::abs(rawInput);
+	if (absVal <= inner)
+		return 0.0f;
+	if (absVal >= outer)
+		return sign(rawInput) * 1.0f;
+	float normalized = (absVal - inner) / (outer - inner);
+	return sign(rawInput) * normalized;
+}
+
+float applyTriggerDeadzone(float rawInput, float inner, float outer) {
+	if (rawInput <= inner)
+		return 0.0f;
+	if (rawInput >= outer)
+		return 1.0f;
+	float normalized = (rawInput - inner) / (outer - inner);
+	return normalized;
+}
+
+} // namespace
+
 namespace XinputManager {
 
 bool xinputEnabled;
 int xinputDeviceIndex;
 float stickDeadzone;
+float stickOuterDeadzone;
 float triggerDeadzone;
+float triggerOuterDeadzone;
 
 const float stickScale = 128.0f;
 const float triggerScale = 128.0f;
@@ -37,12 +67,12 @@ void PollInput() {
 		float leftTrigger = rawLeftTrigger / 255.0f;
 		float rightTrigger = rawRightTrigger / 255.0f;
 
-		input.leftStick.x = (std::abs(leftX) > stickDeadzone) ? -stickScale * leftX : 0;
-		input.leftStick.y = (std::abs(leftY) > stickDeadzone) ? stickScale * leftY : 0;
-		input.rightStick.x = (std::abs(rightX) > stickDeadzone) ? stickScale * rightX : 0;
-		input.rightStick.y = (std::abs(rightY) > stickDeadzone) ? -stickScale * rightY : 0;
-		input.leftTrigger = (leftTrigger > triggerDeadzone) ? triggerScale * leftTrigger : 0;
-		input.rightTrigger = (rightTrigger > triggerDeadzone) ? triggerScale * rightTrigger : 0;
+		input.leftStick.x = -applyStickDeadzone(leftX, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.leftStick.y = applyStickDeadzone(leftY, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.rightStick.x = applyStickDeadzone(rightX, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.rightStick.y = -applyStickDeadzone(rightY, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.leftTrigger = applyTriggerDeadzone(leftTrigger, triggerDeadzone, triggerOuterDeadzone) * triggerScale;
+		input.rightTrigger = applyTriggerDeadzone(rightTrigger, triggerDeadzone, triggerOuterDeadzone) * triggerScale;
 
 		input.dpad.up = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0;
 		input.dpad.down = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
@@ -117,7 +147,9 @@ void Setup() {
 	xinputEnabled = api->SetupIniBool(L"Input", L"XinputEnabled", true);
 	xinputDeviceIndex = api->SetupIniInt(L"Input", L"DeviceIndex", 0);
 	stickDeadzone = api->SetupIniInt(L"Input", L"StickDeadzone", 25) / 100.0f;
+	stickOuterDeadzone = api->SetupIniInt(L"Input", L"StickOuterDeadzone", 75) / 100.0f;
 	triggerDeadzone = api->SetupIniInt(L"Input", L"TriggerDeadzone", 10) / 100.0f;
+	triggerOuterDeadzone = api->SetupIniInt(L"Input", L"TriggerOuterDeadzone", 90) / 100.0f;
 
 	PollInput();
 	if (!xinputEnabled)
