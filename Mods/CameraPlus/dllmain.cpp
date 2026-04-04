@@ -42,6 +42,8 @@ bool orbitInvertY;
 bool orbitAutoTurn;
 int orbitAutoTurnStrength;
 int orbitAutoTurnMinSpeed;
+bool orbitTriggerZoom;
+
 bool orbitHasLastCrocPos = false;
 Vec3i orbitLastCrocPos;
 
@@ -201,7 +203,7 @@ void __stdcall PhysicsLoop() {
 	const float stickScale = input.config.stickScale;
 	const float triggerScale = input.config.triggerScale;
 
-	if (xinputEnabled) {
+	if (xinputEnabled && cameraMode == CameraMode::Orbit && orbitTriggerZoom) {
 		orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
 		orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
 	}
@@ -381,6 +383,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		orbitAutoTurn = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
 		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
 		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
+		orbitTriggerZoom = api->SetupIniBool(L"OrbitCamera", L"TriggerZoom", true);
 
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
