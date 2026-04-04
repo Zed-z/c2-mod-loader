@@ -55,14 +55,14 @@
     </CheatEntry>
     <CheatEntry>
       <ID>21</ID>
-      <Description>"1-continue screen, 2-game over, 3-no clue, 4-credits, 5-restart map"</Description>
+      <Description>"Continue Type: 1-continue screen, 2-game over, 3-no clue, 4-credits, 5-restart map"</Description>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>004B7880</Address>
     </CheatEntry>
     <CheatEntry>
       <ID>20</ID>
-      <Description>"If above is 5 and this is 1, restart the map instead of returning to hub"</Description>
+      <Description>"Continue Return Location: If above is 5 and this is 1, restart the map instead of returning to hub"</Description>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>004B7950</Address>
@@ -2083,16 +2083,100 @@
   </CheatEntries>
   <UserdefinedSymbols>
     <SymbolEntry>
-      <Name>AnalogX</Name>
-      <Address>0052A564</Address>
+      <Name>Cheats</Name>
+      <Address>4B7964</Address>
     </SymbolEntry>
     <SymbolEntry>
-      <Name>AnalogY</Name>
-      <Address>0052A574</Address>
+      <Name>Current Tribe</Name>
+      <Address>0x4A8C44</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Current Level</Name>
+      <Address>0x4A8C48</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Current Map</Name>
+      <Address>0x4A8C4C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Level type</Name>
+      <Address>Croc2.exe+A8C50</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Render Distance</Name>
+      <Address>0x4B7B18</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Fog Distance</Name>
+      <Address>0x4B7B48</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Continue Type</Name>
+      <Address>004B7880</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Continue Return Location</Name>
+      <Address>004B7950</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>No description</Name>
+      <Address>004AF340</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Control Method Current</Name>
+      <Address>Croc2.exe+12A5F4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Inputs Raw</Name>
+      <Address>Croc2.exe+12A588</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Inputs</Name>
+      <Address>Croc2.exe+12A590</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Inputs Pressed</Name>
+      <Address>0052A554</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Inputs Released</Name>
+      <Address>0052A558</Address>
     </SymbolEntry>
     <SymbolEntry>
       <Name>Analog Strength</Name>
       <Address>0052A54C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Analog X</Name>
+      <Address>0052A564</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Analog Y</Name>
+      <Address>0052A574</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Device Limit</Name>
+      <Address>Croc2.exe + 12A5A8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Croc Object</Name>
+      <Address>4A8C3C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Strat Count</Name>
+      <Address>0x00636160</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Movement allowed state</Name>
+      <Address>622c44</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Current Save Slot</Name>
+      <Address>006220FC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Current Door</Name>
+      <Address>0x004B7888</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
 </CheatTable>
