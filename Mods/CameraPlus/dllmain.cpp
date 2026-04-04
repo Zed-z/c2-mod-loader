@@ -25,7 +25,7 @@ const double DEFAULT_CAMERA_PITCH = 0.3;
 double cameraPitch = DEFAULT_CAMERA_PITCH;
 Vec3i cameraLookAt;
 
-const double PI = 3.141;
+constexpr double PI = 3.14159265358979323846;
 
 const double CAMERA_ORBIT_Y_OFFSET = 800.0;
 const double ORBIT_MIN_DISTANCE = 1200.0;
@@ -83,6 +83,10 @@ int RadiansToGameRotation(double radians_input) {
 	}
 
 	return game_rotation_value;
+}
+
+double GameRotationToRadians(int game_rotation) {
+	return (game_rotation * PI) / 2048.0;
 }
 
 void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
@@ -223,18 +227,6 @@ void __stdcall PhysicsLoop() {
 	}
 	case CameraMode::Orbit: {
 
-		if (inputs.flip) {
-			cameraPitch = DEFAULT_CAMERA_PITCH;
-			orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
-			return;
-		}
-		if (inputsReleased.flip) {
-			cameraRotPos = camera->newRotPos;
-			const double x = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y));
-			cameraYaw = ((x + 2048.0) / 4096.0) * (2 * PI);
-			cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
-		}
-
 		if (camera == nullptr) {
 			cameraMode = CameraMode::Normal;
 			saveCameraMode();
@@ -249,6 +241,12 @@ void __stdcall PhysicsLoop() {
 			api->LogError("No player found!");
 			api->ShowErrorToast("No player found!");
 			return;
+		}
+
+		if (inputs.flip) {
+			cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
+			cameraPitch = DEFAULT_CAMERA_PITCH;
+			orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
 		}
 
 		float input_rot_yaw, input_rot_pitch;
