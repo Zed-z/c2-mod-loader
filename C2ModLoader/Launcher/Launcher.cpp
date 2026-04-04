@@ -31,8 +31,16 @@ extern bool loaderEnabled;
 namespace {
 using ConfigEntry = LauncherIni::ConfigEntry;
 
-struct ConfigSectionView {
+using ConfigSectionKey = std::string;
+using ConfigKey = std::string;
+
+struct ConfigSection {
 	std::string name;
+	std::string description;
+};
+
+struct ConfigSectionView {
+	ConfigSection sectionInfo;
 	std::vector<size_t> entryIndices;
 };
 
@@ -45,15 +53,21 @@ struct ConfigHint {
 	std::vector<std::string> options; // Enum options for dropdowns
 };
 
-struct ParsedConfigHints {
-	std::vector<std::pair<std::string, ConfigHint>> ordered;
-	std::map<std::string, ConfigHint> lookup;
+struct ParsedConfig {
+	struct {
+		std::vector<std::pair<ConfigSectionKey, ConfigSection>> ordered;
+		std::map<ConfigSectionKey, ConfigSection> lookup;
+	} sections;
+	struct {
+		std::vector<std::pair<ConfigKey, ConfigHint>> ordered;
+		std::map<ConfigKey, ConfigHint> lookup;
+	} hints;
+	std::vector<ConfigEntry> configEntries;
 };
 
 // 0 = loader, 1+ = mods
 int g_selectedMod = 0;
-std::vector<std::vector<ConfigEntry>> g_allConfigs;
-std::vector<std::map<std::string, ConfigHint>> g_allHintMaps;
+std::vector<ParsedConfig> allParsedConfigs;
 
 std::vector<Launcher::EmbeddedLicense> licenses = Launcher::GetEmbeddedLicenses();
 
@@ -70,13 +84,13 @@ std::wstring GetConfigPath(int modIndex) {
 }
 
 void SaveConfigForMod(int modIndex) {
-	LauncherIni::WriteIniFile(GetConfigPath(modIndex), g_allConfigs[modIndex]);
+	LauncherIni::WriteIniFile(GetConfigPath(modIndex), allParsedConfigs[modIndex].configEntries);
 }
 
-ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
-	ParsedConfigHints parsed;
+ParsedConfig ParseConfigHints(const std::wstring &configTypes) {
+	ParsedConfig parsedConfig;
 	if (configTypes.empty())
-		return parsed;
+		return parsedConfig;
 
 	std::string str = WStringToString(configTypes);
 	std::istringstream ss(str);
@@ -84,71 +98,102 @@ ParsedConfigHints ParseConfigHints(const std::wstring &configTypes) {
 
 	while (std::getline(ss, token, ';')) {
 		/*
-			Expected format: [_]Section/Key[Name|Description]:type[typeinfo]=default
-			_ - Mark as hidden
-			Name - Human readable name
-			Description - Description for tooltips
-			typeinfo - Additional info for certain types:
-				enum[Option1|Option2|Option3]
+			Config Section: @Section[Name|Description]
+				@ - Section marker
+				Name - Human readable name
+				Description - Description for display below the header
+			Config Hint:    [_]Section/Key[Name|Description]:type[typeinfo]=default
+				_ - Mark as hidden
+				Name - Human readable name
+				Description - Description for tooltips
+				typeinfo - Additional info for certain types:
+					enum[Option1|Option2|Option3]
 		*/
-		bool hidden = false;
-		size_t hiddenMarkerPos = token.find('_');
-		if (hiddenMarkerPos != std::string::npos) {
-			token.erase(hiddenMarkerPos, 1);
-			hidden = true;
-		}
-		size_t colonPos = token.find(':');
-		if (colonPos == std::string::npos)
-			continue;
-		size_t equalsPos = token.find('=', colonPos + 1);
-		if (equalsPos == std::string::npos)
-			continue;
+		size_t atPos = token.find('@');
+		bool isSection = atPos != std::string::npos && atPos == 0;
 
-		std::string name, description;
-		std::string keyString = token.substr(0, colonPos);
-		size_t openBracketPos = keyString.find('[');
-		size_t closeBracketPos = keyString.find(']');
-		if (!(openBracketPos == std::string::npos || closeBracketPos == std::string::npos || closeBracketPos < openBracketPos)) {
-			const std::string nameDescStr = keyString.substr(openBracketPos + 1, closeBracketPos - openBracketPos - 1);
-			size_t pipePos = nameDescStr.find('|');
-			name = (pipePos == std::string::npos) ? nameDescStr : nameDescStr.substr(0, pipePos);
-			description = (pipePos == std::string::npos) ? "" : nameDescStr.substr(pipePos + 1);
-			keyString = keyString.substr(0, openBracketPos);
-		} else {
-			size_t slashPos = keyString.find('/');
-			name = (slashPos == std::string::npos) ? keyString : keyString.substr(slashPos + 1);
-			description = "";
-		}
-
-		ConfigHint hint;
-		hint.hidden = hidden;
-		hint.name = name;
-		hint.description = description;
-		hint.defaultValue = token.substr(equalsPos + 1);
-		hint.type = token.substr(colonPos + 1, equalsPos - colonPos - 1);
-		if (hint.type == "bool" && (hint.defaultValue == "true" || hint.defaultValue == "True"))
-			hint.defaultValue = "1";
-		if (hint.type.find("enum") == 0) {
-			std::istringstream ss(hint.type);
-			std::string token;
-			size_t openBracket = hint.type.find('[');
-			if (openBracket == std::string::npos)
-				continue;
-			size_t closeBracket = hint.type.find(']');
-			if (closeBracket == std::string::npos || closeBracket < openBracket)
-				continue;
-			const std::string optionsStr = hint.type.substr(openBracket + 1, closeBracket - openBracket - 1);
-			std::istringstream optionsSS(optionsStr);
-			while (std::getline(optionsSS, token, '|')) {
-				hint.options.push_back(token);
+		if (isSection) {
+			std::string sectionKey = token.substr(1);
+			size_t openBracketPos = token.find('[');
+			size_t closeBracketPos = token.find(']');
+			if (openBracketPos != std::string::npos && openBracketPos > 1) {
+				sectionKey = token.substr(1, openBracketPos - 1);
 			}
-			hint.type = "enum";
-		}
 
-		parsed.ordered.push_back({keyString, hint});
-		parsed.lookup[keyString] = hint;
+			std::string sectionName = (openBracketPos != std::string::npos && closeBracketPos != std::string::npos && closeBracketPos > openBracketPos)
+				? token.substr(openBracketPos + 1, closeBracketPos - openBracketPos - 1)
+				: sectionKey;
+			std::string name, description;
+			size_t pipePos = sectionName.find('|');
+			if (pipePos != std::string::npos) {
+				name = sectionName.substr(0, pipePos);
+				description = sectionName.substr(pipePos + 1);
+			} else {
+				name = sectionName;
+				description = "";
+			}
+			parsedConfig.sections.ordered.push_back({sectionKey, {name, description}});
+			parsedConfig.sections.lookup[sectionKey] = {name, description};
+		} else {
+			bool hidden = false;
+			size_t hiddenMarkerPos = token.find('_');
+			if (hiddenMarkerPos != std::string::npos) {
+				token.erase(hiddenMarkerPos, 1);
+				hidden = true;
+			}
+			size_t colonPos = token.find(':');
+			if (colonPos == std::string::npos)
+				continue;
+			size_t equalsPos = token.find('=', colonPos + 1);
+			if (equalsPos == std::string::npos)
+				continue;
+
+			std::string name, description;
+			std::string keyString = token.substr(0, colonPos);
+			size_t openBracketPos = keyString.find('[');
+			size_t closeBracketPos = keyString.find(']');
+			if (!(openBracketPos == std::string::npos || closeBracketPos == std::string::npos || closeBracketPos < openBracketPos)) {
+				const std::string nameDescStr = keyString.substr(openBracketPos + 1, closeBracketPos - openBracketPos - 1);
+				size_t pipePos = nameDescStr.find('|');
+				name = (pipePos == std::string::npos) ? nameDescStr : nameDescStr.substr(0, pipePos);
+				description = (pipePos == std::string::npos) ? "" : nameDescStr.substr(pipePos + 1);
+				keyString = keyString.substr(0, openBracketPos);
+			} else {
+				size_t slashPos = keyString.find('/');
+				name = (slashPos == std::string::npos) ? keyString : keyString.substr(slashPos + 1);
+				description = "";
+			}
+
+			ConfigHint hint;
+			hint.hidden = hidden;
+			hint.name = name;
+			hint.description = description;
+			hint.defaultValue = token.substr(equalsPos + 1);
+			hint.type = token.substr(colonPos + 1, equalsPos - colonPos - 1);
+			if (hint.type == "bool" && (hint.defaultValue == "true" || hint.defaultValue == "True"))
+				hint.defaultValue = "1";
+			if (hint.type.find("enum") == 0) {
+				std::istringstream ss(hint.type);
+				std::string token;
+				size_t openBracket = hint.type.find('[');
+				if (openBracket == std::string::npos)
+					continue;
+				size_t closeBracket = hint.type.find(']');
+				if (closeBracket == std::string::npos || closeBracket < openBracket)
+					continue;
+				const std::string optionsStr = hint.type.substr(openBracket + 1, closeBracket - openBracket - 1);
+				std::istringstream optionsSS(optionsStr);
+				while (std::getline(optionsSS, token, '|')) {
+					hint.options.push_back(token);
+				}
+				hint.type = "enum";
+			}
+
+			parsedConfig.hints.ordered.push_back({keyString, hint});
+			parsedConfig.hints.lookup[keyString] = hint;
+		}
 	}
-	return parsed;
+	return parsedConfig;
 }
 
 bool EnsureConfigDefaults(std::vector<ConfigEntry> &config, const std::vector<std::pair<std::string, ConfigHint>> &orderedHints) {
@@ -209,35 +254,49 @@ bool IsConfigValueDefault(const ConfigEntry &entry, const ConfigHint &hint) {
 
 void LoadAllConfigs() {
 	const int count = 1 + (int)mods.size();
-	g_allConfigs.resize(count);
-	g_allHintMaps.resize(count);
+	allParsedConfigs.resize(count);
 
 	for (int i = 0; i < count; ++i) {
 		const std::wstring configTypes = (i == 0)
 			? StringToWString(LOADER_CONFIG_TYPES)
 			: mods[i - 1].info.configTypes;
 		const std::wstring configPath = GetConfigPath(i);
-		const ParsedConfigHints parsedHints = ParseConfigHints(configTypes);
+		ParsedConfig parsedConfig = ParseConfigHints(configTypes);
+		parsedConfig.configEntries = LauncherIni::ParseIniFile(configPath);
 
-		g_allHintMaps[i] = parsedHints.lookup;
-		g_allConfigs[i] = LauncherIni::ParseIniFile(configPath);
-		const bool defaultsAdded = EnsureConfigDefaults(g_allConfigs[i], parsedHints.ordered);
+		const bool defaultsAdded = EnsureConfigDefaults(parsedConfig.configEntries, parsedConfig.hints.ordered);
 		if (defaultsAdded) {
-			LauncherIni::WriteIniFile(configPath, g_allConfigs[i]);
+			LauncherIni::WriteIniFile(configPath, parsedConfig.configEntries);
 		}
+
+		allParsedConfigs[i] = parsedConfig;
 	}
 }
 
-std::vector<ConfigSectionView> BuildConfigSections(const std::vector<ConfigEntry> &entries) {
+std::vector<ConfigSectionView> BuildConfigSections(const ParsedConfig &parsedConfig) {
 	std::vector<ConfigSectionView> sections;
-	std::map<std::string, size_t> sectionIndices;
+	std::map<ConfigSectionKey, size_t> sectionIndices;
 
+	for (const auto &[sectionKey, section] : parsedConfig.sections.ordered) {
+		sectionIndices[sectionKey] = sections.size();
+		sections.push_back({section, {}});
+	}
+
+	const auto &entries = parsedConfig.configEntries;
 	for (size_t i = 0; i < entries.size(); ++i) {
-		const std::string sectionName = entries[i].section.empty() ? "Uncategorized" : entries[i].section;
-		auto it = sectionIndices.find(sectionName);
+		ConfigSectionKey key = entries[i].section.empty() ? "Uncategorized" : entries[i].section;
+		ConfigSection sectionInfo;
+		const auto sectionIt = parsedConfig.sections.lookup.find(key);
+		if (sectionIt != parsedConfig.sections.lookup.end()) {
+			sectionInfo = {sectionIt->second.name, sectionIt->second.description};
+		} else {
+			sectionInfo = {key, ""};
+		}
+
+		auto it = sectionIndices.find(key);
 		if (it == sectionIndices.end()) {
-			sectionIndices[sectionName] = sections.size();
-			sections.push_back({sectionName, {i}});
+			sectionIndices[key] = sections.size();
+			sections.push_back({sectionInfo, {i}});
 		} else {
 			sections[it->second].entryIndices.push_back(i);
 		}
@@ -247,30 +306,38 @@ std::vector<ConfigSectionView> BuildConfigSections(const std::vector<ConfigEntry
 }
 
 void RenderConfigSections() {
-	auto &config = g_allConfigs[g_selectedMod];
-	auto &hintMap = g_allHintMaps[g_selectedMod];
-	const std::vector<ConfigSectionView> sections = BuildConfigSections(config);
+	ParsedConfig &parsedConfig = allParsedConfigs[g_selectedMod];
+	const std::vector<ConfigSectionView> sections = BuildConfigSections(parsedConfig);
 
 	for (size_t sectionIndex = 0; sectionIndex < sections.size(); ++sectionIndex) {
 		const ConfigSectionView &section = sections[sectionIndex];
-		std::string headerLabel = section.name + "##section" + std::to_string(sectionIndex);
+		std::string headerLabel = section.sectionInfo.name + "##section" + std::to_string(sectionIndex);
+		const bool isOpen = ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
-		if (ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (isOpen) {
+			if (!section.sectionInfo.description.empty()) {
+				ImGui::Spacing();
+				ImGui::TextWrapped(section.sectionInfo.description.c_str());
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+			}
+
 			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 3)) {
 				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 180.0f);
 				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 				ImGui::TableSetupColumn("Reset", ImGuiTableColumnFlags_WidthFixed, 72.0f);
 
 				for (size_t entryIndex : section.entryIndices) {
-					ConfigEntry &entry = config[entryIndex];
+					ConfigEntry &entry = parsedConfig.configEntries[entryIndex];
 					const std::string hintKey = entry.section + "/" + entry.key;
-					const auto hintIt = hintMap.find(hintKey);
-					const std::string type = (hintIt != hintMap.end()) ? hintIt->second.type : "string";
-					const std::string name = (hintIt != hintMap.end()) ? hintIt->second.name : entry.key;
-					const std::string description = (hintIt != hintMap.end()) ? hintIt->second.description : "";
+					const auto hintIt = parsedConfig.hints.lookup.find(hintKey);
+					const std::string type = (hintIt != parsedConfig.hints.lookup.end()) ? hintIt->second.type : "string";
+					const std::string name = (hintIt != parsedConfig.hints.lookup.end()) ? hintIt->second.name : entry.key;
+					const std::string description = (hintIt != parsedConfig.hints.lookup.end()) ? hintIt->second.description : "";
 					bool valueChanged = false;
 
-					if (hintIt != hintMap.end() && hintIt->second.hidden) {
+					if (hintIt != parsedConfig.hints.lookup.end() && hintIt->second.hidden) {
 						continue;
 					}
 
@@ -341,7 +408,7 @@ void RenderConfigSections() {
 					}
 
 					ImGui::TableSetColumnIndex(2);
-					if (hintIt != hintMap.end()) {
+					if (hintIt != parsedConfig.hints.lookup.end()) {
 						ImGui::BeginDisabled(IsConfigValueDefault(entry, hintIt->second));
 						if (ImGui::Button("Reset##reset")) {
 							entry.value = hintIt->second.defaultValue;
@@ -426,7 +493,7 @@ void RenderSelectedItemDetails() {
 }
 
 void RenderSelectedItemConfig() {
-	if (g_allConfigs[g_selectedMod].empty()) {
+	if (allParsedConfigs[g_selectedMod].configEntries.empty()) {
 		ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No configuration available.");
 	} else {
 		RenderConfigSections();
@@ -595,7 +662,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 
 			ImGui::BeginChild("DetailsPane", ImVec2(0, contentHeight), true);
 			{
-				const bool hasConfig = !g_allConfigs[g_selectedMod].empty();
+				const bool hasConfig = !allParsedConfigs[g_selectedMod].configEntries.empty();
 				if (ImGui::BeginTabBar("DetailsTabs")) {
 					if (ImGui::BeginTabItem("Overview")) {
 						RenderSelectedItemDetails();

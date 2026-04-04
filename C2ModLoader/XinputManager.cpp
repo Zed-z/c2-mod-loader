@@ -144,12 +144,12 @@ void PatchAnalogInput() {
 
 void Setup() {
 	// Load config
-	xinputEnabled = api->SetupIniBool(L"Input", L"XinputEnabled", true);
-	xinputDeviceIndex = api->SetupIniInt(L"Input", L"DeviceIndex", 0);
-	stickDeadzone = api->SetupIniInt(L"Input", L"StickDeadzone", 25) / 100.0f;
-	stickOuterDeadzone = api->SetupIniInt(L"Input", L"StickOuterDeadzone", 75) / 100.0f;
-	triggerDeadzone = api->SetupIniInt(L"Input", L"TriggerDeadzone", 10) / 100.0f;
-	triggerOuterDeadzone = api->SetupIniInt(L"Input", L"TriggerOuterDeadzone", 90) / 100.0f;
+	xinputEnabled = api->SetupIniBool(L"Xinput", L"XinputEnabled", true);
+	xinputDeviceIndex = api->SetupIniInt(L"Xinput", L"DeviceIndex", 0);
+	stickDeadzone = api->SetupIniInt(L"Xinput", L"StickDeadzone", 25) / 100.0f;
+	stickOuterDeadzone = api->SetupIniInt(L"Xinput", L"StickOuterDeadzone", 75) / 100.0f;
+	triggerDeadzone = api->SetupIniInt(L"Xinput", L"TriggerDeadzone", 10) / 100.0f;
+	triggerOuterDeadzone = api->SetupIniInt(L"Xinput", L"TriggerOuterDeadzone", 90) / 100.0f;
 
 	PollInput();
 	if (!xinputEnabled)

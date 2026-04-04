@@ -20,7 +20,10 @@ BEGIN
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
-            VALUE "ConfigTypes", "Config/Type1Flip[Type 1 Flip|Allows to do a 180 in Type 1 by double tapping the camera reset / 180 button]:bool=1;Config/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=0"
+            VALUE "ConfigTypes",
+                "@Config[General Configuration|General mod settings];"
+                "Config/Type1Flip[Type 1 Flip|Allows to do a 180 in Type 1 by double tapping the camera reset / 180 button]:bool=1;"
+                "Config/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=0"
         END
     END
     BLOCK "VarFileInfo"

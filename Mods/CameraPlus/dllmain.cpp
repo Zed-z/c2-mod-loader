@@ -51,11 +51,11 @@ bool freecamInvertX;
 bool freecamInvertY;
 
 void saveCameraMode() {
-	api->WriteIniInt(L"General", L"CameraMode", static_cast<int>(cameraMode));
+	api->WriteIniInt(L"Config", L"CameraMode", static_cast<int>(cameraMode));
 }
 
 CameraMode loadCameraMode() {
-	return static_cast<CameraMode>(api->SetupIniInt(L"General", L"CameraMode", static_cast<int>(CameraMode::Normal)));
+	return static_cast<CameraMode>(api->SetupIniInt(L"Config", L"CameraMode", static_cast<int>(CameraMode::Normal)));
 }
 
 static double LerpAngle(double a, double b, double t) {
