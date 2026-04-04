@@ -1,4 +1,5 @@
 #pragma once
+#include "FileOverrides.h"
 #include "ModApi.h"
 #include "Utils.h"
 
@@ -16,6 +17,9 @@ struct Mod {
 	PathInfo path;
 	bool enabled = true;
 	HMODULE handle = nullptr;
+
+	std::wstring overridePath;
+	std::vector<FileOverrideEntry> fileOverrides;
 
 	std::wstring getName();
 };

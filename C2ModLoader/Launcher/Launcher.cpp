@@ -500,6 +500,54 @@ void RenderSelectedItemConfig() {
 	}
 }
 
+void RenderSelectedItemFileOverrides() {
+	if (g_selectedMod == 0 || mods[g_selectedMod - 1].fileOverrides.empty()) {
+		ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No file overrides available.");
+	} else {
+		const Mod &mod = mods[g_selectedMod - 1];
+		const std::wstring &overridePath = mod.overridePath;
+		const bool overridePathExists = !mod.fileOverrides.empty();
+
+		ImGui::BeginDisabled(!overridePathExists);
+		if (ImGui::Button("Open Folder")) {
+			ShellExecuteW(NULL, L"open", overridePath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		}
+		ImGui::EndDisabled();
+		if (ImGui::IsItemHovered() && overridePathExists) {
+			ImGui::SetTooltip("%s", WStringToString(overridePath).c_str());
+		}
+
+		ImGui::Spacing();
+
+		if (ImGui::BeginTable("##fileoverridestable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+			ImGui::TableHeadersRow();
+
+			for (const auto &override : mod.fileOverrides) {
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				std::string displayPath = WStringToString(override.relativePath) + (override.isDirectory ? "\\" : "");
+				ImGui::TextUnformatted(displayPath.c_str());
+
+				ImGui::TableSetColumnIndex(1);
+				if (!override.isDirectory) {
+					if (override.fileSize < 1024) {
+						ImGui::Text("%u B", override.fileSize);
+					} else if (override.fileSize < 1024 * 1024) {
+						ImGui::Text("%.2f KB", override.fileSize / 1024.0f);
+					} else {
+						ImGui::Text("%.2f MB", override.fileSize / (1024.0f * 1024.0f));
+					}
+				} else {
+					ImGui::TextUnformatted("[DIR]");
+				}
+			}
+			ImGui::EndTable();
+		}
+	}
+}
+
 void RenderLicensesSection(bool fullHeight = false) {
 	if (licenses.empty())
 		return;
@@ -663,6 +711,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 			ImGui::BeginChild("DetailsPane", ImVec2(0, contentHeight), true);
 			{
 				const bool hasConfig = !allParsedConfigs[g_selectedMod].configEntries.empty();
+				const bool hasFileOverrides = g_selectedMod > 0 && !mods[g_selectedMod - 1].fileOverrides.empty();
 				if (ImGui::BeginTabBar("DetailsTabs")) {
 					if (ImGui::BeginTabItem("Overview")) {
 						RenderSelectedItemDetails();
@@ -676,6 +725,15 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 						ImGui::EndTabItem();
 					}
 					if (!hasConfig)
+						ImGui::EndDisabled();
+
+					if (!hasFileOverrides)
+						ImGui::BeginDisabled();
+					if (ImGui::BeginTabItem("Files")) {
+						RenderSelectedItemFileOverrides();
+						ImGui::EndTabItem();
+					}
+					if (!hasFileOverrides)
 						ImGui::EndDisabled();
 
 					ImGui::EndTabBar();

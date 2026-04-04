@@ -2,7 +2,6 @@
 #include "XinputManager.h"
 
 #include <filesystem>
-#include <regex>
 
 namespace fs = std::filesystem;
 
@@ -151,6 +150,9 @@ std::vector<Mod> GetMods() {
 			mod.path = GetPathInfo(modPath);
 			mod.enabled = std::find(disabledMods.begin(), disabledMods.end(), modPath) == disabledMods.end();
 
+			mod.overridePath = GetFileOverridePath(modPath);
+			GetFileOverrides(mod.overridePath, mod.fileOverrides);
+
 			mods.push_back(mod);
 		}
 	} while (FindNextFileW(hFind, &findFileData) != 0);
@@ -187,12 +189,12 @@ void LoadMods(std::vector<Mod> &mods) {
 		}
 
 		// Load file overrides
-		fs::path overridePath = std::regex_replace(mod.path.path, std::wregex(L".asi$"), L"");
+		const std::wstring &overridePath = mod.overridePath;
 
 		try {
-			if (fs::exists(overridePath) && fs::is_directory(overridePath)) {
+			if (!overridePath.empty() && fs::exists(overridePath) && fs::is_directory(overridePath)) {
 				fs::copy(
-					overridePath, FILE_OVERRIDE_DIRECTORY_L,
+					fs::path(overridePath), FILE_OVERRIDE_DIRECTORY_L,
 					fs::copy_options::recursive | fs::copy_options::update_existing | fs::copy_options::overwrite_existing);
 			}
 		} catch (const fs::filesystem_error &e) {
