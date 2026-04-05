@@ -45,7 +45,12 @@ bool orbitInvertY;
 bool orbitAutoTurn;
 int orbitAutoTurnStrength;
 int orbitAutoTurnMinSpeed;
-bool orbitTriggerZoom;
+enum ZoomControls {
+	ZOOM_NONE = 0,
+	ZOOM_TRIGGERS = 1,
+	ZOOM_RIGHT_STICK_CLICK = 2
+};
+ZoomControls orbitZoomControls = ZOOM_TRIGGERS;
 std::vector<LevelInfo> orbitLevelBlocklist;
 
 void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo> &blocklist) {
@@ -298,9 +303,32 @@ void __stdcall PhysicsLoop() {
 			orbitCameraReset();
 		}
 
-		if (xinputEnabled && cameraMode == CameraMode::Orbit && orbitTriggerZoom) {
-			orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
-			orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
+		if (xinputEnabled) {
+			switch (orbitZoomControls) {
+			case ZOOM_TRIGGERS: {
+				orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
+				orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
+				break;
+			}
+			case ZOOM_RIGHT_STICK_CLICK: {
+				static bool wasRightStickClicked = false;
+				if (input.rightStick.click && !wasRightStickClicked) {
+					wasRightStickClicked = true;
+					if (orbitCameraDistance == ORBIT_MAX_DISTANCE) {
+						orbitCameraDistance = ORBIT_MIN_DISTANCE;
+					} else if (orbitCameraDistance == ORBIT_MIN_DISTANCE) {
+						orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+					} else if (orbitCameraDistance == DEFAULT_ORBIT_DISTANCE) {
+						orbitCameraDistance = ORBIT_MAX_DISTANCE;
+					} else {
+						orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+					}
+				} else if (!input.rightStick.click) {
+					wasRightStickClicked = false;
+				}
+				break;
+			}
+			}
 		}
 
 		float input_rot_yaw, input_rot_pitch;
@@ -435,7 +463,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		orbitAutoTurn = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
 		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
 		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
-		orbitTriggerZoom = api->SetupIniBool(L"OrbitCamera", L"TriggerZoom", true);
+
+		const int zoomControlsValue = min(max(api->SetupIniInt(L"OrbitCamera", L"ZoomControls", 1), ZOOM_NONE), ZOOM_RIGHT_STICK_CLICK);
+		orbitZoomControls = static_cast<ZoomControls>(zoomControlsValue);
 
 		constexpr int orbitLevelBlocklistStringLength = 65536;
 		std::unique_ptr<wchar_t[]> orbitLevelBlocklistWchar = std::make_unique<wchar_t[]>(orbitLevelBlocklistStringLength);

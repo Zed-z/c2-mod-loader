@@ -38,7 +38,7 @@ BEGIN
                 "OrbitCamera/AutoTurn[Auto Turn|Automatically turn the camera when moving]:bool=1;"
                 "OrbitCamera/AutoTurnStrength[Auto Turn Strength|The strength of camera turning when moving]:int=40;"
                 "OrbitCamera/AutoTurnMinSpeed[Auto Turn Min Speed|Minimum player speed to automatically turn the camera]:int=100;"
-                "OrbitCamera/TriggerZoom[Trigger Zoom|Use triggers to zoom the camera]:bool=1;"
+                "OrbitCamera/ZoomControls[Zoom Controls|The method used for controlling camera zoom]:enum[None|Triggers|Right Stick Click]=1;"
                 "_OrbitCamera/LevelBlocklist[Level Blocklist|Levels to disable orbit camera in]:string=2:5:1;"
                 "@Freecam[Freecam|Settings regarding the freecam camera mode];"
                 "Freecam/InvertX[Invert X|Invert camera X axis movement]:bool=0;Freecam/InvertY[Invert Y|Invert camera y axis movement]:bool=0"

@@ -58,6 +58,7 @@
 #define ADDR_CONTROL_SCHEME_SLOT 0x60438C
 #define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
 #define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
+#define ADDR_MOVEMENT_ALLOWED_STATE 0x622C44
 
 #define ADDR_DOOR_STRUCT 0x4B7888
 #define ADDR_CURRENT_TRIBE 0x4A8C44
@@ -373,6 +374,7 @@ struct XinputInput {
 	struct {
 		int x;
 		int y;
+		bool click;
 	} leftStick, rightStick;
 	struct {
 		bool up;

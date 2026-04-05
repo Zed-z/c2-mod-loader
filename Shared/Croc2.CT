@@ -55,7 +55,7 @@
     </CheatEntry>
     <CheatEntry>
       <ID>21</ID>
-      <Description>"Continue Type: 1-continue screen, 2-game over, 3-no clue, 4-credits, 5-restart map"</Description>
+      <Description>"Continue Type: 1-continue screen, 2-game over, 3-no clue, 4-credits, 5-restart map, 7-restart now"</Description>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>004B7880</Address>
@@ -1665,8 +1665,7 @@
     </CheatEntry>
     <CheatEntry>
       <ID>161</ID>
-      <Description>"Movement allowed state"</Description>
-      <ShowAsHex>1</ShowAsHex>
+      <Description>"Movement allowed state - 24576 minecart, 4096 cutscene, 8192 in-game cutscene, 12288 boss cutscene"</Description>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>622c44</Address>
