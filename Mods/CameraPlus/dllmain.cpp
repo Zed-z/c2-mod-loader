@@ -2,7 +2,10 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <memory>
+#include <sstream>
 #include <string>
+#include <vector>
 
 using std::sin, std::cos, std::min, std::max;
 
@@ -43,6 +46,31 @@ bool orbitAutoTurn;
 int orbitAutoTurnStrength;
 int orbitAutoTurnMinSpeed;
 bool orbitTriggerZoom;
+std::vector<LevelInfo> orbitLevelBlocklist;
+
+void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo> &blocklist) {
+	std::wstring orbitLevelBlocklistStr(orbitLevelBlockList);
+	std::wstring token;
+	std::wstringstream wss(orbitLevelBlocklistStr);
+	while (std::getline(wss, token, L',')) {
+		LevelInfo levelInfo;
+		size_t firstSep = token.find(':');
+		size_t secondSep = token.find(':', firstSep + 1);
+		if (firstSep == std::wstring::npos || secondSep == std::wstring::npos) {
+			continue;
+		}
+
+		try {
+			levelInfo.tribe = std::stoi(token.substr(0, firstSep));
+			levelInfo.level = std::stoi(token.substr(firstSep + 1, secondSep - firstSep - 1));
+			levelInfo.map = std::stoi(token.substr(secondSep + 1));
+		} catch (...) {
+			continue;
+		}
+
+		orbitLevelBlocklist.push_back(levelInfo);
+	}
+}
 
 bool orbitHasLastCrocPos = false;
 Vec3i orbitLastCrocPos;
@@ -195,6 +223,32 @@ void __stdcall cameraSetFreecam() {
 	cameraSet(CameraMode::Freecam);
 }
 
+void __stdcall orbitCameraReset() {
+	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	if (croc == nullptr) {
+		api->LogDebug("[orbitCameraReset] Croc not found!");
+		return;
+	}
+	cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
+	cameraPitch = DEFAULT_CAMERA_PITCH;
+	orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+}
+
+static DWORD WINAPI delayedOrbitCameraResetThread(LPVOID param) {
+	int delay = (int)param;
+	Sleep(delay);
+	orbitCameraReset();
+	return 0;
+}
+
+void __stdcall mapDoorChangeOrbitCameraReset() {
+	CreateThread(nullptr, 0, delayedOrbitCameraResetThread, (LPVOID)100, 0, nullptr);
+}
+
+void __stdcall deathChangeOrbitCameraReset() {
+	CreateThread(nullptr, 0, delayedOrbitCameraResetThread, (LPVOID)700, 0, nullptr);
+}
+
 void __stdcall PhysicsLoop() {
 
 	// Xinput
@@ -202,11 +256,6 @@ void __stdcall PhysicsLoop() {
 	const bool xinputEnabled = input.config.enabled;
 	const float stickScale = input.config.stickScale;
 	const float triggerScale = input.config.triggerScale;
-
-	if (xinputEnabled && cameraMode == CameraMode::Orbit && orbitTriggerZoom) {
-		orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
-		orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
-	}
 
 	// Inputs
 	Inputs inputs = api->GetInputs();
@@ -229,26 +278,29 @@ void __stdcall PhysicsLoop() {
 	}
 	case CameraMode::Orbit: {
 
-		if (camera == nullptr) {
-			cameraMode = CameraMode::Normal;
-			saveCameraMode();
-			api->LogError("No camera found!");
-			api->ShowErrorToast("No camera found!");
+		if (camera == nullptr)
 			return;
-		}
 
-		if (croc == nullptr) {
-			cameraMode = CameraMode::Normal;
-			saveCameraMode();
-			api->LogError("No player found!");
-			api->ShowErrorToast("No player found!");
+		if (croc == nullptr)
 			return;
-		}
+
+		LevelInfo currentLevel = api->GetLevelInfo();
+		const bool orbitBlockedOnLevel = std::any_of(
+			orbitLevelBlocklist.begin(),
+			orbitLevelBlocklist.end(),
+			[&](const LevelInfo &blocked) {
+				return blocked.tribe == currentLevel.tribe && blocked.level == currentLevel.level && blocked.map == currentLevel.map;
+			});
+		if (orbitBlockedOnLevel)
+			break;
 
 		if (inputs.flip) {
-			cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
-			cameraPitch = DEFAULT_CAMERA_PITCH;
-			orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+			orbitCameraReset();
+		}
+
+		if (xinputEnabled && cameraMode == CameraMode::Orbit && orbitTriggerZoom) {
+			orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
+			orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
 		}
 
 		float input_rot_yaw, input_rot_pitch;
@@ -385,6 +437,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
 		orbitTriggerZoom = api->SetupIniBool(L"OrbitCamera", L"TriggerZoom", true);
 
+		constexpr int orbitLevelBlocklistStringLength = 65536;
+		std::unique_ptr<wchar_t[]> orbitLevelBlocklistWchar = std::make_unique<wchar_t[]>(orbitLevelBlocklistStringLength);
+		api->ReadIniString(L"OrbitCamera", L"LevelBlocklist", L"", orbitLevelBlocklistWchar.get(), orbitLevelBlocklistStringLength);
+		populateOrbitBlocklist(orbitLevelBlocklistWchar.get(), orbitLevelBlocklist);
+
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
 
@@ -392,6 +449,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		api->RegisterMenuAction(hModule, cameraNormalRegistration);
 		api->RegisterMenuAction(hModule, cameraOrbitRegistration);
 		api->RegisterMenuAction(hModule, cameraFreeRegistration);
+
+		api->HookGame(GAME_HOOK_MAP_CHANGE, mapDoorChangeOrbitCameraReset);
+		api->HookGame(GAME_HOOK_DOOR_CHANGE, mapDoorChangeOrbitCameraReset);
+		api->HookGame(GAME_HOOK_PLAYER_DEATH, deathChangeOrbitCameraReset);
 
 		DisableThreadLibraryCalls(hModule);
 	}

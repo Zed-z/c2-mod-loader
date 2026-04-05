@@ -16,7 +16,16 @@ BEGIN
         BEGIN
             VALUE "Name", "Camera+"
             VALUE "Author", "Zed-z"
-            VALUE "Description", "Adds extra camera modes.\n\nOrbit Camera:\nA manually controllable orbiting camera. Use side step controls to tilt left/right and inventory controls to tilt up/down. Optionally turns as you move.\n\nFreecam:\nA camera detached from the player character that can pass through objects. Move around with movement controls. Use side step controls to tilt left/right and inventory controls to tilt up/down. Jump to raise and attack to lower the camera.\n\nChange camera modes with [side step left] + [side step right] + [camera center / 180]."
+            VALUE "Description",
+                "Adds extra camera modes.\n"
+                "\n"
+                "Orbit Camera:\n"
+                "A manually controllable orbiting camera. Use side step controls to tilt left/right and inventory controls to tilt up/down. Optionally turns as you move.\n"
+                "\n"
+                "Freecam:\n"
+                "A camera detached from the player character that can pass through objects. Move around with movement controls. Use side step controls to tilt left/right and inventory controls to tilt up/down. Jump to raise and attack to lower the camera.\n"
+                "\n"
+                "Change camera modes with [side step left] + [side step right] + [camera center / 180]."
             VALUE "Version", "1.1.0"
             VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
             VALUE "ApiVersion", API_VERSION_STR
@@ -30,6 +39,7 @@ BEGIN
                 "OrbitCamera/AutoTurnStrength[Auto Turn Strength|The strength of camera turning when moving]:int=40;"
                 "OrbitCamera/AutoTurnMinSpeed[Auto Turn Min Speed|Minimum player speed to automatically turn the camera]:int=100;"
                 "OrbitCamera/TriggerZoom[Trigger Zoom|Use triggers to zoom the camera]:bool=1;"
+                "_OrbitCamera/LevelBlocklist[Level Blocklist|Levels to disable orbit camera in]:string=2:5:1;"
                 "@Freecam[Freecam|Settings regarding the freecam camera mode];"
                 "Freecam/InvertX[Invert X|Invert camera X axis movement]:bool=0;Freecam/InvertY[Invert Y|Invert camera y axis movement]:bool=0"
         END
