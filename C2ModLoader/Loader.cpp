@@ -253,25 +253,55 @@ void __stdcall RunDoorChangeHooks() {
 	}
 }
 
+std::vector<void(__stdcall *)()> mapChangeCallbacks;
+
+void __stdcall RunMapChangeHooks() {
+	for (auto &callback : mapChangeCallbacks) {
+		callback();
+	}
+}
+
+std::vector<void(__stdcall *)()> playerDeathCallbacks;
+
+void __stdcall RunPlayerDeathHooks() {
+	for (auto &callback : playerDeathCallbacks) {
+		callback();
+	}
+}
+
 void ApiSetup() {
 
 	// Hook physics callbacks
 	/*
-		Croc2.exe+4A591 - 39 1D 0CA24A00 - cmp [Croc2.exe+AA20C], ebx {(1)}
+		Croc2.exe+4A591 - 39 1D 0CA24A00 - cmp [Croc2.exe+AA20C], ebx
 	*/
 	uintptr_t physicsHook = 0x0044A591;
 	size_t physicsHookLength = 6;
-
 	api->HookFunction(physicsHook, physicsHookLength, RunPhysicsHooks, INJECT_AFTER);
 
 	// Hook door change callbacks
 	/*
-		Croc2.exe + 7FBF0 - 89 3D 88784B00 - mov[Croc2.exe + B7888], edi{(0B199BBA)}
+		Croc2.exe + 7FBF0 - 89 3D 88784B00 - mov[Croc2.exe + B7888], edi
 	*/
 	uintptr_t doorChangeHook = 0x0047FBF0;
 	size_t doorChangeHookLength = 6;
-
 	api->HookFunction(doorChangeHook, doorChangeHookLength, RunDoorChangeHooks, INJECT_AFTER);
+
+	// Hook map change callbacks
+	/*
+		Croc2.exe + 18DBB - 89 3D 4C8C4A00 - mov [Croc2.exe + A8C4C],edi
+	*/
+	uintptr_t mapChangeHook = 0x00418DBB;
+	size_t mapChangeHookLength = 6;
+	api->HookFunction(mapChangeHook, mapChangeHookLength, RunMapChangeHooks, INJECT_AFTER);
+
+	// Hook player death callbacks
+	/*
+		Croc2.exe + 81DF9 - C7 05 50794B00 01000000 - mov [Croc2.exe + B7950],00000001
+	*/
+	uintptr_t playerDeathHook = 0x00481DF9;
+	size_t playerDeathHookLength = 10;
+	api->HookFunction(playerDeathHook, playerDeathHookLength, RunPlayerDeathHooks, INJECT_BEFORE);
 
 	XinputManager::Setup();
 }

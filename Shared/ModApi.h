@@ -313,6 +313,8 @@ typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__std
 
 #define GAME_HOOK_PHYSICS 0
 #define GAME_HOOK_DOOR_CHANGE 1
+#define GAME_HOOK_MAP_CHANGE 2
+#define GAME_HOOK_PLAYER_DEATH 3
 typedef bool (*HookGameFunction)(int hook_type, void(__stdcall *func)());
 
 typedef int (*SetupIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);

@@ -358,6 +358,12 @@ bool HookGame(int hook_type, void(__stdcall *func)()) {
 	case GAME_HOOK_DOOR_CHANGE:
 		doorChangeCallbacks.push_back(func);
 		break;
+	case GAME_HOOK_MAP_CHANGE:
+		mapChangeCallbacks.push_back(func);
+		break;
+	case GAME_HOOK_PLAYER_DEATH:
+		playerDeathCallbacks.push_back(func);
+		break;
 	}
 	return true;
 }
