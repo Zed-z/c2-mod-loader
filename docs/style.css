@@ -2,7 +2,7 @@
 	--text-color: #e0e0e0;
 }
 
-h tml, body {
+html, body {
 	height: 100%;
 	color: var(--text-color);
 	margin: 0;
@@ -20,12 +20,9 @@ img {
 	transition: transform 0.2s ease-in-out;
 	user-select: none;
 }
-img:active {
-	transform: scale(1.5);
-	box-shadow: 0 0 32px rgba(0, 0, 0, 0.2);
-}
 
 a {
+	font-weight: bold;
 	color: #66A640FF;
 	text-decoration: none;
 }
@@ -33,17 +30,32 @@ a:hover {
 	text-decoration: underline;
 }
 
+li + li {
+	margin-top: 8px;
+}
+
 
 header {
-	background: #66A640FF;
+	background: #404040FF;
 }
-header .content {
+header .logo .content {
 	width: 900px;
+	max-width: 100%;
 	box-sizing: border-box;
 	margin: 0 auto;
-	padding: 16px 64px 16px 64px;
+	padding: 16px;
 }
-header nav a {
+header .navigation {
+	background: #66A640FF;
+}
+header .navigation .content {
+	width: 900px;
+	max-width: 100%;
+	box-sizing: border-box;
+	margin: 0 auto;
+	padding: 16px;
+}
+header .navigation .content a {
 	display: inline-block;
 	text-decoration: none;
 	padding: 2px;
@@ -51,10 +63,10 @@ header nav a {
 	padding-right: 16px;
 	color: var(--text-color);
 }
-header nav a:hover {
+header .navigation .content a:hover {
 	text-decoration: underline;
 }
-header nav a + a {
+header .navigation .content a + a {
 	border-left: 2px solid var(--text-color);
 }
 
@@ -62,6 +74,7 @@ main {
 	padding: 16px;
 	background: #404040FF;
 	width: 900px;
+	max-width: 100%;
 	margin: 0 auto;
     box-sizing: border-box;
 	flex: 1;
@@ -79,9 +92,10 @@ footer {
 }
 footer .content {
 	width: 900px;
+	max-width: 100%;
 	box-sizing: border-box;
 	margin: 0 auto;
-	padding: 16px 64px 16px 64px;
+	padding: 16px;
 }
 footer a {
 	text-decoration: none;
