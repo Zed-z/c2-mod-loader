@@ -16,9 +16,6 @@ void RenderLog() {
 	if (!showLog)
 		return;
 
-	// ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - logWidth * 0.5f, io.DisplaySize.y - logHeight - margin), ImGuiCond_Once);
-	// ImGui::SetNextWindowSize(ImVec2((float)logWidth, (float)logHeight), ImGuiCond_Once);
-
 	ImGui::Begin("Console Log");
 
 	if (ImGui::Checkbox("Show Info##log_showinfo", &showLogInfo)) {

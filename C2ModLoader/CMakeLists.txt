@@ -53,6 +53,7 @@ set(SOURCES
     CheatsManager.cpp
     dllmain.cpp
     Overlay/Overlay.cpp
+    Overlay/Backend.cpp
     Overlay/Components/Log.cpp
     Overlay/Components/LevelInfo.cpp
     Overlay/Components/Toast.cpp

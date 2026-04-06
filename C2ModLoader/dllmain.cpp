@@ -5,6 +5,7 @@
 #include "Loader.h"
 #include "ModApi.h"
 #include "MouseCaptureRemover.h"
+#include "Overlay/Backend.h"
 #include "Overlay/Overlay.h"
 #include "Resource.h"
 #include "Utils.h"
@@ -146,7 +147,7 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	SetupCheats();
 
 	if (guiEnabled) {
-		CreateThread(nullptr, 0, ImGuiInitThread, hModule, 0, nullptr);
+		CreateThread(nullptr, 0, OverlayInitThread, hModule, 0, nullptr);
 	}
 
 	if (freeMouse) {
