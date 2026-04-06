@@ -1,11 +1,11 @@
 #define IS_MOD_LOADER
 #include "CheatsManager.h"
 #include "Config.h"
-#include "ImGuiHandler.h"
 #include "Launcher/Launcher.h"
 #include "Loader.h"
 #include "ModApi.h"
 #include "MouseCaptureRemover.h"
+#include "Overlay/Overlay.h"
 #include "Resource.h"
 #include "Utils.h"
 

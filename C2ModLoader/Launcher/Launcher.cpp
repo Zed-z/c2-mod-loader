@@ -640,8 +640,8 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 	ImGuiIO &io = ImGui::GetIO();
 
 	io.Fonts->Clear();
-	io.FontDefault = LoadTextFont(IDR_FONT_TEXT, hInstance, fontSizeText);
-	fontTitle = LoadTextFont(IDR_FONT_TEXT, hInstance, fontSizeTitle);
+	io.FontDefault = LoadTextFont(IDR_FONT_TEXT, fontSizeText);
+	fontTitle = LoadTextFont(IDR_FONT_TEXT, fontSizeTitle);
 
 	ImGuiStyle baseStyle;
 	ImGui::StyleColorsDark();
@@ -706,7 +706,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 		} else {
 			ImGui::BeginChild("ListPane", ImVec2(listWidth, contentHeight), true);
 			{
-				ImGui::PushFont(fontTitle);
+				ImGui::PushFont(fontTitle, fontSizeTitle);
 				ImGui::TextUnformatted(LOADER_NAME);
 				ImGui::PopFont();
 

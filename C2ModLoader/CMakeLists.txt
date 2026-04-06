@@ -52,12 +52,23 @@ file(WRITE "${GENERATED_EMBEDDED_LICENSES_HEADER}" "${GENERATED_EMBEDDED_LICENSE
 set(SOURCES
     CheatsManager.cpp
     dllmain.cpp
-    ImGuiHandler.cpp
+    Overlay/Overlay.cpp
+    Overlay/Components/Log.cpp
+    Overlay/Components/LevelInfo.cpp
+    Overlay/Components/Toast.cpp
+    Overlay/Components/VersionInfo.cpp
+    Overlay/Components/Inputs.cpp
+    Overlay/Components/Coords.cpp
+    Overlay/Components/MenuBar.cpp
+    Overlay/Components/ObjectList.cpp
+    Overlay/Components/SaveSlotList.cpp
+    Overlay/Fonts.cpp
     Launcher/Launcher.cpp
     Launcher/EmbeddedLicenses.cpp
     Launcher/Backend.cpp
     Launcher/IniConfig.cpp
     Launcher/Colors.cpp
+    Logs.cpp
     FileOverrides.cpp
     Loader.cpp
     ModApi.cpp

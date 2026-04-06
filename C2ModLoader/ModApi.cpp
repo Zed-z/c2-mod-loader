@@ -1,8 +1,10 @@
 #define IS_MOD_LOADER
 #include "ModApi.h"
 #include "Config.h"
-#include "ImGuiHandler.h"
 #include "Loader.h"
+#include "Overlay/Components/MenuBar.h"
+#include "Overlay/Components/Toast.h"
+#include "Overlay/Overlay.h"
 #include "Resource.h"
 #include "Utils.h"
 #include "XinputManager.h"
