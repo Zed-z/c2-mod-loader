@@ -52,6 +52,7 @@ enum ZoomControls {
 };
 ZoomControls orbitZoomControls = ZOOM_TRIGGERS;
 std::vector<LevelInfo> orbitLevelBlocklist;
+bool orbitDisableRestrictions;
 
 void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo> &blocklist) {
 	std::wstring orbitLevelBlocklistStr(orbitLevelBlockList);
@@ -74,6 +75,60 @@ void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo>
 		}
 
 		orbitLevelBlocklist.push_back(levelInfo);
+	}
+}
+
+bool orbitCameraDisabled() {
+	if (orbitDisableRestrictions)
+		return false;
+
+	LevelInfo currentLevel = api->GetLevelInfo();
+	const bool orbitBlockedOnLevel = std::any_of(
+		orbitLevelBlocklist.begin(),
+		orbitLevelBlocklist.end(),
+		[&](const LevelInfo &blocked) {
+			return blocked.tribe == currentLevel.tribe && blocked.level == currentLevel.level && blocked.map == currentLevel.map;
+		});
+	if (orbitBlockedOnLevel)
+		return true;
+
+	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
+
+	// Disable during in-game events
+	if (api->AddressGetInt(ADDR_MOVEMENT_ALLOWED_STATE) != 0)
+		return true;
+
+	// Vehicles
+	if (strcmp(croc->name, "ClockworkGobbo") == 0)
+		return true;
+	if (strcmp(croc->name, "Croc In a Boat") == 0)
+		return true;
+	if (strcmp(croc->name, "Croc Snowball PC") == 0)
+		return true;
+	if (strcmp(croc->name, "HangGlider PC") == 0)
+		return true;
+	if (strcmp(croc->name, "Croc In a Car") == 0)
+		return true;
+	if (strcmp(croc->name, "DPPlane") == 0)
+		return true;
+
+	// Cameras
+	if (strcmp(camera->name, "MineCartCam2") == 0)
+		return true;
+	if (strcmp(camera->name, "GooManShoo Camera") == 0)
+		return true;
+
+	return false;
+}
+
+void orbitCameraOverrides() {
+	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+
+	// Flavio override
+	if (strcmp(croc->name, "FlavioCroc") == 0) {
+		orbitCameraDistance = 6000.0;
+		cameraPitch = min(max(cameraPitch, 0.75), 0.9);
 	}
 }
 
@@ -289,16 +344,6 @@ void __stdcall PhysicsLoop() {
 		if (croc == nullptr)
 			return;
 
-		LevelInfo currentLevel = api->GetLevelInfo();
-		const bool orbitBlockedOnLevel = std::any_of(
-			orbitLevelBlocklist.begin(),
-			orbitLevelBlocklist.end(),
-			[&](const LevelInfo &blocked) {
-				return blocked.tribe == currentLevel.tribe && blocked.level == currentLevel.level && blocked.map == currentLevel.map;
-			});
-		if (orbitBlockedOnLevel)
-			break;
-
 		if (inputs.flip) {
 			orbitCameraReset();
 		}
@@ -363,6 +408,12 @@ void __stdcall PhysicsLoop() {
 
 		orbitLastCrocPos = croc->newRotPos.position;
 
+		orbitCameraOverrides();
+
+		if (orbitCameraDisabled())
+			return;
+
+		// Apply camera position
 		double offsetX = cos(cameraPitch) * sin(cameraYaw) * orbitCameraDistance;
 		double offsetY = sin(cameraPitch) * orbitCameraDistance;
 		double offsetZ = cos(cameraPitch) * cos(cameraYaw) * orbitCameraDistance;
@@ -471,6 +522,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		std::unique_ptr<wchar_t[]> orbitLevelBlocklistWchar = std::make_unique<wchar_t[]>(orbitLevelBlocklistStringLength);
 		api->ReadIniString(L"OrbitCamera", L"LevelBlocklist", L"", orbitLevelBlocklistWchar.get(), orbitLevelBlocklistStringLength);
 		populateOrbitBlocklist(orbitLevelBlocklistWchar.get(), orbitLevelBlocklist);
+
+		orbitDisableRestrictions = api->SetupIniBool(L"OrbitCamera", L"DisableRestrictions", false);
 
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
