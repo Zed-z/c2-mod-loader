@@ -640,10 +640,7 @@ SaveSlot *GetCurrentSaveSlot() {
 }
 
 LevelInfo GetLevelInfo() {
-	LevelInfo levelInfo;
-	levelInfo.tribe = AddressGetInt(ADDR_CURRENT_TRIBE);
-	levelInfo.level = AddressGetInt(ADDR_CURRENT_LEVEL);
-	levelInfo.map = AddressGetInt(ADDR_CURRENT_MAP);
+	LevelInfo levelInfo = *(LevelInfo *)ADDR_LEVEL_INFO;
 	return levelInfo;
 }
 

@@ -61,9 +61,7 @@
 #define ADDR_MOVEMENT_ALLOWED_STATE 0x622C44
 
 #define ADDR_DOOR_STRUCT 0x4B7888
-#define ADDR_CURRENT_TRIBE 0x4A8C44
-#define ADDR_CURRENT_LEVEL 0x4A8C48
-#define ADDR_CURRENT_MAP 0x4A8C4C
+#define ADDR_LEVEL_INFO 0x4A8C44
 
 // Game structs ----------------------------------------------------------
 
@@ -366,6 +364,7 @@ struct LevelInfo {
 	int tribe;
 	int level;
 	int map;
+	int type;
 };
 typedef LevelInfo (*GetLevelInfoFunction)();
 

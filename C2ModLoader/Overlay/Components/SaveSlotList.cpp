@@ -14,6 +14,7 @@ void RenderSaveSlotList() {
 	if (!showSaveSlotList)
 		return;
 
+	ImGui::SetNextWindowSizeConstraints(ImVec2(300, 400), ImVec2(FLT_MAX, FLT_MAX));
 	ImGui::Begin("Save Slot List");
 	ImGui::PushFont(Fonts::GetFontCode());
 	for (int i = 0; i < SAVE_SLOT_NUMBER; i++) {

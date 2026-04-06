@@ -22,6 +22,7 @@ void RenderLevelInfo() {
 	ss << "Tribe: " << levelInfo.tribe << std::endl;
 	ss << "Level: " << levelInfo.level << std::endl;
 	ss << "Map: " << levelInfo.map << std::endl;
+	ss << "Type: " << levelInfo.type << std::endl;
 	ImGui::Text(ss.str().c_str());
 	ImGui::PopFont();
 	ImGui::End();

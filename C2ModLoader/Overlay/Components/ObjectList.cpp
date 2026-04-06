@@ -19,7 +19,10 @@ void RenderObjectList() {
 	if (!showObjectList)
 		return;
 
+	ImGui::SetNextWindowSizeConstraints(ImVec2(300, 400), ImVec2(FLT_MAX, FLT_MAX));
 	ImGui::Begin("Object List");
+
+	bool isWide = ImGui::GetContentRegionAvail().x > 400.0f;
 
 	float itemWidth;
 
@@ -96,22 +99,34 @@ void RenderObjectList() {
 
 					itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3);
 
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("PosX##posx") + ss.str()).c_str(), &(node->newPosition.x), 100, 1000);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("PosY##posy") + ss.str()).c_str(), &(node->newPosition.y), 100, 1000);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("PosZ##posz") + ss.str()).c_str(), &(node->newPosition.z), 100, 1000);
 
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("RotX##rotx") + ss.str()).c_str(), &(node->newRotation.x), 100, 1000);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("RotY##roty") + ss.str()).c_str(), &(node->newRotation.y), 100, 1000);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("RotZ##rotz") + ss.str()).c_str(), &(node->newRotation.z), 100, 1000);
 
 					ImGui::Text(("Distance from player: " + std::to_string(node->distanceToPlayer) + " (" + std::to_string(playerDistance) + ")").c_str());
@@ -124,42 +139,66 @@ void RenderObjectList() {
 
 						itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 16 / 3);
 
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosX##oldposx") + ss.str()).c_str(), &(node->OldRotPos.position.x), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosY##oldposy") + ss.str()).c_str(), &(node->OldRotPos.position.y), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosZ##oldposz") + ss.str()).c_str(), &(node->OldRotPos.position.z), 100, 1000);
 
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotX##oldrotx") + ss.str()).c_str(), &(node->OldRotPos.rotation.x), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotY##oldroty") + ss.str()).c_str(), &(node->OldRotPos.rotation.y), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotZ##oldrotz") + ss.str()).c_str(), &(node->OldRotPos.rotation.z), 100, 1000);
 
 						// Start Position
 						ImGui::Text("Start Position");
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosX##startposx") + ss.str()).c_str(), &(node->StartRotPos.position.x), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosY##startposy") + ss.str()).c_str(), &(node->StartRotPos.position.y), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("PosZ##startposz") + ss.str()).c_str(), &(node->StartRotPos.position.z), 100, 1000);
 
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotX##startrotx") + ss.str()).c_str(), &(node->StartRotPos.rotation.x), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotY##startroty") + ss.str()).c_str(), &(node->StartRotPos.rotation.y), 100, 1000);
-						ImGui::SameLine();
-						ImGui::SetNextItemWidth(itemWidth);
+						if (isWide) {
+							ImGui::SameLine();
+							ImGui::SetNextItemWidth(itemWidth);
+						}
 						ImGui::InputInt((std::string("RotZ##startrotz") + ss.str()).c_str(), &(node->StartRotPos.rotation.z), 100, 1000);
 					}
 
@@ -180,13 +219,19 @@ void RenderObjectList() {
 
 					itemWidth = (ImGui::GetContentRegionAvail().x / 3 - ImGui::GetStyle().ItemSpacing.x * 8 / 3);
 
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("X##scalex") + ss.str()).c_str(), &(node->scale.x), 128, 4096);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("Y##scaley") + ss.str()).c_str(), &(node->scale.y), 128, 4096);
-					ImGui::SameLine();
-					ImGui::SetNextItemWidth(itemWidth);
+					if (isWide) {
+						ImGui::SameLine();
+						ImGui::SetNextItemWidth(itemWidth);
+					}
 					ImGui::InputInt((std::string("Z##scalez") + ss.str()).c_str(), &(node->scale.z), 128, 4096);
 
 					// Actions
@@ -263,8 +308,8 @@ void RenderObjectList() {
 						ImGui::InputInt(("Flags 0" + std::string("##flags0") + ss.str()).c_str(), &(node->flags0), 0, 0);
 
 						for (int i = 0; i < 32; i++) {
-							std::string checkboxLabel =
-								(i < 10 ? " " : "") + std::to_string(i) + "##flags0flag" + std::to_string(i) + ss.str();
+							std::string label = isWide ? ((i < 10 ? " " : "") + std::to_string(i)) : "";
+							std::string checkboxLabel = label + "##flags0flag" + std::to_string(i) + ss.str();
 							int flagMask = (1 << i);
 							bool isFlagSet = (node->flags0 & flagMask) != 0;
 
@@ -275,6 +320,10 @@ void RenderObjectList() {
 									node->flags0 &= ~flagMask;
 								}
 							}
+							if (ImGui::IsItemHovered()) {
+								std::string tooltipText = "Flag 0:" + std::to_string(i);
+								ImGui::SetTooltip(tooltipText.c_str());
+							}
 
 							if ((i + 1) % 8 != 0 && i < 31) {
 								ImGui::SameLine();
@@ -284,8 +333,8 @@ void RenderObjectList() {
 						ImGui::InputInt(("Flags 1" + std::string("##flags1") + ss.str()).c_str(), &(node->flags1), 0, 0);
 
 						for (int i = 0; i < 32; i++) {
-							std::string checkboxLabel =
-								(i < 10 ? " " : "") + std::to_string(i) + "##flags1flag" + std::to_string(i) + ss.str();
+							std::string label = isWide ? ((i < 10 ? " " : "") + std::to_string(i)) : "";
+							std::string checkboxLabel = label + "##flags1flag" + std::to_string(i) + ss.str();
 							int flagMask = (1 << i);
 							bool isFlagSet = (node->flags1 & flagMask) != 0;
 
@@ -295,6 +344,10 @@ void RenderObjectList() {
 								} else {
 									node->flags1 &= ~flagMask;
 								}
+							}
+							if (ImGui::IsItemHovered()) {
+								std::string tooltipText = "Flag 1:" + std::to_string(i);
+								ImGui::SetTooltip(tooltipText.c_str());
 							}
 
 							if ((i + 1) % 8 != 0 && i < 31) {
