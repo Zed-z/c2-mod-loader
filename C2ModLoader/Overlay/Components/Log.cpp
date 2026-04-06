@@ -2,6 +2,7 @@
 
 #include "Logs.h"
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 
 extern ModApi *api;
@@ -34,6 +35,7 @@ void RenderLog() {
 		api->WriteIniBool(L"Logging", L"Error", showLogError);
 	}
 
+	ImGui::PushFont(Fonts::GetFontCode());
 	ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
 	bool autoScroll = false;
@@ -84,5 +86,6 @@ void RenderLog() {
 		ImGui::SetScrollHereY(1.0f);
 
 	ImGui::EndChild();
+	ImGui::PopFont();
 	ImGui::End();
 }

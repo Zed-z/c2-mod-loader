@@ -7,6 +7,7 @@ set(EMBEDDED_LICENSE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/scabber_font/License.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/inter_font/OFL.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/libs/roboto_mono_font/OFL.txt"
 )
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${EMBEDDED_LICENSE_FILES})
 
@@ -26,6 +27,7 @@ append_embedded_license("Dear ImGui" "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LIC
 append_embedded_license("MinHook" "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Scabber Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/scabber_font/License.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Inter Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/inter_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("Roboto Mono Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/roboto_mono_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
 
 set(GENERATED_EMBEDDED_LICENSES_HEADER "${CMAKE_CURRENT_BINARY_DIR}/GeneratedEmbeddedLicenses.h")
 string(CONCAT GENERATED_EMBEDDED_LICENSES_CONTENT

@@ -21,6 +21,7 @@ void ImGuiShowToast(const std::string &message, const LogSeverity &severity, flo
 void RenderToasts() {
 
 	ImGuiIO &io = ImGui::GetIO();
+	const float uiScale = io.FontGlobalScale > 0.0f ? io.FontGlobalScale : 1.0f;
 
 	float displayScale = io.DisplaySize.y / 720.0f;
 
@@ -80,7 +81,7 @@ void RenderToasts() {
 			ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
 
 			// Text with wrapping
-			ImGui::PushFont(Fonts::GetFontText(), fontSize);
+			ImGui::PushFont(Fonts::GetFontTitle(), fontSize / uiScale); // Neutralize UI scale
 			ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
 			ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
 			ImGui::TextUnformatted(toast.message.c_str());

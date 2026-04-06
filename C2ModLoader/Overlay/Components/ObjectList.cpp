@@ -2,6 +2,7 @@
 
 #include "Launcher/Colors.h"
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -67,6 +68,7 @@ void RenderObjectList() {
 
 			ImGui::Text(("Object count: " + std::to_string(stratCount)).c_str());
 
+			ImGui::PushFont(Fonts::GetFontCode());
 			while (node != nullptr) {
 
 				int playerDistance = (croc != nullptr)
@@ -324,6 +326,7 @@ void RenderObjectList() {
 
 				node = node->next;
 			}
+			ImGui::PopFont();
 
 			if (ImGui::Button("Dump to Log##logdump")) {
 				StratEntity *node = rootObject->next;

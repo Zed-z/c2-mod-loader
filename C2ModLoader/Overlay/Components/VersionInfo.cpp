@@ -2,9 +2,9 @@
 
 #include "Loader.h"
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "Resource.h"
 #include "imgui.h"
-#include "Overlay/Fonts.h"
 
 #include <string>
 
@@ -15,7 +15,7 @@ void RenderVersionInfo() {
 
 	LevelInfo levelInfo = api->GetLevelInfo();
 	if (levelInfo.tribe == 0 && levelInfo.level == 0) {
-		ImFont* fontTitle = Fonts::GetFontTitle();
+		ImFont *fontTitle = Fonts::GetFontTitle();
 
 		std::string labelText = std::string(LOADER_NAME " v" LOADER_VERSION) + "\n" + "Mods loaded: " + std::to_string(modsLoaded);
 		char *labelTextChar = const_cast<char *>(labelText.c_str());
@@ -25,7 +25,7 @@ void RenderVersionInfo() {
 		float fontSize = 32.0f * displayScale;
 
 		float labelX = 48.0f * displayScale;
-		float labelY = io.DisplaySize.y - (48.0f + labelSize.y * 2.0f) * displayScale; // Offset for bottom alignment
+		float labelY = io.DisplaySize.y - (48.0f + labelSize.y * 2.0f); // Offset for bottom alignment
 		float labelStrokeWidth = 2.0f * displayScale;
 
 		int labelOpacity = levelInfo.map == 0 ? 255 : 63;

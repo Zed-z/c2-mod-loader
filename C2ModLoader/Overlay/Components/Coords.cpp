@@ -1,6 +1,7 @@
 #include "Coords.h"
 
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -14,6 +15,7 @@ void RenderCoords() {
 		return;
 
 	ImGui::Begin("Coords");
+	ImGui::PushFont(Fonts::GetFontCode());
 
 	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
 	if (croc == nullptr) {
@@ -27,5 +29,6 @@ void RenderCoords() {
 		ImGui::Text(ss.str().c_str());
 	}
 
+	ImGui::PopFont();
 	ImGui::End();
 }

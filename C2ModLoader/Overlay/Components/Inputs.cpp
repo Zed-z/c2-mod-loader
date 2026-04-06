@@ -1,6 +1,7 @@
 #include "Inputs.h"
 
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 #include <bitset>
 #include <sstream>
@@ -22,6 +23,7 @@ void RenderInputs() {
 	int controlScheme = api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
 
 	ImGui::Begin("Inputs");
+	ImGui::PushFont(Fonts::GetFontCode());
 
 	std::ostringstream ss0;
 	ss0 << "Inputs: " << inputBits << " (" << inputs.raw << ")";
@@ -56,5 +58,6 @@ void RenderInputs() {
 	ImGui::Text(ss6.str().c_str());
 	ImGui::Text(ss7.str().c_str());
 
+	ImGui::PopFont();
 	ImGui::End();
 }

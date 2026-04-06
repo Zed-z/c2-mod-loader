@@ -1,6 +1,7 @@
 #include "LevelInfo.h"
 
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -16,10 +17,12 @@ void RenderLevelInfo() {
 	LevelInfo levelInfo = api->GetLevelInfo();
 
 	ImGui::Begin("Level Info");
+	ImGui::PushFont(Fonts::GetFontCode());
 	std::stringstream ss;
 	ss << "Tribe: " << levelInfo.tribe << std::endl;
 	ss << "Level: " << levelInfo.level << std::endl;
 	ss << "Map: " << levelInfo.map << std::endl;
 	ImGui::Text(ss.str().c_str());
+	ImGui::PopFont();
 	ImGui::End();
 }

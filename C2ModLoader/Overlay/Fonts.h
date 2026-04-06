@@ -6,5 +6,6 @@ namespace Fonts {
 
 ImFont *GetFontTitle();
 ImFont *GetFontText();
+ImFont *GetFontCode();
 
 } // namespace Fonts

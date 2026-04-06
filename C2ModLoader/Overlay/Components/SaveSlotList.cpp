@@ -1,6 +1,7 @@
 #include "SaveSlotList.h"
 
 #include "ModApi.h"
+#include "Overlay/Fonts.h"
 #include "imgui.h"
 
 #include <string>
@@ -14,7 +15,7 @@ void RenderSaveSlotList() {
 		return;
 
 	ImGui::Begin("Save Slot List");
-
+	ImGui::PushFont(Fonts::GetFontCode());
 	for (int i = 0; i < SAVE_SLOT_NUMBER; i++) {
 		SaveSlot *slot = api->GetSaveSlot(i);
 		std::string slotId = std::string("slot") + std::to_string(i);
@@ -71,6 +72,6 @@ void RenderSaveSlotList() {
 			ImGui::Unindent();
 		}
 	}
-
+	ImGui::PopFont();
 	ImGui::End();
 }

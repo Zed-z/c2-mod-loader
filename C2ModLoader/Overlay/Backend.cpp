@@ -4,6 +4,7 @@
 #include "Loader.h"
 #include "ModApi.h"
 #include "Overlay.h"
+#include "UiScale.h"
 
 #include <string>
 
@@ -19,6 +20,8 @@
 #include "imgui_impl_win32.h"
 
 extern ModApi *api;
+
+static float g_dpiScale = 1.0f;
 
 typedef HRESULT(__stdcall *PresentFunction)(IDXGISwapChain *, UINT, UINT);
 static PresentFunction oPresent = nullptr;
@@ -80,9 +83,12 @@ static void InitOrRestoreImGui(IDXGISwapChain *pSwap) {
 
 			// Set fonts.
 			ImGuiIO &io = ImGui::GetIO();
-			io.Fonts->AddFontDefault();
-			io.FontDefault = io.Fonts->Fonts.back();
-			(void)Fonts::GetFontTitle();
+			io.FontDefault = Fonts::GetFontText();
+			io.FontGlobalScale = g_dpiScale;
+
+			// Apply DPI scale to style.
+			ImGuiStyle &style = ImGui::GetStyle();
+			style.ScaleAllSizes(g_dpiScale);
 
 			if (g_hWnd && !oWndProc) {
 				oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
@@ -148,6 +154,10 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain *pSwap, UINT sync, UINT flags)
 DWORD WINAPI OverlayInitThread(LPVOID lpParam) {
 
 	g_hModule = (HMODULE)lpParam;
+
+	// Enable DPI awareness for accurate scaling.
+	UiScale::EnableDpiAwareness();
+	g_dpiScale = UiScale::ResolveUiScale(nullptr);
 
 	// Check if dgVoodoo is present.
 	// (ddraw.dll loaded from the game directory)

@@ -50,6 +50,7 @@ This project uses the following third party assets:
 -   [MinHook](https://github.com/TsudaKageyu/minhook) - Copyright (c) 2009-2017 Tsuda Kageyu
 -   [Scabber Font](https://ggbot.itch.io/scabber-font) by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.
 -   [Inter Font](https://rsms.me/inter/) by Rasmus Andersson, licensed under the SIL Open Font License 1.1.
+-   [Roboto Mono Font](https://fonts.google.com/specimen/Roboto+Mono) by Christian Robertson, licensed under the SIL Open Font License 1.1.
 
 Licenses for the above mentioned are available on the GitHub repository.
 
