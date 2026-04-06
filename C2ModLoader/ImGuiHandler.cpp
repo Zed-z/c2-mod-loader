@@ -26,7 +26,7 @@ extern ModApi *api;
 // Variables for GUI
 std::vector<LogMessage> logMessages;
 std::mutex logMutex;
-ImFont *uiFont = nullptr;
+static ImFont *fontTitle = nullptr;
 
 bool showGui;
 bool showLog;
@@ -119,11 +119,7 @@ static void InitOrRestoreImGui(IDXGISwapChain *pSwap) {
 			io.Fonts->AddFontDefault();
 			io.FontDefault = io.Fonts->Fonts.back();
 
-			HRSRC hResource = FindResource(g_hModule, MAKEINTRESOURCE(IDR_UIFONT), RT_RCDATA);
-			HGLOBAL hData = LoadResource(g_hModule, hResource);
-			DWORD hDataSizeSize = SizeofResource(g_hModule, hResource);
-			void *hResourceData = LockResource(hData);
-			uiFont = io.Fonts->AddFontFromMemoryTTF(hResourceData, hDataSizeSize);
+			fontTitle = LoadTextFont(IDR_FONT_TITLE, g_hModule, 24.0f);
 
 			if (g_hWnd && !oWndProc) {
 				oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
@@ -360,7 +356,7 @@ void RenderToasts() {
 			ImGui::Begin(("##Toast" + std::to_string(i)).c_str(), nullptr, flags);
 
 			// Text with wrapping
-			ImGui::PushFont(uiFont, fontSize);
+			ImGui::PushFont(fontTitle, fontSize);
 			ImGui::PushStyleColor(ImGuiCol_Text, toastColor);
 			ImGui::PushTextWrapPos(ImGui::GetWindowContentRegionMax().x);
 			ImGui::TextUnformatted(toast.message.c_str());
@@ -1120,7 +1116,7 @@ void ImGuiDraw() {
 	if (levelInfo.tribe == 0 && levelInfo.level == 0) {
 		std::string labelText = std::string(LOADER_NAME " v" LOADER_VERSION) + "\n" + "Mods loaded: " + std::to_string(modsLoaded);
 		char *labelTextChar = const_cast<char *>(labelText.c_str());
-		ImVec2 labelSize = uiFont->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelTextChar);
+		ImVec2 labelSize = fontTitle->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, labelTextChar);
 
 		float displayScale = io.DisplaySize.y / 720.0f;
 		float fontSize = 32.0f * displayScale;
@@ -1134,15 +1130,15 @@ void ImGuiDraw() {
 		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, labelOpacity);
 
 		ImDrawList *drawList = ImGui::GetBackgroundDrawList();
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
-		drawList->AddText(uiFont, fontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX + labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX - labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX - labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
+		drawList->AddText(fontTitle, fontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
 	}
 
 	if (showGui) {

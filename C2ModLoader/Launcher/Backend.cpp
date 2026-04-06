@@ -2,8 +2,10 @@
 
 #include "ModApi.h"
 #include "Resource.h"
+#include "UiScale.h"
 #include "backends/imgui_impl_win32.h"
 
+#include <cmath>
 #include <cstdio>
 #include <d3d11.h>
 #include <dxgi.h>
@@ -13,11 +15,21 @@ extern ModApi *api;
 
 namespace LauncherBackend {
 namespace {
+
 constexpr const wchar_t *kWindowClassName = LOADER_NAME_L;
+constexpr DWORD windowFlags = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME;
 
 HWND g_hwnd = nullptr;
+
+// Inner window dimensions
 int g_minWindowWidth = 720;
 int g_minWindowHeight = 480;
+
+// Real window dimensions
+int g_minTrackWidth = 720;
+int g_minTrackHeight = 480;
+
+float g_dpiScale = 1.0f;
 
 bool g_comInitialized = false;
 ID3D11Device *g_d3dDevice = nullptr;
@@ -222,8 +234,8 @@ LRESULT CALLBACK BackendWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 	case WM_GETMINMAXINFO:
 		LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-		lpMMI->ptMinTrackSize.x = g_minWindowWidth;
-		lpMMI->ptMinTrackSize.y = g_minWindowHeight;
+		lpMMI->ptMinTrackSize.x = g_minTrackWidth;
+		lpMMI->ptMinTrackSize.y = g_minTrackHeight;
 		return 0;
 	}
 
@@ -242,6 +254,15 @@ void PumpWindowMessagesForInitialization() {
 bool Initialize(HINSTANCE hInstance, const wchar_t *windowTitle, int minWidth, int minHeight) {
 	g_minWindowWidth = minWidth;
 	g_minWindowHeight = minHeight;
+	UiScale::EnableDpiAwareness();
+	g_dpiScale = UiScale::ResolveUiScale(nullptr);
+	const int minWidthPx = (int)std::lround((float)g_minWindowWidth * g_dpiScale);
+	const int minHeightPx = (int)std::lround((float)g_minWindowHeight * g_dpiScale);
+
+	RECT minRect = {0, 0, minWidthPx, minHeightPx};
+	AdjustWindowRectEx(&minRect, windowFlags, FALSE, 0);
+	g_minTrackWidth = minRect.right - minRect.left;
+	g_minTrackHeight = minRect.bottom - minRect.top;
 
 	WNDCLASSEXW wc{};
 	wc.cbSize = sizeof(wc);
@@ -257,15 +278,17 @@ bool Initialize(HINSTANCE hInstance, const wchar_t *windowTitle, int minWidth, i
 	}
 
 	api->LogDebug("[Launcher Backend] Window class registered, creating window");
+	const int windowWidth = g_minTrackWidth;
+	const int windowHeight = g_minTrackHeight;
 
 	g_hwnd = CreateWindowW(
 		wc.lpszClassName,
 		windowTitle,
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME,
+		windowFlags,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		g_minWindowWidth,
-		g_minWindowHeight,
+		windowWidth,
+		windowHeight,
 		nullptr,
 		nullptr,
 		hInstance,
@@ -337,6 +360,10 @@ void Present(UINT syncInterval, UINT flags) {
 	if (g_swapChain) {
 		g_swapChain->Present(syncInterval, flags);
 	}
+}
+
+float GetDpiScale() {
+	return g_dpiScale;
 }
 
 HWND GetWindowHandle() {

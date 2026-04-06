@@ -7,6 +7,7 @@
 
 #include "ModApi.h"
 #include "Resource.h"
+#include "imgui.h"
 
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
@@ -130,4 +131,37 @@ inline void ClearLog() {
 		return;
 
 	log.close();
+}
+
+inline ImFont *LoadTextFont(int resourceId, HINSTANCE moduleInstance, float fontSize) {
+	ImGuiIO &io = ImGui::GetIO();
+
+	HRSRC hResource = FindResourceW(moduleInstance, MAKEINTRESOURCEW(resourceId), RT_RCDATA);
+	if (!hResource)
+		return io.Fonts->AddFontDefault();
+
+	HGLOBAL hData = LoadResource(moduleInstance, hResource);
+	if (!hData)
+		return io.Fonts->AddFontDefault();
+
+	void *resourceData = LockResource(hData);
+	if (!resourceData)
+		return io.Fonts->AddFontDefault();
+
+	const DWORD resourceSize = SizeofResource(moduleInstance, hResource);
+	if (resourceSize == 0)
+		return io.Fonts->AddFontDefault();
+
+	void *fontDataCopy = IM_ALLOC(resourceSize);
+	if (!fontDataCopy)
+		return io.Fonts->AddFontDefault();
+	memcpy(fontDataCopy, resourceData, resourceSize);
+
+	ImFontConfig fontConfig;
+	fontConfig.FontDataOwnedByAtlas = true;
+	ImFont *font = io.Fonts->AddFontFromMemoryTTF(fontDataCopy, (int)resourceSize, fontSize, &fontConfig);
+	if (!font)
+		return io.Fonts->AddFontDefault();
+
+	return font;
 }

@@ -13,6 +13,9 @@
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
 
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 #include <d3d11.h>
 #include <map>
 #include <shellapi.h>
@@ -25,6 +28,11 @@ extern ModApi *api;
 
 int minWindowWidth = 720;
 int minWindowHeight = 480;
+float g_uiScale = 1.0f;
+
+static ImFont *fontTitle = nullptr;
+constexpr float fontSizeTitle = 22.0f;
+constexpr float fontSizeText = 16.0f;
 
 extern bool loaderEnabled;
 
@@ -243,6 +251,17 @@ std::string NormalizeConfigValue(std::string value, const std::string &type) {
 		}
 	}
 
+	if (type == "float") {
+		try {
+			const float parsed = std::stof(value);
+			char buffer[64] = {};
+			std::snprintf(buffer, sizeof(buffer), "%.8g", parsed);
+			return std::string(buffer);
+		} catch (...) {
+			return value;
+		}
+	}
+
 	return value;
 }
 
@@ -324,9 +343,9 @@ void RenderConfigSections() {
 			}
 
 			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 3)) {
-				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 180.0f);
+				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 180.0f * g_uiScale);
 				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("Reset", ImGuiTableColumnFlags_WidthFixed, 72.0f);
+				ImGui::TableSetupColumn("Reset", ImGuiTableColumnFlags_WidthFixed, 48.0f * g_uiScale);
 
 				for (size_t entryIndex : section.entryIndices) {
 					ConfigEntry &entry = parsedConfig.configEntries[entryIndex];
@@ -396,6 +415,21 @@ void RenderConfigSections() {
 							entry.value = std::to_string(currentIndex);
 							valueChanged = true;
 						}
+					} else if (type == "float") {
+						float val = 0.0f;
+						if (!entry.value.empty()) {
+							try {
+								val = std::stof(entry.value);
+							} catch (...) {
+								val = 0.0f;
+							}
+						}
+						if (ImGui::InputFloat("##value", &val, 0.0f, 0.0f, "%.6g")) {
+							char floatBuffer[64] = {};
+							std::snprintf(floatBuffer, sizeof(floatBuffer), "%.8g", val);
+							entry.value = floatBuffer;
+							valueChanged = true;
+						}
 					} else {
 						if (ImGui::InputText("##value", buffer, sizeof(buffer))) {
 							entry.value = buffer;
@@ -454,7 +488,10 @@ void RenderSelectedItemDetails() {
 		apiVersion = mod.info.apiVersion;
 	}
 
+	ImGui::PushFont(fontTitle, fontSizeTitle);
 	ImGui::Text(name.c_str());
+	ImGui::PopFont();
+
 	if (ImGui::IsItemHovered() && !filePath.empty()) {
 		ImGui::SetTooltip("%s", filePath.c_str());
 	}
@@ -552,9 +589,9 @@ void RenderLicensesSection(bool fullHeight = false) {
 	if (licenses.empty())
 		return;
 
-	float panelHeight = fullHeight ? ImGui::GetContentRegionAvail().y : 260.0f;
-	if (panelHeight < 120.0f) {
-		panelHeight = 120.0f;
+	float panelHeight = fullHeight ? ImGui::GetContentRegionAvail().y : (260.0f * g_uiScale);
+	if (panelHeight < (120.0f * g_uiScale)) {
+		panelHeight = 120.0f * g_uiScale;
 	}
 
 	ImGui::BeginChild("LicensePanel", ImVec2(0.0f, panelHeight), false);
@@ -570,6 +607,14 @@ void RenderLicensesSection(bool fullHeight = false) {
 		ImGui::EndTabBar();
 	}
 	ImGui::EndChild();
+}
+
+void UpdateUiScale(ImGuiIO &io, const ImGuiStyle &baseStyle, float scale) {
+	ImGuiStyle &style = ImGui::GetStyle();
+	style = baseStyle;
+	style.ScaleAllSizes(scale);
+	io.FontGlobalScale = scale;
+	g_uiScale = scale;
 }
 
 } // namespace
@@ -593,9 +638,16 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
-	(void)io;
+
+	io.Fonts->Clear();
+	io.FontDefault = LoadTextFont(IDR_FONT_TEXT, hInstance, fontSizeText);
+	fontTitle = LoadTextFont(IDR_FONT_TEXT, hInstance, fontSizeTitle);
+
+	ImGuiStyle baseStyle;
 	ImGui::StyleColorsDark();
 	ApplyStyle();
+	baseStyle = ImGui::GetStyle();
+	UpdateUiScale(io, baseStyle, LauncherBackend::GetDpiScale());
 
 	ImGui_ImplWin32_Init(LauncherBackend::GetWindowHandle());
 	ImGui_ImplDX11_Init(LauncherBackend::GetDevice(), LauncherBackend::GetContext());
@@ -630,8 +682,8 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 				ImGuiWindowFlags_NoMove |
 				ImGuiWindowFlags_NoTitleBar);
 
-		float listWidth = 250.0f;
-		float footerHeight = 16.0f;
+		const float listWidth = 250.0f * g_uiScale;
+		const float footerHeight = 16.0f * g_uiScale;
 		float contentHeight = ImGui::GetContentRegionAvail().y;
 		if (!showLicensesOverlay) {
 			contentHeight -= (footerHeight + ImGui::GetStyle().ItemSpacing.y);
@@ -654,15 +706,17 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 		} else {
 			ImGui::BeginChild("ListPane", ImVec2(listWidth, contentHeight), true);
 			{
-				ImGui::TextUnformatted("Mod List");
+				ImGui::PushFont(fontTitle);
+				ImGui::TextUnformatted(LOADER_NAME);
+				ImGui::PopFont();
 
 				ImGui::Spacing();
 
-				ImGui::BeginChild("ModList", ImVec2(listWidth - 16.0f, contentHeight - 80.0f), true);
+				ImGui::BeginChild("ModList", ImVec2(listWidth - (16.0f * g_uiScale), contentHeight - (86.0f * g_uiScale)), true);
 				{
 					float availableWidth = ImGui::GetContentRegionAvail().x;
-					float nameWidth = availableWidth - 20.0f;
-					float checkboxOffset = availableWidth - 5.0f;
+					float nameWidth = availableWidth - (25.0f * g_uiScale);
+					float checkboxOffset = availableWidth - (10.0f * g_uiScale);
 
 					// Loader entry
 					bool loaderSelected = (g_selectedMod == 0);
@@ -699,7 +753,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 
 				ImGui::Spacing();
 
-				if (ImGui::Button("Launch Game", ImVec2(listWidth - 16.0f, 32.0f))) {
+				if (ImGui::Button("Launch Game", ImVec2(listWidth - (16.0f * g_uiScale), 32.0f * g_uiScale))) {
 					start_game = true;
 					close_launcher = true;
 				}

@@ -326,6 +326,10 @@ typedef bool (*SetupIniBoolFunction)(const wchar_t *section, const wchar_t *key,
 typedef bool (*ReadIniBoolFunction)(const wchar_t *section, const wchar_t *key, bool default_value);
 typedef bool (*WriteIniBoolFunction)(const wchar_t *section, const wchar_t *key, bool value);
 
+typedef float (*SetupIniFloatFunction)(const wchar_t *section, const wchar_t *key, float default_value);
+typedef float (*ReadIniFloatFunction)(const wchar_t *section, const wchar_t *key, float default_value);
+typedef bool (*WriteIniFloatFunction)(const wchar_t *section, const wchar_t *key, float value);
+
 typedef void (*SetupIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size);
 typedef void (*ReadIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size);
 typedef bool (*WriteIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *value);
@@ -422,6 +426,10 @@ struct ModApi {
 	SetupIniBoolFunction SetupIniBool;
 	ReadIniBoolFunction ReadIniBool;
 	WriteIniBoolFunction WriteIniBool;
+
+	SetupIniFloatFunction SetupIniFloat;
+	ReadIniFloatFunction ReadIniFloat;
+	WriteIniFloatFunction WriteIniFloat;
 
 	SetupIniStringFunction SetupIniString;
 	ReadIniStringFunction ReadIniString;

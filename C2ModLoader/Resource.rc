@@ -32,4 +32,5 @@ BEGIN
 END
 
 // Font
-IDR_UIFONT RCDATA "libs/scabber_font/Scabber.ttf"
+IDR_FONT_TITLE RCDATA "libs/scabber_font/Scabber.ttf"
+IDR_FONT_TEXT RCDATA "libs/inter_font/Inter_18pt-Medium.ttf"

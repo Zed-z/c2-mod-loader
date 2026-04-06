@@ -20,6 +20,7 @@
 Config/LoaderEnabled[Loader Enabled|Enable or disable mod loading]:bool=1;\
 Config/SkipLauncher[Skip Launcher|Skip the launcher and start the game directly]:bool=0;\
 Config/FreeMouse[Free Mouse|Allow mouse to move freely]:bool=1;\
+Config/DisplayScale[Display Scale|Launcher and UI display scale (0 = automatic)]:float=0;\
 _Config/DisabledMods[Disabled Mods|List of disabled mods]:string=;\
 @GUI[GUI|Configure in-game GUI settings];\
 GUI/GuiEnabled[GUI Enabled|Enable the GUI]:bool=1;\
@@ -60,4 +61,5 @@ Xinput/TriggerOuterDeadzone[Trigger Outer|Outer deadzone for triggers]:int=90"
 #define CONFIG_FILE "C2ModLoader.ini"
 #define CONFIG_FILE_L L"C2ModLoader.ini"
 
-#define IDR_UIFONT 10001
+#define IDR_FONT_TITLE 10001
+#define IDR_FONT_TEXT 10002

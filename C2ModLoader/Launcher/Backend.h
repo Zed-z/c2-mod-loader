@@ -14,6 +14,7 @@ void Shutdown(HINSTANCE hInstance);
 bool PollMessages(bool &shouldQuit);
 void BeginFrame(const float clearColor[4]);
 void Present(UINT syncInterval = 1, UINT flags = 0);
+float GetDpiScale();
 
 HWND GetWindowHandle();
 ID3D11Device *GetDevice();

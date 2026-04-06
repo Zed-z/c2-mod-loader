@@ -11,6 +11,7 @@
 #include <chrono>
 #include <cstdint>
 #include <ctime>
+#include <cwchar>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -400,6 +401,29 @@ bool WriteIniBoolForModule(const std::wstring &section, const std::wstring &key,
 	return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
 }
 
+float ReadIniFloatForModule(const std::wstring &section, const std::wstring &key, float default_value, HMODULE caller) {
+	std::wstring iniPath = GetIniPathForModule(caller);
+	wchar_t defaultValueStr[64] = {};
+	swprintf_s(defaultValueStr, L"%.8g", default_value);
+
+	wchar_t valueStr[64] = {};
+	GetPrivateProfileStringW(section.c_str(), key.c_str(), defaultValueStr, valueStr, _countof(valueStr), iniPath.c_str());
+
+	wchar_t *parseEnd = nullptr;
+	const float parsedValue = std::wcstof(valueStr, &parseEnd);
+	if (parseEnd == valueStr) {
+		return default_value;
+	}
+	return parsedValue;
+}
+
+bool WriteIniFloatForModule(const std::wstring &section, const std::wstring &key, float value, HMODULE caller) {
+	std::wstring iniPath = GetIniPathForModule(caller);
+	wchar_t valueStr[64] = {};
+	swprintf_s(valueStr, L"%.8g", value);
+	return WritePrivateProfileStringW(section.c_str(), key.c_str(), valueStr, iniPath.c_str()) != 0;
+}
+
 void ReadIniStringForModule(const std::wstring &section, const std::wstring &key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size, HMODULE caller) {
 	std::wstring iniPath = GetIniPathForModule(caller);
 	GetPrivateProfileStringW(section.c_str(), key.c_str(), default_value, buffer, buffer_size, iniPath.c_str());
@@ -446,6 +470,25 @@ bool SetupIniBool(const wchar_t *section, const wchar_t *key, bool default_value
 	const wchar_t *resolvedKey = key != nullptr ? key : L"";
 	int value = ReadIniBoolForModule(resolvedSection, resolvedKey, default_value, caller);
 	WriteIniBoolForModule(resolvedSection, resolvedKey, value, caller);
+	return value;
+}
+
+float ReadIniFloat(const wchar_t *section, const wchar_t *key, float default_value) {
+	HMODULE caller = GetCallingModule();
+	return ReadIniFloatForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", default_value, caller);
+}
+
+bool WriteIniFloat(const wchar_t *section, const wchar_t *key, float value) {
+	HMODULE caller = GetCallingModule();
+	return WriteIniFloatForModule(section != nullptr ? section : L"", key != nullptr ? key : L"", value, caller);
+}
+
+float SetupIniFloat(const wchar_t *section, const wchar_t *key, float default_value) {
+	HMODULE caller = GetCallingModule();
+	const wchar_t *resolvedSection = section != nullptr ? section : L"";
+	const wchar_t *resolvedKey = key != nullptr ? key : L"";
+	float value = ReadIniFloatForModule(resolvedSection, resolvedKey, default_value, caller);
+	WriteIniFloatForModule(resolvedSection, resolvedKey, value, caller);
 	return value;
 }
 
@@ -627,6 +670,9 @@ ModApi g_ModApi = {
 	SetupIniBool,
 	ReadIniBool,
 	WriteIniBool,
+	SetupIniFloat,
+	ReadIniFloat,
+	WriteIniFloat,
 	SetupIniString,
 	ReadIniString,
 	WriteIniString,
