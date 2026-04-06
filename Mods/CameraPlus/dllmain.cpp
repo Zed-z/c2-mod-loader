@@ -42,6 +42,7 @@ const double CAMERA_ZOOM_SPEED = 80.0;
 
 bool orbitInvertX;
 bool orbitInvertY;
+bool orbitAutoTurnSaved;
 bool orbitAutoTurn;
 int orbitAutoTurnStrength;
 int orbitAutoTurnMinSpeed;
@@ -118,17 +119,20 @@ bool orbitCameraDisabled() {
 		return true;
 	if (strcmp(camera->name, "GooManShoo Camera") == 0)
 		return true;
+	if (strcmp(camera->name, "DPCamera") == 0)
+		return true;
 
 	return false;
 }
 
-void orbitCameraOverrides() {
+void orbitCameraOverridesPreAutoTurn() {
 	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
 
 	// Flavio override
 	if (strcmp(croc->name, "FlavioCroc") == 0) {
 		orbitCameraDistance = 6000.0;
 		cameraPitch = min(max(cameraPitch, 0.75), 0.9);
+		orbitAutoTurn = false;
 	}
 }
 
@@ -338,6 +342,8 @@ void __stdcall PhysicsLoop() {
 	}
 	case CameraMode::Orbit: {
 
+		orbitAutoTurn = orbitAutoTurnSaved;
+
 		if (camera == nullptr)
 			return;
 
@@ -348,6 +354,7 @@ void __stdcall PhysicsLoop() {
 			orbitCameraReset();
 		}
 
+		// Zoom controls
 		if (xinputEnabled) {
 			switch (orbitZoomControls) {
 			case ZOOM_TRIGGERS: {
@@ -376,6 +383,7 @@ void __stdcall PhysicsLoop() {
 			}
 		}
 
+		// Camera rotation
 		float input_rot_yaw, input_rot_pitch;
 		if (xinputEnabled) {
 			input_rot_yaw = ((float)input.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
@@ -389,6 +397,9 @@ void __stdcall PhysicsLoop() {
 		cameraPitch += input_rot_pitch * CAMERA_PITCH_SPEED;
 		cameraPitch = min(max(cameraPitch, MIN_CAMERA_PITCH), MAX_CAMERA_PITCH);
 
+		orbitCameraOverridesPreAutoTurn();
+
+		// Auto turn
 		if (!orbitHasLastCrocPos) {
 			orbitLastCrocPos = croc->newRotPos.position;
 			orbitHasLastCrocPos = true;
@@ -407,8 +418,6 @@ void __stdcall PhysicsLoop() {
 		}
 
 		orbitLastCrocPos = croc->newRotPos.position;
-
-		orbitCameraOverrides();
 
 		if (orbitCameraDisabled())
 			return;
@@ -511,7 +520,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
 		orbitInvertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
 		orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
-		orbitAutoTurn = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
+		orbitAutoTurnSaved = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
 		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
 		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
 

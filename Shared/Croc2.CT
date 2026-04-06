@@ -146,6 +146,23 @@
       </CheatEntries>
     </CheatEntry>
     <CheatEntry>
+      <ID>244</ID>
+      <Description>"Camera Name"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>String</VariableType>
+      <Length>256</Length>
+      <Unicode>0</Unicode>
+      <CodePage>0</CodePage>
+      <ZeroTerminate>1</ZeroTerminate>
+      <Address>4A8C3C</Address>
+      <Offsets>
+        <Offset>0</Offset>
+        <Offset>18</Offset>
+        <Offset>0x3C</Offset>
+        <Offset>14</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
       <ID>38</ID>
       <Description>"Croc"</Description>
       <Options moManualExpandCollapse="1"/>
@@ -2178,4 +2195,6 @@
       <Address>0x004B7888</Address>
     </SymbolEntry>
   </UserdefinedSymbols>
+  <Comments>Info about this table:
+</Comments>
 </CheatTable>
