@@ -1,12 +1,8 @@
 # Croc 2 Mod Loader
 
-ASI Mod Loader for Croc 2
+ASI Mod Loader and Modding API for Croc 2
 
-Will automatically load `.asi` files from the `mods/` folder.
-
-Additionally, provides a lightweight API for mod developers.
-
-Overview and install instructions are available on [the website](https://zed-z.github.io/c2-mod-loader/).
+Feature overview and install instructions are available on [the official website](https://zed-z.github.io/c2-mod-loader/).
 
 # Mod development
 
