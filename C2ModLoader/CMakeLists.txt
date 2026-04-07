@@ -195,6 +195,7 @@ target_link_libraries(C2ModLoader PRIVATE
     shlwapi
     dwmapi
     version
+    xinput
 )
 
 # Copy to Release folder

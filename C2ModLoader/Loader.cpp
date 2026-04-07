@@ -1,6 +1,7 @@
 #include "Loader.h"
 #include "XinputManager.h"
 
+#include <algorithm>
 #include <filesystem>
 
 namespace fs = std::filesystem;

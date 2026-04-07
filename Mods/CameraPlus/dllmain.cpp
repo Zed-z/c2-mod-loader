@@ -524,7 +524,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
 		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
 
-		const int zoomControlsValue = min(max(api->SetupIniInt(L"OrbitCamera", L"ZoomControls", 1), ZOOM_NONE), ZOOM_RIGHT_STICK_CLICK);
+		const int zoomControlsValue = min(max(api->SetupIniInt(L"OrbitCamera", L"ZoomControls", 1), static_cast<int>(ZOOM_NONE)), static_cast<int>(ZOOM_RIGHT_STICK_CLICK));
 		orbitZoomControls = static_cast<ZoomControls>(zoomControlsValue);
 
 		constexpr int orbitLevelBlocklistStringLength = 65536;
