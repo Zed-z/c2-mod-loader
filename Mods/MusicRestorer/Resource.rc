@@ -18,7 +18,7 @@ BEGIN
             VALUE "Author", "Zed-z"
             VALUE "Description", "Restores missing music from the console version of the game. Requires providing your own JIceCave1.asf and JHub34.asf file."
             VALUE "Version", "1.0.0"
-            VALUE "Hyperlink", "https://github.com/Zed-z/c2-mod-loader"
+            VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#music-restorer"
             VALUE "ApiVersion", API_VERSION_STR
         END
     END
