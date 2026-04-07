@@ -166,6 +166,20 @@ void LoadMods(std::vector<Mod> &mods) {
 
 	std::vector<Mod> failedMods;
 
+	// Load file overrides
+	try {
+		const fs::path loaderOverridePath = fs::path(MOD_DIRECTORY_L) / L"C2ModLoader";
+		if (fs::exists(loaderOverridePath) && fs::is_directory(loaderOverridePath)) {
+			fs::copy(
+				loaderOverridePath, FILE_OVERRIDE_DIRECTORY_L,
+				fs::copy_options::recursive | fs::copy_options::update_existing | fs::copy_options::overwrite_existing);
+			api->LogInfo("Loaded file overrides: C2ModLoader");
+		}
+	} catch (const fs::filesystem_error &e) {
+		std::string message = "Failed loading file overrides: C2ModLoader (" + std::string(e.what()) + ")";
+		api->LogError(message.c_str());
+	}
+
 	// Load mods
 	for (auto &mod : mods) {
 
@@ -191,12 +205,13 @@ void LoadMods(std::vector<Mod> &mods) {
 
 		// Load file overrides
 		const std::wstring &overridePath = mod.overridePath;
-
 		try {
 			if (!overridePath.empty() && fs::exists(overridePath) && fs::is_directory(overridePath)) {
 				fs::copy(
 					fs::path(overridePath), FILE_OVERRIDE_DIRECTORY_L,
 					fs::copy_options::recursive | fs::copy_options::update_existing | fs::copy_options::overwrite_existing);
+				std::string message = "Loaded file overrides: " + modName;
+				api->LogInfo(message.c_str());
 			}
 		} catch (const fs::filesystem_error &e) {
 			std::string message = "Failed loading file overrides: " + modName + " (" + std::string(e.what()) + ")";

@@ -34,14 +34,33 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CROC2_GAME_DIR "${CMAKE_SOURCE_DIR}/Croc2" CACHE PATH "Path to local Croc 2 game directory")
 set(CROC2_MODS_DIR "${CROC2_GAME_DIR}/mods")
 
+# Mod projects to exclude from automatic Mods/ detection
+set(C2ML_EXCLUDED_MODS "ModTemplate" CACHE STRING "List of mods to exclude from compilation")
+
 # Add main loader
 add_subdirectory(C2ModLoader)
+
+# Loader-level file overrides source directory
+set(C2ML_LOADER_OVERRIDES_SOURCE_DIR "${CMAKE_SOURCE_DIR}/C2ModLoader/overrides")
+set(C2ML_PIPELINE_EXTRA_DEPENDS "")
+add_custom_target(C2ModLoaderOverridesStage ALL
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/Release/C2ModLoader"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${C2ML_LOADER_OVERRIDES_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/Release/C2ModLoader"
+    DEPENDS C2ModLoader
+    COMMENT "Staging C2ModLoader overrides to Release/C2ModLoader"
+)
+list(APPEND C2ML_PIPELINE_EXTRA_DEPENDS C2ModLoaderOverridesStage)
+
+# Tracks mods that provide an optional overrides/ directory
+set(MODS_WITH_OVERRIDES "")
 
 # Macro for building mod projects
 macro(add_mod_project MOD_NAME)
     
     # Set mod directory (look in Mods/ subdirectory)
     set(MOD_DIR "${CMAKE_SOURCE_DIR}/Mods/${MOD_NAME}")
+    set(MOD_OVERRIDES_SOURCE_DIR "${MOD_DIR}/overrides")
+    set(MOD_OVERRIDES_OUTPUT_DIR "${CMAKE_BINARY_DIR}/Release/${MOD_NAME}")
     enable_language(RC)
 
     # Find C++ sources recursively
@@ -142,6 +161,16 @@ macro(add_mod_project MOD_NAME)
             ${CMAKE_BINARY_DIR}/Release/$<TARGET_FILE_NAME:${MOD_NAME}>
         COMMENT "Copying ${MOD_NAME}.asi to Release folder"
     )
+
+    # If present, stage file overrides as Release/<ModName>/...
+    if(EXISTS "${MOD_OVERRIDES_SOURCE_DIR}")
+        list(APPEND MODS_WITH_OVERRIDES ${MOD_NAME})
+        add_custom_command(TARGET ${MOD_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E rm -rf "${MOD_OVERRIDES_OUTPUT_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${MOD_OVERRIDES_SOURCE_DIR}" "${MOD_OVERRIDES_OUTPUT_DIR}"
+            COMMENT "Staging ${MOD_NAME} overrides to Release/${MOD_NAME}"
+        )
+    endif()
     
 endmacro()
 
@@ -155,6 +184,12 @@ if(EXISTS ${MODS_DIR})
     foreach(DIR_NAME ${MOD_CANDIDATES})
         # Skip if it's not a directory
         if(NOT IS_DIRECTORY ${MODS_DIR}/${DIR_NAME})
+            continue()
+        endif()
+
+        # Skip directories explicitly excluded from autodetection
+        if(DIR_NAME IN_LIST C2ML_EXCLUDED_MODS)
+            message(STATUS "Skipping excluded mod: ${DIR_NAME}")
             continue()
         endif()
         
@@ -192,7 +227,7 @@ add_custom_target(Deploy
     VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Shared/global.ini" "$<SHELL_PATH:${CROC2_GAME_DIR}/global.ini>"
     VERBATIM
-    DEPENDS C2ModLoader ${MOD_LIST}
+    DEPENDS C2ModLoader ${MOD_LIST} ${C2ML_PIPELINE_EXTRA_DEPENDS}
     COMMENT "Deploying all mods to game directory"
 )
 
@@ -205,6 +240,22 @@ foreach(MOD_NAME ${MOD_LIST})
     )
 endforeach()
 
+add_custom_command(TARGET Deploy POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CROC2_MODS_DIR}/C2ModLoader"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/Release/C2ModLoader" "${CROC2_MODS_DIR}/C2ModLoader"
+    VERBATIM
+    COMMENT "Copying C2ModLoader overrides into mods directory"
+)
+
+foreach(MOD_NAME ${MODS_WITH_OVERRIDES})
+    add_custom_command(TARGET Deploy POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CROC2_MODS_DIR}/${MOD_NAME}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/Release/${MOD_NAME}" "${CROC2_MODS_DIR}/${MOD_NAME}"
+        VERBATIM
+        COMMENT "Copying ${MOD_NAME} overrides into mods directory"
+    )
+endforeach()
+
 # Package release
 add_custom_target(Package
     COMMAND ${CMAKE_COMMAND} -E echo "Creating release package..."
@@ -213,7 +264,7 @@ add_custom_target(Package
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi ${PACKAGE_DIR}/C2ModLoader.asi
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/Shared/global.ini ${PACKAGE_DIR}/global.ini
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR} ${CMAKE_COMMAND} -E rm -f ${PACKAGE_ZIP_NAME}
-    DEPENDS C2ModLoader ${MOD_LIST}
+    DEPENDS C2ModLoader ${MOD_LIST} ${C2ML_PIPELINE_EXTRA_DEPENDS}
     COMMENT "Packaging C2ModLoader release artifacts"
 )
 
@@ -221,6 +272,20 @@ foreach(MOD_NAME ${MOD_LIST})
     add_custom_command(TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/${MOD_NAME}.asi ${PACKAGE_MODS_DIR}/${MOD_NAME}.asi
         COMMENT "Packaging ${MOD_NAME}.asi"
+    )
+endforeach()
+
+add_custom_command(TARGET Package POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_MODS_DIR}/C2ModLoader
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/Release/C2ModLoader" "${PACKAGE_MODS_DIR}/C2ModLoader"
+    COMMENT "Packaging C2ModLoader overrides"
+)
+
+foreach(MOD_NAME ${MODS_WITH_OVERRIDES})
+    add_custom_command(TARGET Package POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_MODS_DIR}/${MOD_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/Release/${MOD_NAME}" "${PACKAGE_MODS_DIR}/${MOD_NAME}"
+        COMMENT "Packaging ${MOD_NAME} overrides"
     )
 endforeach()
 
