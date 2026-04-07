@@ -179,6 +179,7 @@ HICON LoadIconFromPngResource(HMODULE module, int resourceId, int targetSize) {
 	UINT stride = 0;
 	UINT imageSize = 0;
 	void *dibBits = nullptr;
+	HDC hdc = nullptr;
 	BITMAPV5HEADER bi = {};
 	ICONINFO ii = {};
 
@@ -227,9 +228,10 @@ HICON LoadIconFromPngResource(HMODULE module, int resourceId, int targetSize) {
 	bi.bV5BlueMask = 0x000000FF;
 	bi.bV5AlphaMask = 0xFF000000;
 
-	HDC hdc = GetDC(nullptr);
+	hdc = GetDC(nullptr);
 	colorBitmap = CreateDIBSection(hdc, reinterpret_cast<BITMAPINFO *>(&bi), DIB_RGB_COLORS, &dibBits, nullptr, 0);
-	ReleaseDC(nullptr, hdc);
+	if (hdc)
+		ReleaseDC(nullptr, hdc);
 	if (!colorBitmap || !dibBits)
 		goto cleanup;
 
