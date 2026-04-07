@@ -1,7 +1,8 @@
 #pragma once
+
 #include <imgui.h>
 
-namespace Launcher {
+namespace Style {
 
 struct Style {
 	ImVec4 windowBg = ImVec4(0.105f, 0.105f, 0.1f, 1.0f);
@@ -30,4 +31,4 @@ struct Style {
 const Style &GetStyle();
 void ApplyStyle();
 
-} // namespace Launcher
+} // namespace Style

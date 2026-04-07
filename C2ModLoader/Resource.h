@@ -64,3 +64,6 @@ Xinput/TriggerOuterDeadzone[Trigger Outer|Outer deadzone for triggers]:int=90"
 #define IDR_FONT_TITLE 10001
 #define IDR_FONT_TEXT 10002
 #define IDR_FONT_CODE 10003
+
+#define IDR_LOGO 20001
+#define IDR_ICON 20002

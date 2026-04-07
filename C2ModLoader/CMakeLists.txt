@@ -54,31 +54,32 @@ file(WRITE "${GENERATED_EMBEDDED_LICENSES_HEADER}" "${GENERATED_EMBEDDED_LICENSE
 set(SOURCES
     CheatsManager.cpp
     dllmain.cpp
-    Overlay/Overlay.cpp
+    FileOverrides.cpp
+    Launcher/Backend.cpp
+    Launcher/EmbeddedLicenses.cpp
+    Launcher/IniConfig.cpp
+    Launcher/Launcher.cpp
+    Loader.cpp
+    Logs.cpp
+    ModApi.cpp
+    MouseCaptureRemover.cpp
     Overlay/Backend.cpp
-    Overlay/Components/Log.cpp
-    Overlay/Components/LevelInfo.cpp
-    Overlay/Components/Toast.cpp
-    Overlay/Components/VersionInfo.cpp
-    Overlay/Components/Inputs.cpp
     Overlay/Components/Coords.cpp
+    Overlay/Components/Inputs.cpp
+    Overlay/Components/LevelInfo.cpp
+    Overlay/Components/Log.cpp
     Overlay/Components/MenuBar.cpp
     Overlay/Components/ObjectList.cpp
     Overlay/Components/SaveSlotList.cpp
-    Overlay/Fonts.cpp
-    Launcher/Launcher.cpp
-    Launcher/EmbeddedLicenses.cpp
-    Launcher/Backend.cpp
-    Launcher/IniConfig.cpp
-    Launcher/Colors.cpp
-    Logs.cpp
-    FileOverrides.cpp
-    Loader.cpp
-    ModApi.cpp
-    UiScale.cpp
-    MouseCaptureRemover.cpp
-    XinputManager.cpp
+    Overlay/Components/Toast.cpp
+    Overlay/Components/VersionInfo.cpp
+    Overlay/Overlay.cpp
     Resource.rc
+    Utils/Fonts.cpp
+    Utils/ResourceLoader.cpp
+    Utils/Style.cpp
+    Utils/UiScale.cpp
+    XinputManager.cpp
 )
 
 # ImGui Core + Backends

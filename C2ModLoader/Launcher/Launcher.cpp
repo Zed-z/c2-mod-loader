@@ -1,6 +1,5 @@
 #include "Launcher.h"
 #include "Backend.h"
-#include "Colors.h"
 #include "Config.h"
 #include "EmbeddedLicenses.h"
 #include "IniConfig.h"
@@ -8,6 +7,9 @@
 #include "ModApi.h"
 #include "Resource.h"
 #include "Utils.h"
+#include "Utils/Fonts.h"
+#include "Utils/ResourceLoader.h"
+#include "Utils/Style.h"
 
 #include "backends/imgui_impl_dx11.h"
 #include "backends/imgui_impl_win32.h"
@@ -30,9 +32,11 @@ int minWindowWidth = 720;
 int minWindowHeight = 480;
 float g_uiScale = 1.0f;
 
-static ImFont *fontTitle = nullptr;
 constexpr float fontSizeTitle = 22.0f;
 constexpr float fontSizeText = 16.0f;
+static ID3D11ShaderResourceView *g_launcherLogoTexture = nullptr;
+static float g_launcherLogoWidth = 0.0f;
+static float g_launcherLogoHeight = 0.0f;
 
 extern bool loaderEnabled;
 
@@ -488,7 +492,7 @@ void RenderSelectedItemDetails() {
 		apiVersion = mod.info.apiVersion;
 	}
 
-	ImGui::PushFont(fontTitle, fontSizeTitle);
+	ImGui::PushFont(Fonts::GetFontTitle(), fontSizeTitle);
 	ImGui::Text(name.c_str());
 	ImGui::PopFont();
 
@@ -505,7 +509,7 @@ void RenderSelectedItemDetails() {
 		ImGui::Text("Version: %s, API: v%d", version.c_str(), apiVersion);
 	}
 	if (!hyperlink.empty()) {
-		ImGui::TextColored(Launcher::GetStyle().link, "Website URL");
+		ImGui::TextColored(Style::GetStyle().link, "Website URL");
 		if (ImGui::IsItemClicked()) {
 			ShellExecuteA(NULL, "open", hyperlink.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		}
@@ -609,6 +613,39 @@ void RenderLicensesSection(bool fullHeight = false) {
 	ImGui::EndChild();
 }
 
+bool LoadLauncherLogoTexture() {
+	if (g_launcherLogoTexture) {
+		return true;
+	}
+
+	ID3D11Device *device = LauncherBackend::GetDevice();
+	if (!device) {
+		return false;
+	}
+
+	HMODULE module = GetCallingModule();
+	if (!module) {
+		return false;
+	}
+
+	if (!ResourceLoader::LoadTextureFromPngResource(module, IDR_LOGO, device, &g_launcherLogoTexture, &g_launcherLogoWidth, &g_launcherLogoHeight)) {
+		g_launcherLogoWidth = 0.0f;
+		g_launcherLogoHeight = 0.0f;
+		return false;
+	}
+
+	return true;
+}
+
+void CleanupLauncherLogoTexture() {
+	if (g_launcherLogoTexture) {
+		g_launcherLogoTexture->Release();
+		g_launcherLogoTexture = nullptr;
+	}
+	g_launcherLogoWidth = 0.0f;
+	g_launcherLogoHeight = 0.0f;
+}
+
 void UpdateUiScale(ImGuiIO &io, const ImGuiStyle &baseStyle, float scale) {
 	ImGuiStyle &style = ImGui::GetStyle();
 	style = baseStyle;
@@ -640,17 +677,20 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 	ImGuiIO &io = ImGui::GetIO();
 
 	io.Fonts->Clear();
-	io.FontDefault = LoadTextFont(IDR_FONT_TEXT, fontSizeText);
-	fontTitle = LoadTextFont(IDR_FONT_TEXT, fontSizeTitle);
+	io.FontDefault = Fonts::GetFontText();
 
 	ImGuiStyle baseStyle;
 	ImGui::StyleColorsDark();
-	ApplyStyle();
+	Style::ApplyStyle();
 	baseStyle = ImGui::GetStyle();
 	UpdateUiScale(io, baseStyle, LauncherBackend::GetDpiScale());
 
 	ImGui_ImplWin32_Init(LauncherBackend::GetWindowHandle());
 	ImGui_ImplDX11_Init(LauncherBackend::GetDevice(), LauncherBackend::GetContext());
+
+	if (!LoadLauncherLogoTexture()) {
+		api->LogWarning("[Launcher] Failed to load embedded launcher logo texture, using text header fallback");
+	}
 
 	RECT rect;
 	GetClientRect(LauncherBackend::GetWindowHandle(), &rect);
@@ -706,13 +746,37 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 		} else {
 			ImGui::BeginChild("ListPane", ImVec2(listWidth, contentHeight), true);
 			{
-				ImGui::PushFont(fontTitle, fontSizeTitle);
-				ImGui::TextUnformatted(LOADER_NAME);
-				ImGui::PopFont();
+				if (g_launcherLogoTexture && g_launcherLogoWidth > 0.0f && g_launcherLogoHeight > 0.0f) {
+					const float availableWidth = ImGui::GetContentRegionAvail().x;
+					const float maxLogoHeight = 56.0f * g_uiScale;
+					float logoScale = maxLogoHeight / g_launcherLogoHeight;
+					const float widthScale = availableWidth / g_launcherLogoWidth;
+					if (widthScale < logoScale) {
+						logoScale = widthScale;
+					}
+					if (logoScale > 1.0f) {
+						logoScale = 1.0f;
+					}
+					if (logoScale <= 0.0f) {
+						logoScale = 1.0f;
+					}
+
+					const float renderWidth = g_launcherLogoWidth * logoScale;
+					const float renderHeight = g_launcherLogoHeight * logoScale;
+					const float cursorX = ImGui::GetCursorPosX();
+					if (renderWidth < availableWidth) {
+						ImGui::SetCursorPosX(cursorX + (availableWidth - renderWidth) * 0.5f);
+					}
+					ImGui::Image((ImTextureID)g_launcherLogoTexture, ImVec2(renderWidth, renderHeight));
+				} else {
+					ImGui::PushFont(Fonts::GetFontTitle(), fontSizeTitle);
+					ImGui::TextUnformatted(LOADER_NAME);
+					ImGui::PopFont();
+				}
 
 				ImGui::Spacing();
 
-				ImGui::BeginChild("ModList", ImVec2(listWidth - (16.0f * g_uiScale), contentHeight - (86.0f * g_uiScale)), true);
+				ImGui::BeginChild("ModList", ImVec2(listWidth - (16.0f * g_uiScale), contentHeight - (88.0f * g_uiScale)), true);
 				{
 					float availableWidth = ImGui::GetContentRegionAvail().x;
 					float nameWidth = availableWidth - (25.0f * g_uiScale);
@@ -816,7 +880,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 				}
 
 				ImGui::SetCursorPosY(footerTextY);
-				ImGui::TextColored(GetStyle().link, "%s", legalLink);
+				ImGui::TextColored(Style::GetStyle().link, "%s", legalLink);
 				if (ImGui::IsItemClicked()) {
 					showLicensesOverlay = true;
 				}
@@ -835,6 +899,8 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		LauncherBackend::Present(1, 0);
 	}
+
+	CleanupLauncherLogoTexture();
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();

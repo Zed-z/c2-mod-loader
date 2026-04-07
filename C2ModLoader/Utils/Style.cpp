@@ -1,6 +1,6 @@
-#include "Colors.h"
+#include "Style.h"
 
-namespace Launcher {
+namespace Style {
 
 const Style &GetStyle() {
 	static Style style;
@@ -36,4 +36,4 @@ void ApplyStyle() {
 	imguiStyle.Colors[ImGuiCol_CheckMark] = style.checkMark;
 }
 
-} // namespace Launcher
+} // namespace Style

@@ -1,8 +1,9 @@
 #include "Backend.h"
 
+#include "Utils/ResourceLoader.h"
 #include "ModApi.h"
 #include "Resource.h"
-#include "UiScale.h"
+#include "Utils/UiScale.h"
 #include "backends/imgui_impl_win32.h"
 
 #include <cmath>
@@ -36,6 +37,19 @@ ID3D11Device *g_d3dDevice = nullptr;
 ID3D11DeviceContext *g_d3dContext = nullptr;
 IDXGISwapChain *g_swapChain = nullptr;
 ID3D11RenderTargetView *g_mainRenderTargetView = nullptr;
+HICON g_windowIconBig = nullptr;
+HICON g_windowIconSmall = nullptr;
+
+void CleanupWindowIcons() {
+	if (g_windowIconBig) {
+		DestroyIcon(g_windowIconBig);
+		g_windowIconBig = nullptr;
+	}
+	if (g_windowIconSmall) {
+		DestroyIcon(g_windowIconSmall);
+		g_windowIconSmall = nullptr;
+	}
+}
 
 void CreateRenderTarget() {
 	ID3D11Texture2D *backBuffer = nullptr;
@@ -296,17 +310,23 @@ bool Initialize(HINSTANCE hInstance, const wchar_t *windowTitle, int minWidth, i
 
 	if (!g_hwnd) {
 		api->LogDebug("[Launcher Backend] Failed to create window");
+		CleanupWindowIcons();
 		UnregisterClassW(wc.lpszClassName, hInstance);
 		return false;
 	}
 
-	HICON hIcon = ExtractIconW(hInstance, L"Croc2.exe", 0);
-	if (hIcon) {
-		SendMessageW(g_hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-		SendMessageW(g_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-		api->LogDebug("[Launcher Backend] Icon loaded from Croc2.exe");
+	g_windowIconBig = ResourceLoader::LoadIconFromPngResource(hInstance, IDR_ICON, GetSystemMetrics(SM_CXICON));
+	g_windowIconSmall = ResourceLoader::LoadIconFromPngResource(hInstance, IDR_ICON, GetSystemMetrics(SM_CXSMICON));
+	if (g_windowIconBig || g_windowIconSmall) {
+		if (g_windowIconBig) {
+			SendMessageW(g_hwnd, WM_SETICON, ICON_BIG, (LPARAM)g_windowIconBig);
+		}
+		if (g_windowIconSmall) {
+			SendMessageW(g_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)g_windowIconSmall);
+		}
+		api->LogDebug("[Launcher Backend] Icon loaded from embedded icon.png resource");
 	} else {
-		api->LogDebug("[Launcher Backend] Failed to load icon from Croc2.exe");
+		api->LogDebug("[Launcher Backend] Failed to load embedded icon.png resource");
 	}
 
 	api->LogDebug("[Launcher Backend] Window created, showing and pumping messages");
@@ -318,6 +338,7 @@ bool Initialize(HINSTANCE hInstance, const wchar_t *windowTitle, int minWidth, i
 	api->LogDebug("[Launcher Backend] Window initialized, creating D3D11");
 	if (!CreateD3D(g_hwnd)) {
 		api->LogDebug("[Launcher Backend] CreateD3D failed");
+		CleanupWindowIcons();
 		DestroyWindow(g_hwnd);
 		g_hwnd = nullptr;
 		UnregisterClassW(wc.lpszClassName, hInstance);
@@ -329,6 +350,7 @@ bool Initialize(HINSTANCE hInstance, const wchar_t *windowTitle, int minWidth, i
 
 void Shutdown(HINSTANCE hInstance) {
 	CleanupD3D();
+	CleanupWindowIcons();
 	if (g_hwnd) {
 		DestroyWindow(g_hwnd);
 		g_hwnd = nullptr;

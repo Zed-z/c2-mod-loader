@@ -35,3 +35,5 @@ END
 IDR_FONT_TITLE RCDATA "libs/scabber_font/Scabber.ttf"
 IDR_FONT_TEXT RCDATA "libs/inter_font/Inter_18pt-Medium.ttf"
 IDR_FONT_CODE RCDATA "libs/roboto_mono_font/RobotoMono-Medium.ttf"
+IDR_LOGO RCDATA "../docs/logo.png"
+IDR_ICON RCDATA "../docs/icon.png"

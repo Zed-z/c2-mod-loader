@@ -9,12 +9,12 @@
 #include "Components/SaveSlotList.h"
 #include "Components/Toast.h"
 #include "Components/VersionInfo.h"
-#include "Launcher/Colors.h"
+#include "Utils/Style.h"
 
 bool showGui;
 
 void ImGuiDraw() {
-	Launcher::ApplyStyle();
+	Style::ApplyStyle();
 
 	RenderVersionInfo();
 

@@ -2,8 +2,8 @@
 
 #include "Loader.h"
 #include "ModApi.h"
-#include "Overlay/Fonts.h"
 #include "Resource.h"
+#include "Utils/Fonts.h"
 #include "imgui.h"
 
 #include <string>
@@ -24,8 +24,9 @@ void RenderVersionInfo() {
 		float displayScale = io.DisplaySize.y / 720.0f;
 		float fontSize = 32.0f * displayScale;
 
-		float labelX = 48.0f * displayScale;
-		float labelY = io.DisplaySize.y - (48.0f + labelSize.y * 2.0f); // Offset for bottom alignment
+		const float margin = 48.0f * displayScale;
+		float labelX = margin;
+		float labelY = io.DisplaySize.y - margin - labelSize.y * 2 * displayScale;
 		float labelStrokeWidth = 2.0f * displayScale;
 
 		int labelOpacity = levelInfo.map == 0 ? 255 : 63;

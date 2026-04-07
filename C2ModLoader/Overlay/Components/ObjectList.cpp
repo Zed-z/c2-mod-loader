@@ -1,8 +1,8 @@
 #include "ObjectList.h"
 
-#include "Launcher/Colors.h"
 #include "ModApi.h"
-#include "Overlay/Fonts.h"
+#include "Utils/Fonts.h"
+#include "Utils/Style.h"
 #include "imgui.h"
 
 #include <sstream>
@@ -86,7 +86,7 @@ void RenderObjectList() {
 				// Header colors
 				float distanceModifier = maxDistanceToPlayer != -1 ? (1 - ((float)playerDistance / (float)maxDistanceToPlayer)) : 1;
 
-				const Launcher::Style &style = Launcher::GetStyle();
+				const Style::Style &style = Style::GetStyle();
 				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(style.header.x * distanceModifier, style.header.y * distanceModifier, style.header.z * distanceModifier, style.header.w));
 				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(style.headerHovered.x * distanceModifier, style.headerHovered.y * distanceModifier, style.headerHovered.z * distanceModifier, style.headerHovered.w));
 				ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(style.headerActive.x * distanceModifier, style.headerActive.y * distanceModifier, style.headerActive.z * distanceModifier, style.headerActive.w));

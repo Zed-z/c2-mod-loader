@@ -1,10 +1,10 @@
 #include "Backend.h"
 
-#include "Fonts.h"
 #include "Loader.h"
 #include "ModApi.h"
 #include "Overlay.h"
-#include "UiScale.h"
+#include "Utils/Fonts.h"
+#include "Utils/UiScale.h"
 
 #include <string>
 
