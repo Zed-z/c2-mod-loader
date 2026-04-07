@@ -122,6 +122,16 @@ bool orbitCameraDisabled() {
 	if (strcmp(camera->name, "DPCamera") == 0)
 		return true;
 
+	// Binoc break fixes
+	if (strcmp(camera->name, "CrocCannonCamera") == 0) // Keith
+		return true;
+	if (strcmp(camera->name, "Blank") == 0) // Venus
+		return true;
+
+	// Climbing
+	if (!(croc->flags0 & (1 << 5)) && (croc->flags1 & (1 << 26)))
+		return true;
+
 	return false;
 }
 
@@ -419,8 +429,10 @@ void __stdcall PhysicsLoop() {
 
 		orbitLastCrocPos = croc->newRotPos.position;
 
-		if (orbitCameraDisabled())
+		if (orbitCameraDisabled()) {
+			orbitCameraReset();
 			return;
+		}
 
 		// Apply camera position
 		double offsetX = cos(cameraPitch) * sin(cameraYaw) * orbitCameraDistance;
