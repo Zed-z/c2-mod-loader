@@ -74,11 +74,17 @@ set(SOURCES
     Overlay/Components/Toast.cpp
     Overlay/Components/VersionInfo.cpp
     Overlay/Overlay.cpp
+    Registry/ManagedKeys.cpp
+    Registry/PathOverrides.cpp
+    Registry/QueryReturns.cpp
+    Registry/RegistryManager.cpp
+    Registry/ValueMapParser.cpp
     Resource.rc
     Utils/Fonts.cpp
     Utils/ResourceLoader.cpp
     Utils/Style.cpp
     Utils/UiScale.cpp
+    Wad/WadFile.cpp
     XinputManager.cpp
 )
 
@@ -178,6 +184,7 @@ target_link_libraries(C2ModLoader PRIVATE
     d3d11
     dxgi
     d3dcompiler
+    gdiplus
     kernel32
     user32
     gdi32

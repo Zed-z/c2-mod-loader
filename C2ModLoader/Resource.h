@@ -21,6 +21,9 @@ Config/SkipLauncher[Skip Launcher|Skip the launcher and start the game directly]
 Config/FreeMouse[Free Mouse|Allow mouse to move freely]:bool=1;\
 Config/DisplayScale[Display Scale|Launcher and UI display scale (0 = automatic)]:float=0;\
 _Config/DisabledMods[Disabled Mods|List of disabled mods]:string=;\
+@RegistryBypass[Registry Bypass|Bypass registry calls and store game settings in the mod loader configuration file];\
+RegistryBypass/Enabled[Enable Registry Bypass|Enable the registry bypass mechanism]:bool=1;\
+RegistryBypass/ManagedValues[Registry Values|Key-value map for game settings, reset to clear settings]:string=;\
 @GUI[GUI|Configure in-game GUI settings];\
 GUI/GuiEnabled[GUI Enabled|Enable the GUI]:bool=1;\
 GUI/ShowGui[Show GUI|Show or hide the GUI]:bool=0;\

@@ -44,7 +44,7 @@ inline PathInfo GetPathInfo(std::wstring path) {
 	size_t lastBackslashPos = path.find_last_of(L"\\/");
 
 	std::wstring filename = path.substr(lastBackslashPos + 1);
-	std::wstring directory = path.substr(0, lastBackslashPos);
+	std::wstring directory = path.substr(0, lastBackslashPos + 1);
 
 	size_t extensionPos = filename.find(L".asi");
 	std::wstring name = filename;

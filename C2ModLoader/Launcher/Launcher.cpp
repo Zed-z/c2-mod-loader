@@ -88,7 +88,7 @@ std::wstring GetConfigPath(int modIndex) {
 		wchar_t exePath[MAX_PATH] = {};
 		GetModuleFileNameW(GetModuleHandleA(NULL), exePath, MAX_PATH);
 		PathInfo exeInfo = GetPathInfo(std::wstring(exePath));
-		return exeInfo.directory + L"\\" + CONFIG_FILE_L;
+		return exeInfo.directory + CONFIG_FILE_L;
 	}
 	std::wstring path = mods[modIndex - 1].path.path;
 	path.replace(path.length() - 4, 4, L".ini");

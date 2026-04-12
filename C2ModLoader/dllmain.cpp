@@ -7,6 +7,7 @@
 #include "MouseCaptureRemover.h"
 #include "Overlay/Backend.h"
 #include "Overlay/Overlay.h"
+#include "Registry/RegistryManager.h"
 #include "Resource.h"
 #include "Utils.h"
 
@@ -145,6 +146,7 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 
 	ApiSetup();
 	SetupCheats();
+	RegistryManager::InstallHooks();
 
 	if (guiEnabled) {
 		CreateThread(nullptr, 0, OverlayInitThread, hModule, 0, nullptr);

@@ -1,4 +1,6 @@
 #include "Loader.h"
+
+#include "Registry/RegistryManager.h"
 #include "XinputManager.h"
 
 #include <algorithm>
@@ -41,6 +43,12 @@ void LoadConfig() {
 	loaderEnabled = api->SetupIniBool(L"Config", L"LoaderEnabled", true);
 	skipLauncher = api->SetupIniBool(L"Config", L"SkipLauncher", false);
 	freeMouse = api->SetupIniBool(L"Config", L"FreeMouse", true);
+
+	RegistryManager::SetEnabled(api->SetupIniBool(L"RegistryBypass", L"Enabled", true));
+	constexpr DWORD registryOverridesLength = 4096;
+	wchar_t managedOverrides[registryOverridesLength] = {};
+	api->SetupIniString(L"RegistryBypass", L"ManagedValues", L"", managedOverrides, registryOverridesLength);
+	RegistryManager::SetManagedKeys(WStringToString(managedOverrides));
 
 	guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
 	showGui = api->SetupIniBool(L"GUI", L"ShowGui", false);

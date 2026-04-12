@@ -38,7 +38,7 @@ void LogRaw(const std::string &message, const LogSeverity &severity, const HMODU
 	// Get log path - ignore directory override
 	HMODULE executable = GetModuleHandleA(NULL);
 	PathInfo executableFilepath = GetModuleFilepath(executable);
-	fs::path p(executableFilepath.directory + L"\\" + StringToWString(LOG_FILE));
+	fs::path p(executableFilepath.directory + StringToWString(LOG_FILE));
 
 	// Open log
 	std::wofstream log{p, std::ios::app};
