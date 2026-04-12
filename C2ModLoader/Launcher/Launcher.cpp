@@ -15,6 +15,7 @@
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -74,6 +75,7 @@ struct ParsedConfig {
 		std::vector<std::pair<ConfigKey, ConfigHint>> ordered;
 		std::map<ConfigKey, ConfigHint> lookup;
 	} hints;
+	bool hasTypeHints = false;
 	std::vector<ConfigEntry> configEntries;
 };
 
@@ -103,6 +105,8 @@ ParsedConfig ParseConfigHints(const std::wstring &configTypes) {
 	ParsedConfig parsedConfig;
 	if (configTypes.empty())
 		return parsedConfig;
+
+	parsedConfig.hasTypeHints = true;
 
 	std::string str = WStringToString(configTypes);
 	std::istringstream ss(str);
@@ -238,6 +242,14 @@ bool EnsureConfigDefaults(std::vector<ConfigEntry> &config, const std::vector<st
 	return changed;
 }
 
+bool IsConfigEntryDeclared(const ParsedConfig &parsedConfig, const ConfigEntry &entry) {
+	if (!parsedConfig.hasTypeHints)
+		return true;
+
+	const std::string hintKey = entry.section + "/" + entry.key;
+	return parsedConfig.hints.lookup.find(hintKey) != parsedConfig.hints.lookup.end();
+}
+
 std::string NormalizeConfigValue(std::string value, const std::string &type) {
 	if (type == "bool") {
 		if (_stricmp(value.c_str(), "true") == 0)
@@ -299,6 +311,7 @@ void LoadAllConfigs() {
 std::vector<ConfigSectionView> BuildConfigSections(const ParsedConfig &parsedConfig) {
 	std::vector<ConfigSectionView> sections;
 	std::map<ConfigSectionKey, size_t> sectionIndices;
+	const bool showFallbackEntries = !parsedConfig.hasTypeHints;
 
 	for (const auto &[sectionKey, section] : parsedConfig.sections.ordered) {
 		sectionIndices[sectionKey] = sections.size();
@@ -307,6 +320,10 @@ std::vector<ConfigSectionView> BuildConfigSections(const ParsedConfig &parsedCon
 
 	const auto &entries = parsedConfig.configEntries;
 	for (size_t i = 0; i < entries.size(); ++i) {
+		if (!showFallbackEntries && !IsConfigEntryDeclared(parsedConfig, entries[i])) {
+			continue;
+		}
+
 		ConfigSectionKey key = entries[i].section.empty() ? "Uncategorized" : entries[i].section;
 		ConfigSection sectionInfo;
 		const auto sectionIt = parsedConfig.sections.lookup.find(key);
@@ -325,13 +342,18 @@ std::vector<ConfigSectionView> BuildConfigSections(const ParsedConfig &parsedCon
 		}
 	}
 
+	// Erase empty sections
+	sections.erase(
+		std::remove_if(sections.begin(), sections.end(), [](const ConfigSectionView &section) {
+			return section.entryIndices.empty();
+		}),
+		sections.end());
+
 	return sections;
 }
 
-void RenderConfigSections() {
+void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 	ParsedConfig &parsedConfig = allParsedConfigs[g_selectedMod];
-	const std::vector<ConfigSectionView> sections = BuildConfigSections(parsedConfig);
-
 	for (size_t sectionIndex = 0; sectionIndex < sections.size(); ++sectionIndex) {
 		const ConfigSectionView &section = sections[sectionIndex];
 		std::string headerLabel = section.sectionInfo.name + "##section" + std::to_string(sectionIndex);
@@ -534,10 +556,12 @@ void RenderSelectedItemDetails() {
 }
 
 void RenderSelectedItemConfig() {
-	if (allParsedConfigs[g_selectedMod].configEntries.empty()) {
+	ParsedConfig &parsedConfig = allParsedConfigs[g_selectedMod];
+	const std::vector<ConfigSectionView> sections = BuildConfigSections(parsedConfig);
+	if (sections.empty()) {
 		ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No configuration available.");
 	} else {
-		RenderConfigSections();
+		RenderConfigSections(sections);
 	}
 }
 
