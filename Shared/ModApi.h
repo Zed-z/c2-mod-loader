@@ -232,12 +232,15 @@ struct SaveSlot {
 	uint32_t crystals;
 	uint8_t _pad1[8];
 	char tribe[16];
-	uint8_t _pad2[56];
+	uint8_t _pad2[48];
+	uint32_t vibration;
+	uint8_t _pad3[4];
 	uint32_t totalBossHearts;
 	uint32_t bossHearts;
-	uint8_t _pad3[8];
-	uint32_t goldenGobbos;
 	uint8_t _pad4[4];
+	uint32_t unknown1;
+	uint32_t goldenGobbos;
+	uint8_t _pad5[4];
 	uint32_t jigsawPieces;
 	uint32_t levelCrystals;
 	uint32_t binoculars;
@@ -245,13 +248,19 @@ struct SaveSlot {
 	uint32_t purpleGummis;
 	uint32_t blueGummis;
 	uint32_t greenGummis;
-	uint8_t _pad5[4];
+	uint32_t otherItem;
 	uint32_t clockworkGobbos;
 	uint32_t unknownItem;
 	uint32_t wheels;
 	uint32_t itemCount;
 	uint32_t selectedItem;
-	uint8_t _pad6[16];
+	uint32_t doorTribe;
+	uint32_t doorLevel;
+	uint32_t doorMap;
+	uint32_t doorType;
+	uint32_t rewardPoints;
+	uint32_t analogOn;
+	uint32_t controlMethod;
 };
 
 struct Inputs {

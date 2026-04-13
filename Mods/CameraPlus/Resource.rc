@@ -41,6 +41,7 @@ BEGIN
                 "OrbitCamera/ZoomControls[Zoom Controls|The method used for controlling camera zoom]:enum[None|Triggers|Right Stick Click]=1;"
                 "OrbitCamera/DisableRestrictions[Disable Restrictions|Disables orbit camera usage restrictions for certain areas]:bool=0;"
                 "_OrbitCamera/LevelBlocklist[Level Blocklist|Levels to disable orbit camera in]:string=;"
+                "OrbitCamera/CenterOnType2[Center on Type 2|Keeps the camera centered while moving when using type 2 controls]:bool=1;"
                 "@Freecam[Freecam|Settings regarding the freecam camera mode];"
                 "Freecam/InvertX[Invert X|Invert camera X axis movement]:bool=0;Freecam/InvertY[Invert Y|Invert camera y axis movement]:bool=0"
         END

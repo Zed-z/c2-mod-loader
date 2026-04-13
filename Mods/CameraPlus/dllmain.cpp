@@ -54,6 +54,8 @@ enum ZoomControls {
 ZoomControls orbitZoomControls = ZOOM_TRIGGERS;
 std::vector<LevelInfo> orbitLevelBlocklist;
 bool orbitDisableRestrictions;
+bool centerOnType2;
+bool centerOnType2Current;
 
 void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo> &blocklist) {
 	std::wstring orbitLevelBlocklistStr(orbitLevelBlockList);
@@ -297,13 +299,17 @@ void __stdcall cameraSetFreecam() {
 	cameraSet(CameraMode::Freecam);
 }
 
-void __stdcall orbitCameraReset() {
+void __stdcall orbitCameraResetYaw() {
 	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
 	if (croc == nullptr) {
 		api->LogDebug("[orbitCameraReset] Croc not found!");
 		return;
 	}
 	cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
+}
+
+void __stdcall orbitCameraReset() {
+	orbitCameraResetYaw();
 	cameraPitch = DEFAULT_CAMERA_PITCH;
 	orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
 }
@@ -362,6 +368,20 @@ void __stdcall PhysicsLoop() {
 
 		if (inputs.flip) {
 			orbitCameraReset();
+		}
+
+		{ // Center on type 2 controls
+			if (inputs.effectiveDown || inputs.effectiveUp || inputs.effectiveLeft || inputs.effectiveRight) {
+				centerOnType2Current = centerOnType2;
+			}
+
+			if (input.rightStick.x != 0 || input.rightStick.y != 0) {
+				centerOnType2Current = false;
+			}
+
+			if (centerOnType2Current && api->GetCurrentSaveSlot()->controlMethod == CTRL_TYPE_2) {
+				orbitCameraResetYaw();
+			}
 		}
 
 		// Zoom controls
@@ -545,6 +565,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		populateOrbitBlocklist(orbitLevelBlocklistWchar.get(), orbitLevelBlocklist);
 
 		orbitDisableRestrictions = api->SetupIniBool(L"OrbitCamera", L"DisableRestrictions", false);
+
+		centerOnType2 = api->SetupIniBool(L"OrbitCamera", L"CenterOnType2", true);
+		centerOnType2Current = centerOnType2;
 
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
