@@ -40,10 +40,14 @@ namespace XinputManager {
 
 bool xinputEnabled;
 int xinputDeviceIndex;
+
 float stickDeadzone;
 float stickOuterDeadzone;
 float triggerDeadzone;
 float triggerOuterDeadzone;
+
+bool vibrationEnabled;
+float vibrationStrength;
 
 const float stickScale = 128.0f;
 const float triggerScale = 128.0f;
@@ -146,14 +150,69 @@ void PatchAnalogInput() {
 	api->InjectCode(hookAddress, 9, hookCode, p, INJECT_BEFORE);
 }
 
+struct VibrationParams {
+	int strength;
+	int durationMs;
+};
+
+static DWORD WINAPI vibrationThread(LPVOID param) {
+	VibrationParams *vibParams = (VibrationParams *)param;
+	int strength = vibParams->strength;
+	int durationMs = vibParams->durationMs;
+	delete vibParams;
+
+	XINPUT_VIBRATION vibrationEnable{};
+	vibrationEnable.wLeftMotorSpeed = strength;
+	vibrationEnable.wRightMotorSpeed = strength;
+	XInputSetState(xinputDeviceIndex, &vibrationEnable);
+
+	Sleep(durationMs);
+
+	XINPUT_VIBRATION vibrationDisable{};
+	vibrationDisable.wLeftMotorSpeed = 0;
+	vibrationDisable.wRightMotorSpeed = 0;
+	XInputSetState(xinputDeviceIndex, &vibrationDisable);
+
+	return 0;
+}
+
+void vibrate(int strength, int durationMs) {
+	VibrationParams *params = new VibrationParams{strength, durationMs};
+	HANDLE threadHandle = CreateThread(nullptr, 0, vibrationThread, params, 0, nullptr);
+	if (threadHandle != nullptr) {
+		CloseHandle(threadHandle);
+	}
+}
+
+/*
+	Croc2.exe+81B80 - 83 3D 3C794B00 0B     - cmp dword ptr [Croc2.exe+B793C],0B
+*/
+void __stdcall PreDamage() {
+	if (vibrationEnabled) {
+		int strength = (int)(vibrationStrength * 65535);
+		vibrate(strength, 200);
+	}
+}
+
+void PatchPreDamage() {
+	api->HookFunction(0x481B80, 7, &PreDamage, INJECT_BEFORE);
+}
+
 void Setup() {
 	// Load config
 	xinputEnabled = api->SetupIniBool(L"Xinput", L"XinputEnabled", true);
 	xinputDeviceIndex = api->SetupIniInt(L"Xinput", L"DeviceIndex", 0);
 	stickDeadzone = api->SetupIniInt(L"Xinput", L"StickDeadzone", 25) / 100.0f;
+	stickDeadzone = min(max(stickDeadzone, 0.0f), 1.0f);
 	stickOuterDeadzone = api->SetupIniInt(L"Xinput", L"StickOuterDeadzone", 75) / 100.0f;
+	stickOuterDeadzone = min(max(stickOuterDeadzone, 0.0f), 1.0f);
 	triggerDeadzone = api->SetupIniInt(L"Xinput", L"TriggerDeadzone", 10) / 100.0f;
+	triggerDeadzone = min(max(triggerDeadzone, 0.0f), 1.0f);
 	triggerOuterDeadzone = api->SetupIniInt(L"Xinput", L"TriggerOuterDeadzone", 90) / 100.0f;
+	triggerDeadzone = min(max(triggerDeadzone, 0.0f), 1.0f);
+	vibrationEnabled = api->SetupIniBool(L"Xinput", L"VibrationEnabled", true);
+	vibrationStrength = api->SetupIniInt(L"Xinput", L"VibrationStrength", 100) / 100.0f;
+	vibrationStrength = min(max(vibrationStrength, 0.0f), 1.0f);
 
 	PollInput();
 	if (!xinputEnabled)
@@ -162,6 +221,7 @@ void Setup() {
 	// Patch the game to use Xinput
 	PatchPreInput();
 	PatchAnalogInput();
+	PatchPreDamage();
 }
 
 } // namespace XinputManager

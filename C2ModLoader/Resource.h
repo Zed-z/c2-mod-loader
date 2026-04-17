@@ -56,7 +56,9 @@ Xinput/DeviceIndex[Device Index|Index of the Xinput device to use]:int=0;\
 Xinput/StickDeadzone[Stick Deadzone|Deadzone for analog sticks]:int=25;\
 Xinput/StickOuterDeadzone[Stick Outer Deadzone|Outer deadzone for analog sticks]:int=75;\
 Xinput/TriggerDeadzone[Trigger Deadzone|Deadzone for triggers]:int=10;\
-Xinput/TriggerOuterDeadzone[Trigger Outer|Outer deadzone for triggers]:int=90"
+Xinput/TriggerOuterDeadzone[Trigger Outer|Outer deadzone for triggers]:int=90;\
+Xinput/VibrationEnabled[Vibration Enabled|Enable vibration]:bool=1;\
+Xinput/VibrationStrength[Vibration Strength|Strength of vibration effects]:int=100"
 
 #define LOG_FILE "C2ModLoader.log"
 #define LOG_FILE_L L"C2ModLoader.log"
