@@ -3,6 +3,7 @@
 #include "Components/Coords.h"
 #include "Components/Inputs.h"
 #include "Components/LevelInfo.h"
+#include "Components/LevelSelect.h"
 #include "Components/Log.h"
 #include "Components/MenuBar.h"
 #include "Components/ObjectList.h"
@@ -19,15 +20,15 @@ void ImGuiDraw() {
 	RenderVersionInfo();
 
 	if (showGui) {
-		RenderLog();
-		RenderInputs();
-		RenderObjectList();
 		RenderCoords();
-		RenderMenuBar();
+		RenderInputs();
 		RenderLevelInfo();
+		RenderLevelSelect();
+		RenderLog();
+		RenderMenuBar();
+		RenderObjectList();
 		RenderSaveSlotList();
 	}
 
-	// Toast notifications
 	RenderToasts();
 }

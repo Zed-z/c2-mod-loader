@@ -6,6 +6,7 @@
 #include "Overlay/Components/Coords.h"
 #include "Overlay/Components/Inputs.h"
 #include "Overlay/Components/LevelInfo.h"
+#include "Overlay/Components/LevelSelect.h"
 #include "Overlay/Components/Log.h"
 #include "Overlay/Components/ObjectList.h"
 #include "Overlay/Components/SaveSlotList.h"
@@ -81,6 +82,9 @@ void RenderMenuBar() {
 			if (ImGui::MenuItem("Show Save Slot List", nullptr, &showSaveSlotList)) {
 				api->WriteIniBool(L"GUI", L"ShowSaveSlotList", showSaveSlotList);
 			}
+			if (ImGui::MenuItem("Show Level Select", nullptr, &showLevelSelect)) {
+				api->WriteIniBool(L"GUI", L"ShowLevelSelect", showLevelSelect);
+			}
 			ImGui::EndMenu();
 		}
 
@@ -119,6 +123,13 @@ void RenderMenuBar() {
 			}
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip("Unlocks music select in sound options.");
+			}
+
+			if (ImGui::MenuItem("Open Level Select", nullptr, false)) {
+				api->GotoLevelSelect();
+			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Open the level select screen.");
 			}
 
 			ImGui::EndMenu();

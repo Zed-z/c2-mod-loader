@@ -8,6 +8,40 @@
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>4B7964 </Address>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>245</ID>
+          <Description>"Set to 0x12 for level select"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0x41AC66 </Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>246</ID>
+          <Description>"Level Select Tribe"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+20830C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>247</ID>
+          <Description>"Level Select Level"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+208310</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>248</ID>
+          <Description>"Level Select Map"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+208314</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>249</ID>
+          <Description>"Level Select Type"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Croc2.exe+208318</Address>
+        </CheatEntry>
+      </CheatEntries>
     </CheatEntry>
     <CheatEntry>
       <ID>8</ID>

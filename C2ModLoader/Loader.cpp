@@ -29,6 +29,7 @@ extern bool showInputs;
 extern bool showObjectList;
 extern bool showCoords;
 extern bool showLevelInfo;
+extern bool showLevelSelect;
 extern bool showSaveSlotList;
 extern bool showLogInfo;
 extern bool showLogDebug;
@@ -57,6 +58,7 @@ void LoadConfig() {
 	showObjectList = api->SetupIniBool(L"GUI", L"ShowObjectList", false);
 	showCoords = api->SetupIniBool(L"GUI", L"ShowCoords", false);
 	showLevelInfo = api->SetupIniBool(L"GUI", L"ShowLevelInfo", false);
+	showLevelSelect = api->SetupIniBool(L"GUI", L"ShowLevelSelect", false);
 	showSaveSlotList = api->SetupIniBool(L"GUI", L"ShowSaveSlotList", false);
 
 	showLogInfo = api->SetupIniBool(L"Logging", L"Info", true);

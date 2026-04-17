@@ -32,9 +32,9 @@ void RenderSaveSlotList() {
 
 			ImGui::Text("Info");
 			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputText((std::string("Name##name") + slotId).c_str(), slot->name, 4);
+			ImGui::InputText((std::string("Name##name") + slotId).c_str(), slot->name, 8);
 			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputText((std::string("Tribe##tribe") + slotId).c_str(), slot->tribe, 16);
+			ImGui::InputText((std::string("FileName##filename") + slotId).c_str(), slot->fileName, 32);
 
 			ImGui::Text("Stats");
 			ImGui::SetNextItemWidth(itemWidth);

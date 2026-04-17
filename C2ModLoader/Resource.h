@@ -32,6 +32,7 @@ GUI/ShowInputs[Show Inputs|Show input configuration]:bool=0;\
 GUI/ShowObjectList[Show Object List|Show the object list]:bool=0;\
 GUI/ShowCoords[Show Coordinates|Show coordinates]:bool=0;\
 GUI/ShowLevelInfo[Show Level Info|Show level information]:bool=0;\
+GUI/ShowLevelSelect[Show Level Select|Show level select]:bool=0;\
 GUI/ShowSaveSlotList[Show Save Slot List|Show save slot list]:bool=0;\
 @Logging[Logging|Configure logging settings];\
 Logging/Info[Info Logging|Show info logs]:bool=1;\

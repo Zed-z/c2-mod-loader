@@ -34,7 +34,7 @@
 #define ADDR_STRAT_COUNT {0x636160}
 
 #define ADDR_CURRENT_SAVE_SLOT {0x6220FC}
-#define ADDR_SAVE_SLOT_BASE 0x6042C4
+#define ADDR_SAVE_SLOT_BASE 0x006040C0
 #define ADDR_SAVE_SLOT_OFFSET 0x2000
 #define SAVE_SLOT_NUMBER 5
 
@@ -61,7 +61,6 @@
 #define ADDR_MOVEMENT_ALLOWED_STATE 0x622C44
 
 #define ADDR_DOOR_STRUCT 0x4B7888
-#define ADDR_LEVEL_INFO 0x4A8C44
 
 // Game structs ----------------------------------------------------------
 
@@ -99,7 +98,15 @@ enum WadFileType : int32_t {
 	WAD_TYPE_LEVEL = 0x0,
 	WAD_TYPE_BOSS = 0x1,
 	WAD_TYPE_SECRET = 0x2,
-	WAD_TYPE_INTERFACE = 0x3,
+	WAD_TYPE_CUTSCENE = 0x3,
+};
+
+constexpr const char *wadFileTypeNames[] = {
+	"Invalid",
+	"Level",
+	"Boss",
+	"Secret",
+	"Cutscene",
 };
 
 struct ColorBGRA32 {
@@ -226,42 +233,162 @@ struct StratEntity {
 };
 
 struct SaveSlot {
+	uint8_t byte0;
+	uint8_t byte1;
+	uint8_t byte2;
+	uint8_t byte3;
+
+	uint16_t Title[32];
+	uint8_t reserve[28];
+	uint16_t Clut[16];
+	uint8_t Icon[384];
+
+	uint8_t Initial1;
+	uint8_t Initial2;
+	uint8_t Initial3;
+	uint8_t Pad00;
+
 	char name[8];
-	uint32_t heartPots;
-	uint32_t health;
+
+	int heartPots;
+	int health;
 	uint32_t crystals;
-	uint8_t _pad1[8];
-	char tribe[16];
-	uint8_t _pad2[48];
-	uint32_t vibration;
-	uint8_t _pad3[4];
-	uint32_t totalBossHearts;
-	uint32_t bossHearts;
-	uint8_t _pad4[4];
-	uint32_t unknown1;
-	uint32_t goldenGobbos;
-	uint8_t _pad5[4];
-	uint32_t jigsawPieces;
-	uint32_t levelCrystals;
-	uint32_t binoculars;
-	uint32_t keys;
-	uint32_t purpleGummis;
-	uint32_t blueGummis;
-	uint32_t greenGummis;
-	uint32_t otherItem;
-	uint32_t clockworkGobbos;
-	uint32_t unknownItem;
-	uint32_t wheels;
-	uint32_t itemCount;
-	uint32_t selectedItem;
-	uint32_t doorTribe;
-	uint32_t doorLevel;
-	uint32_t doorMap;
-	uint32_t doorType;
-	uint32_t rewardPoints;
-	uint32_t analogOn;
+
+	int _pad0;
+	int _pad1;
+
+	char fileName[32];
+
+	int16_t effectVolume;
+	int16_t musicVolume;
+	int16_t dialogVolume;
+	int16_t adsSpeakerConfig;
+
+	int _pad2;
+
+	int tribe0;
+	int level0;
+	int map0;
+	WadFileType type0;
+
+	int _pad3;
+
+	int Language;
+	int vibration;
+
+	int totalBossHearts;
+	int bossHearts;
+
+	uint32_t _pad4;
+
+	int CameraMode;
+	int goldenGobbos;
+
+	int _pad5;
+
+	int jigsawPieces;
+	int levelCrystals;
+
+	int binoculars;
+	int keys;
+	union {
+		int purpleGummis;
+		int redJellies;
+	};
+	union {
+		int blueGummis;
+		int orangeJellies;
+	};
+	union {
+		int greenGummis;
+		int greenJellies;
+	};
+	int tempItems;
+	int clockworkGobbos;
+	int unknownItem;
+	int wheels;
+
+	int itemCount;
+	int selectedItem;
+
+	int doorTribe;
+	int doorLevel;
+	int doorMap;
+	int doorType;
+
+	int rewardPoints;
+
+	int analogOn;
+
 	uint32_t controlMethod;
+
+	uint32_t levelFlags[10][10][4];
+
+	uint8_t _pad6[100];
+
+	int _pad7;
+
+	int saveChecksum;
+
+	int _pad8[1741];
 };
+
+enum GameStates : uint32_t {
+	GS_NONE = 0x0,
+	GS_SELECT_LOAD_SLOT = 0x1,
+	GS_SELECT_SAVE_SLOT = 0x2,
+	GS_CONTINUE = 0x3,
+	GS_CREDITS = 0x4,
+	GS_DEMO_MODE = 0x5,
+	GS_SHUTDOWN = 0x6,
+	GS_SHUTDOWN_2 = 0x7,
+	GS_INITIALIZE = 0x8,
+	GS_ENTER_INITIALS = 0x9,
+	GS_UNKNOWN_10 = 0xA,
+	GS_LOADING = 0xB,
+	GS_GAME_OVER = 0xC,
+	GS_LANGUAGE_SELECT = 0xD,
+	GS_OPTIONS_MENU = 0xE,
+	GS_UNKNOWN_15 = 0xF,
+	GS_MAIN_MENU = 0x10,
+	GS_UNKNOWN_17 = 0x11,
+	GS_LEVEL_SELECT = 0x12,
+	GS_UNKNOWN_19 = 0x13,
+	GS_UNKNOWN_20 = 0x14,
+};
+
+constexpr const char *gameStateNames[] = {
+	"None",
+	"Select Load Slot",
+	"Select Save Slot",
+	"Continue",
+	"Credits",
+	"Demo Mode",
+	"Shutdown",
+	"Shutdown 2",
+	"Initialize",
+	"Enter Initials",
+	"Unknown 10",
+	"Loading",
+	"Game Over",
+	"Language Select",
+	"Options Menu",
+	"Unknown 15",
+	"Main Menu",
+	"Unknown 17",
+	"Level Select",
+	"Unknown 19",
+	"Unknown 20"};
+
+inline GameStates *gameState = (GameStates *)0x004B793C;
+inline GameStates *gameStateComingFrom = (GameStates *)0x004B7894;
+inline GameStates *gameStateGoingTo = (GameStates *)0x004B7930;
+
+typedef int32_t bool32_t;
+inline bool32_t *gameStateTransitioning = (bool32_t *)0x004B7934;
+
+typedef void (*GotoLevelFunction)(int tribe, int level, int map, WadFileType type);
+typedef void (*GotoLevelSelectFunction)();
 
 struct Inputs {
 	uint32_t raw;
@@ -287,6 +414,13 @@ struct Inputs {
 	bool invUse;
 	bool invRight;
 };
+
+typedef void(__cdecl *fnFadeRoutine)();
+inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)0x004B776C;
+
+typedef void(__cdecl *fnInitFade)(uint32_t fadeType);
+inline fnInitFade initFade = (fnInitFade)0x00418240;
+#define FADE_NormalToBlack 1
 
 // Api definition --------------------------------------------------------
 
@@ -369,6 +503,7 @@ typedef Inputs (*GetInputsFunction)();
 typedef Inputs (*GetInputsPressedFunction)();
 typedef Inputs (*GetInputsReleasedFunction)();
 
+#define ADDR_LEVEL_INFO 0x4A8C44
 struct LevelInfo {
 	int tribe;
 	int level;
@@ -463,6 +598,9 @@ struct ModApi {
 	GetLevelInfoFunction GetLevelInfo;
 
 	GetXinputStateFunction GetXinputState;
+
+	GotoLevelFunction GotoLevel;
+	GotoLevelSelectFunction GotoLevelSelect;
 };
 
 extern "C" __declspec(dllexport) ModApi *GetModApi();

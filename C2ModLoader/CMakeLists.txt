@@ -67,6 +67,7 @@ set(SOURCES
     Overlay/Components/Coords.cpp
     Overlay/Components/Inputs.cpp
     Overlay/Components/LevelInfo.cpp
+    Overlay/Components/LevelSelect.cpp
     Overlay/Components/Log.cpp
     Overlay/Components/MenuBar.cpp
     Overlay/Components/ObjectList.cpp

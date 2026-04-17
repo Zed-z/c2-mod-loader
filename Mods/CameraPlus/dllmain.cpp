@@ -341,6 +341,7 @@ void __stdcall PhysicsLoop() {
 	Inputs inputs = api->GetInputs();
 	Inputs inputsPressed = api->GetInputsPressed();
 	Inputs inputsReleased = api->GetInputsReleased();
+	uint32_t controlMethod = api->GetCurrentSaveSlot()->controlMethod;
 
 	// Entities
 	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
@@ -370,7 +371,7 @@ void __stdcall PhysicsLoop() {
 			orbitCameraReset();
 		}
 
-		{ // Center on type 2 controls
+		if (controlMethod == CTRL_TYPE_2) {
 			if (inputs.effectiveDown || inputs.effectiveUp || inputs.effectiveLeft || inputs.effectiveRight) {
 				centerOnType2Current = centerOnType2;
 			}
@@ -379,7 +380,7 @@ void __stdcall PhysicsLoop() {
 				centerOnType2Current = false;
 			}
 
-			if (centerOnType2Current && api->GetCurrentSaveSlot()->controlMethod == CTRL_TYPE_2) {
+			if (centerOnType2Current) {
 				orbitCameraResetYaw();
 			}
 		}

@@ -38,7 +38,7 @@ void LogRaw(const std::string &message, const LogSeverity &severity, const HMODU
 	// Get log path - ignore directory override
 	HMODULE executable = GetModuleHandleA(NULL);
 	PathInfo executableFilepath = GetModuleFilepath(executable);
-	fs::path p(executableFilepath.directory + StringToWString(LOG_FILE));
+	fs::path p(executableFilepath.directory + L"\\" + StringToWString(LOG_FILE));
 
 	// Open log
 	std::wofstream log{p, std::ios::app};
@@ -648,6 +648,33 @@ XinputInput GetXinputState() {
 	return XinputManager::GetState();
 }
 
+void GotoLevel(int tribe, int level, int map, WadFileType type) {
+	SaveSlot *slot = api->GetCurrentSaveSlot();
+
+	slot->tribe0 = tribe;
+	slot->level0 = level;
+	slot->map0 = map;
+	slot->type0 = type;
+
+	*gameStateComingFrom = *gameState;
+	*gameStateGoingTo = GS_LOADING;
+	*gameStateTransitioning = true;
+
+	if (*fadeRoutine == nullptr) {
+		initFade(FADE_NormalToBlack);
+	}
+}
+
+void GotoLevelSelect() {
+	*gameStateComingFrom = *gameState;
+	*gameStateGoingTo = GS_LEVEL_SELECT;
+	*gameStateTransitioning = true;
+
+	if (*fadeRoutine == nullptr) {
+		initFade(FADE_NormalToBlack);
+	}
+}
+
 // API
 ModApi g_ModApi = {
 	LogInfo,
@@ -688,7 +715,10 @@ ModApi g_ModApi = {
 	GetSaveSlot,
 	GetCurrentSaveSlot,
 	GetLevelInfo,
-	GetXinputState};
+	GetXinputState,
+	GotoLevel,
+	GotoLevelSelect,
+};
 
 extern "C" __declspec(dllexport) ModApi *GetModApi() {
 	return &g_ModApi;

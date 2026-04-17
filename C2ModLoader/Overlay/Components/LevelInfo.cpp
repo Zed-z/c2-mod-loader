@@ -19,10 +19,11 @@ void RenderLevelInfo() {
 	ImGui::Begin("Level Info");
 	ImGui::PushFont(Fonts::GetFontCode());
 	std::stringstream ss;
+	ss << "Game State: " << gameStateNames[*gameState] << std::endl;
 	ss << "Tribe: " << levelInfo.tribe << std::endl;
 	ss << "Level: " << levelInfo.level << std::endl;
 	ss << "Map: " << levelInfo.map << std::endl;
-	ss << "Type: " << levelInfo.type << std::endl;
+	ss << "Type: " << wadFileTypeNames[levelInfo.type + 1] << std::endl;
 	ImGui::Text(ss.str().c_str());
 	ImGui::PopFont();
 	ImGui::End();
