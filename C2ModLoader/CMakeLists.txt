@@ -53,6 +53,7 @@ file(WRITE "${GENERATED_EMBEDDED_LICENSES_HEADER}" "${GENERATED_EMBEDDED_LICENSE
 # Source files
 set(SOURCES
     CheatsManager.cpp
+    ConsoleLogging.cpp
     dllmain.cpp
     FileOverrides.cpp
     Launcher/Backend.cpp

@@ -1,6 +1,7 @@
 #define IS_MOD_LOADER
 #include "CheatsManager.h"
 #include "Config.h"
+#include "ConsoleLogging.h"
 #include "Launcher/Launcher.h"
 #include "Loader.h"
 #include "ModApi.h"
@@ -117,6 +118,8 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	if (g_mainThreadHandle) {
 		SuspendThread(g_mainThreadHandle);
 	}
+
+	ConsoleLogging::Initialize();
 
 	std::string gameVersionMessage = std::string("Game version: ") + GameVersions[api->GetGameVersion()];
 	api->LogInfo(gameVersionMessage.c_str());

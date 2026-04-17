@@ -1,6 +1,7 @@
 #define IS_MOD_LOADER
 #include "ModApi.h"
 #include "Config.h"
+#include "ConsoleLogging.h"
 #include "Loader.h"
 #include "Overlay/Components/MenuBar.h"
 #include "Overlay/Components/Toast.h"
@@ -55,10 +56,11 @@ void LogRaw(const std::string &message, const LogSeverity &severity, const HMODU
 	std::wstringstream msg;
 	msg << L"[" << std::put_time(&timeInfo, L"%Y-%m-%d %H:%M:%S") << L"] [" << StringToWString(prefix) << pathInfo.name << L"] " << StringToWString(message) << std::endl;
 
-	// Write the log to file and buffer
-	log << msg.str();
+	// Write the log to file, console, and buffer
 	{
 		std::lock_guard<std::mutex> lock(logMutex);
+		log << msg.str();
+		ConsoleLogging::LogToConsole(msg.str(), severity);
 		logMessages.push_back({WStringToString(msg.str()), severity});
 	}
 
