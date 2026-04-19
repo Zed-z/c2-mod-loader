@@ -86,7 +86,6 @@ set(SOURCES
     Utils/ResourceLoader.cpp
     Utils/Style.cpp
     Utils/UiScale.cpp
-    Wad/WadFile.cpp
     XinputManager.cpp
 )
 

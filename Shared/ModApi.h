@@ -55,9 +55,6 @@
 #define ADDR_CAMERA_LOOKAT_Y 0x622B98
 #define ADDR_CAMERA_LOOKAT_Z 0x622B9C
 
-#define ADDR_CONTROL_SCHEME_SLOT 0x60438C
-#define ADDR_CONTROL_SCHEME_COPY1 0x52A5F4
-#define ADDR_CONTROL_SCHEME_COPY2 0x52AE64
 #define ADDR_MOVEMENT_ALLOWED_STATE 0x622C44
 
 #define ADDR_DOOR_STRUCT 0x4B7888
@@ -378,7 +375,8 @@ constexpr const char *gameStateNames[] = {
 	"Unknown 17",
 	"Level Select",
 	"Unknown 19",
-	"Unknown 20"};
+	"Unknown 20",
+};
 
 inline GameStates *gameState = (GameStates *)0x004B793C;
 inline GameStates *gameStateComingFrom = (GameStates *)0x004B7894;

@@ -19,8 +19,8 @@ void RenderInputs() {
 
 	int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
 
-	int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-	int controlScheme = api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
+	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
+	int controlScheme = currentSaveSlot->controlMethod;
 
 	ImGui::Begin("Inputs");
 	ImGui::PushFont(Fonts::GetFontCode());

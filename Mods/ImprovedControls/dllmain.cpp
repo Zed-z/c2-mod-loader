@@ -19,15 +19,13 @@ std::string typeSwitchModeNames[] = {"None", "Manual", "Automatic"};
 TypeSwitchMode typeSwitchMode;
 
 int GetControlScheme() {
-	int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-	return api->AddressGetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset);
+	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
+	return currentSaveSlot->controlMethod;
 }
 
 void SetControlScheme(int scheme) {
-	int saveSlotOffset = api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT) * ADDR_SAVE_SLOT_OFFSET;
-	api->AddressSetInt(ADDR_CONTROL_SCHEME_SLOT + saveSlotOffset, scheme);
-	api->AddressSetInt(ADDR_CONTROL_SCHEME_COPY1 + saveSlotOffset, scheme);
-	api->AddressSetInt(ADDR_CONTROL_SCHEME_COPY2 + saveSlotOffset, scheme);
+	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
+	currentSaveSlot->controlMethod = scheme;
 }
 
 void __stdcall PhysicsStep() {
@@ -37,42 +35,14 @@ void __stdcall PhysicsStep() {
 	bool controlScheme = (bool)GetControlScheme();
 
 	// Auto control mode
-	switch (typeSwitchMode) {
-	case TypeSwitchMode::Manual: {
+	if (typeSwitchMode == TypeSwitchMode::Manual) {
 		bool changeControls = GetAsyncKeyState(VK_CAPITAL) & 1;
-
 		if (changeControls) {
 			SetControlScheme(!controlScheme);
 			std::string controlSchemeMessage = "Control scheme: " + std::string(ControlSchemeNames[!controlScheme]);
 			api->LogInfo(controlSchemeMessage.c_str());
 			api->ShowInfoToast(controlSchemeMessage.c_str());
 		}
-		break;
-	}
-	case TypeSwitchMode::Automatic: {
-		bool anyInput = inputsPressed.up || inputsPressed.down || inputsPressed.left || inputsPressed.right;
-		int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
-
-		// Started moving
-		if (anyInput) {
-
-			// Keyboard is used - analog strength is 181
-			if (analogStrength == 181) {
-				api->LogDebug("Using keyboard controls (Auto Mode)");
-				SetControlScheme(CTRL_TYPE_2);
-			}
-
-			// Analog stick is being used
-			else {
-				api->LogDebug("Using analog controls (Auto Mode)");
-				SetControlScheme(CTRL_TYPE_1);
-			}
-
-			std::string controlSchemeMessage = "Control scheme: " + std::string(ControlSchemeNames[GetControlScheme()]);
-			api->LogDebug(controlSchemeMessage.c_str());
-		}
-		break;
-	}
 	}
 
 	// Flip pressed
@@ -137,6 +107,46 @@ MenuActionRegistration __stdcall toggleTypeSwitchRegistration() {
 	return {label.c_str(), "Enable manual [CAPSLOCK] or automatic control type switching.", toggleTypeSwitchMode, true};
 }
 
+/*
+		0042f00a 89 3d 4c        MOV        dword ptr [analog_strength_0052a54c],EDI
+				 a5 52 00
+*/
+void __stdcall resetUsingKeyboard() {
+	if (typeSwitchMode == TypeSwitchMode::Automatic)
+		SetControlScheme(CTRL_TYPE_1);
+}
+
+/*
+		0042f0f8 85 f6           TEST       ESI,ESI
+		0042f0fa 66 a3 8e        MOV        [DAT_0052a58e],AX
+				 a5 52 00
+		0042f100 74 14           JZ         LAB_0042f116
+		0042f102 c7 05 4c        MOV        dword ptr [analog_strength_0052a54c],0xb5
+				 a5 52 00
+				 b5 00 00 00
+		0042f10c c7 05 60        MOV        dword ptr [DAT_0052a560],0x2
+				 a5 52 00
+				 02 00 00 00
+
+*/
+void __stdcall setUsingKeyboard() {
+	if (typeSwitchMode == TypeSwitchMode::Automatic)
+		SetControlScheme(CTRL_TYPE_2);
+}
+
+void PatchAutoModeSwitch() {
+	{
+		uintptr_t hookAddress1 = 0x0042f00a;
+		int hookSize1 = 6;
+		api->HookFunction(hookAddress1, hookSize1, &resetUsingKeyboard, INJECT_AFTER);
+	}
+	{
+		uintptr_t hookAddress1 = 0x0042f102;
+		int hookSize1 = 10;
+		api->HookFunction(hookAddress1, hookSize1, &setUsingKeyboard, INJECT_AFTER);
+	}
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 	if (reason == DLL_PROCESS_ATTACH) {
 		api = LoadModApi();
@@ -152,6 +162,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		api->HookGame(GAME_HOOK_PHYSICS, PhysicsStep);
 
 		DisableThreadLibraryCalls(hModule);
+
+		PatchAutoModeSwitch();
 	}
 	return TRUE;
 }
