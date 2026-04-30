@@ -1,6 +1,8 @@
 param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
+    [ValidateSet("EU","US","DEMO")]
+    [string]$Version = "US",
     [switch]$Clean,
     [switch]$Deploy,
     [switch]$Package,
@@ -10,8 +12,9 @@ param(
 
 if ($Help) {
     Write-Host @"
-Arguments: [-Configuration <Debug|Release>] [-Clean] [-Deploy] [-Package] [-Launch]
+Arguments: [-Configuration <Debug|Release>] [-Version <EU|US|DEMO>] [-Clean] [-Deploy] [-Package] [-Launch]
     -Configuration : Build configuration (Debug or Release). Default: Release
+    -Version      : Croc 2 game version to target (EU, US, DEMO). Default: US
     -Clean        : Clean the build directory before building
     -Deploy       : Copy mod files to Croc 2 directory
     -Package      : Create package folder + zip
@@ -42,9 +45,12 @@ if (-not (Test-Path $vsDevCmd)) {
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $buildDir = Join-Path $projectRoot "build"
+$gameDir = Join-Path $projectRoot "Croc2\$Version"
 
 Write-Host "Building C2ModLoader with CMake + MSVC" -ForegroundColor Cyan
 Write-Host "Configuration: $Configuration" -ForegroundColor Cyan
+Write-Host "Version: $Version" -ForegroundColor Cyan
+Write-Host "Game Directory: $gameDir" -ForegroundColor Cyan
 Write-Host "VS DevCmd: $vsDevCmd" -ForegroundColor Cyan
 Write-Host "Build Directory: $buildDir" -ForegroundColor Cyan
 
@@ -63,7 +69,10 @@ if (-not (Test-Path $buildDir)) {
 
 # Configure + build
 Write-Host "Configuring and building with MSVC x86..." -ForegroundColor Yellow
-$cmd = "call `"$vsDevCmd`" -arch=x86 -host_arch=x64 >nul && cmake -S `"$projectRoot`" -B `"$buildDir`" -G Ninja -DCMAKE_BUILD_TYPE=$Configuration && cmake --build `"$buildDir`""
+$cmakeGameDir = "`"$gameDir`""
+$cmakeModsDir = "`"$($gameDir)\mods`""
+$cmakeArgs = "-S `"$projectRoot`" -B `"$buildDir`" -G Ninja -DCMAKE_BUILD_TYPE=$Configuration -DCROC2_GAME_DIR=$cmakeGameDir -DCROC2_MODS_DIR=$cmakeModsDir"
+$cmd = "call `"$vsDevCmd`" -arch=x86 -host_arch=x64 >nul && cmake $cmakeArgs && cmake --build `"$buildDir`""
 Write-Host "Running via cmd.exe: $cmd" -ForegroundColor Gray
 cmd /c $cmd
 if ($LASTEXITCODE -ne 0) {

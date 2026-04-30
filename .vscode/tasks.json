@@ -24,7 +24,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Build and Deploy (Release)",
+            "label": "Build and Deploy (Release - US)",
             "type": "shell",
             "command": "powershell",
             "args": [
@@ -32,6 +32,8 @@
                 "Bypass",
                 "-File",
                 "${workspaceFolder}/build.ps1",
+                "-Version",
+                "US",
                 "-Configuration",
                 "Release",
                 "-Deploy"
@@ -44,7 +46,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Build and Deploy (Debug)",
+            "label": "Build and Deploy (Release - EU)",
             "type": "shell",
             "command": "powershell",
             "args": [
@@ -52,6 +54,96 @@
                 "Bypass",
                 "-File",
                 "${workspaceFolder}/build.ps1",
+                "-Version",
+                "EU",
+                "-Configuration",
+                "Release",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Deploy (Release - DEMO)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "DEMO",
+                "-Configuration",
+                "Release",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Deploy (Debug - US)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "US",
+                "-Configuration",
+                "Debug",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Deploy (Debug - EU)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "EU",
+                "-Configuration",
+                "Debug",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Deploy (Debug - DEMO)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "DEMO",
                 "-Configuration",
                 "Debug",
                 "-Deploy"

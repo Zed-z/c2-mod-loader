@@ -4,15 +4,17 @@ CC=i686-w64-mingw32-gcc
 CXX=i686-w64-mingw32-g++
 RC=i686-w64-mingw32-windres
 TYPE=Release
+VERSION=US
 export WINEPREFIX="$HOME/.local/share/wineprefixes/croc2"
-PATH_TO_GAME="$WINEPREFIX/drive_c/Program Files (x86)/Fox/Croc 2"
+PATH_TO_GAME="$WINEPREFIX/drive_c/Program Files (x86)/Fox/Croc 2/"$VERSION
 DEPLOY=false
 PACKAGE=false
 LAUNCH=false
 
 usage() {
-    echo "Usage: $0 [-c <Debug|Release>] [-Cdplh]"
+    echo "Usage: $0 [-c <Debug|Release>] [-v <EU|US|DEMO>] [-Cdplh]"
     echo "  -c - build configuration (default: Release)"
+    echo "  -v - game version to use (EU, US, DEMO). Default: US"
     echo "  -C - clean the build directory before building"
     echo "  -d - copy the mod loader and mods"
     echo "  -p - create package folder + zip"
@@ -36,9 +38,10 @@ launch() {
     wine "$PATH_TO_GAME/Croc2.exe"
 }
 
-while getopts "c:Cdplh" opt; do
+while getopts "c:v:Cdplh" opt; do
     case $opt in
         c) TYPE="$OPTARG" ;;
+        v) VERSION="$OPTARG" ; PATH_TO_GAME="$WINEPREFIX/drive_c/Program Files (x86)/Fox/Croc 2/$VERSION" ;;
         C) clean_build ;;
         d) DEPLOY=true ;;
         p) PACKAGE=true ;;
