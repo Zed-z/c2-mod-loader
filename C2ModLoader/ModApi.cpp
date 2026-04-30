@@ -516,24 +516,34 @@ void SetupIniString(const wchar_t *section, const wchar_t *key, const wchar_t *d
 }
 
 int GetGameVersion() {
+	static int cachedVersion = GAMEVER_UNCHECKED;
+
+	if (cachedVersion != GAMEVER_UNCHECKED) {
+		return cachedVersion;
+	}
 
 	char path[MAX_PATH];
 	GetModuleFileNameA(nullptr, path, MAX_PATH);
 
 	std::ifstream file(path, std::ios::binary | std::ios::ate);
-	if (!file)
-		return GAMEVER_UNKNOWN;
+	if (!file) {
+		cachedVersion = GAMEVER_UNKNOWN;
+		return cachedVersion;
+	}
 
 	std::streamsize size = file.tellg();
 	file.close();
 
 	if (size == 0xB4000)
-		return GAMEVER_US;
-	if (size == 0xBD000)
-		return GAMEVER_EU;
-	if (size == 0xB3000)
-		return GAMEVER_DEMO;
-	return GAMEVER_UNKNOWN;
+		cachedVersion = GAMEVER_US;
+	else if (size == 0xBD000)
+		cachedVersion = GAMEVER_EU;
+	else if (size == 0xB3000)
+		cachedVersion = GAMEVER_DEMO;
+	else
+		cachedVersion = GAMEVER_UNKNOWN;
+
+	return cachedVersion;
 }
 
 Inputs GetInputsRaw(int address) {

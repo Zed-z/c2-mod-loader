@@ -890,7 +890,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 					footerTextY = 0.0f;
 				}
 
-				const std::string footerLeft = std::string(LOADER_NAME) + " v" + std::string(LOADER_VERSION);
+				const std::string footerLeft = std::string(LOADER_NAME) + " v" + std::string(LOADER_VERSION) + "   |   " + "Game Version: " + GameVersions[api->GetGameVersion()];
 				ImGui::SetCursorPosY(footerTextY);
 				ImGui::TextColored(ImVec4(0.75f, 0.75f, 0.75f, 1.0f), "%s", footerLeft.c_str());
 
