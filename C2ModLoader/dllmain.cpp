@@ -93,25 +93,6 @@ static DWORD WINAPI WindowTitleCallback(LPVOID param) {
 	return 0;
 }
 
-static DWORD WINAPI CameraPanCallback(LPVOID param) {
-	double timer = 0;
-
-	while (true) {
-		Sleep(100);
-
-		LevelInfo levelInfo = api->GetLevelInfo();
-		if (levelInfo.tribe == 0 && levelInfo.level == 0 && levelInfo.map == 0) {
-			StratEntity *camera = api->GetEntity(ADDR_ROOT_OBJ);
-			if (camera != nullptr) {
-				double camMod = sin(timer);
-				camera->newRotPos = {0, (int)(8388608 + camMod * 100000), 0, 54394, -1024, 30854};
-			}
-		}
-
-		timer += 0.1;
-	}
-}
-
 static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	HMODULE hModule = (HMODULE)param;
 
@@ -160,9 +141,6 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	}
 
 	CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
-
-	// Camera tilt on main menu
-	CreateThread(nullptr, 0, CameraPanCallback, nullptr, 0, nullptr);
 
 	if (g_mainThreadHandle) {
 		ResumeThread(g_mainThreadHandle);
