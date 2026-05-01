@@ -5,9 +5,6 @@
 
 // https://www.speedrun.com/croc_2/forums/l2qjp
 
-extern uint32_t cheatsValue;
-#define ADDR_CHEATS 0x4B7964
-
 void SetupCheats();
 void ApplyCheats();
 

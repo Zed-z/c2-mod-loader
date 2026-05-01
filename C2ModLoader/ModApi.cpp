@@ -546,7 +546,7 @@ int GetGameVersion() {
 	return cachedVersion;
 }
 
-Inputs GetInputsRaw(int address) {
+Inputs GetInputsRaw(uintptr_t address) {
 
 	// Get inputs
 	int input = AddressGetInt(address);
@@ -582,15 +582,15 @@ Inputs GetInputsRaw(int address) {
 }
 
 Inputs GetInputs() {
-	return GetInputsRaw(ADDR_INPUTS);
+	return GetInputsRaw((uintptr_t)inputsRaw);
 }
 
 Inputs GetInputsPressed() {
-	return GetInputsRaw(ADDR_INPUTS_PRESSED);
+	return GetInputsRaw((uintptr_t)inputsPressedRaw);
 }
 
 Inputs GetInputsReleased() {
-	return GetInputsRaw(ADDR_INPUTS_RELEASED);
+	return GetInputsRaw((uintptr_t)inputsReleasedRaw);
 }
 
 void ShowInfoToast(const char *message) {
@@ -637,23 +637,15 @@ StratEntity *GetEntity(MemoryAddress address) {
 }
 
 SaveSlot *GetSaveSlot(int slot_number) {
-	uintptr_t addr = ADDR_SAVE_SLOT_BASE + ADDR_SAVE_SLOT_OFFSET * slot_number;
-	if (addr == 0)
-		return nullptr;
-	if (IsBadReadPtr((void *)addr, sizeof(SaveSlot)))
-		return nullptr;
-
-	SaveSlot *slot = (SaveSlot *)addr;
-	return slot;
+	return &saveSlots[slot_number];
 }
 
 SaveSlot *GetCurrentSaveSlot() {
-	return GetSaveSlot(AddressGetInt(ADDR_CURRENT_SAVE_SLOT));
+	return GetSaveSlot(*currentSaveSlotIndex);
 }
 
 LevelInfo GetLevelInfo() {
-	LevelInfo levelInfo = *(LevelInfo *)ADDR_LEVEL_INFO;
-	return levelInfo;
+	return *levelInfo;
 }
 
 XinputInput GetXinputState() {
@@ -678,6 +670,12 @@ void GotoLevel(int tribe, int level, int map, WadFileType type) {
 }
 
 void GotoLevelSelect() {
+	if (api->GetGameVersion() == GAMEVER_DEMO) {
+		api->LogWarning("Level select not available in the demo!");
+		api->ShowWarningToast("Level select not available in the demo!");
+		return;
+	}
+
 	*gameStateComingFrom = *gameState;
 	*gameStateGoingTo = GS_LEVEL_SELECT;
 	*gameStateTransitioning = true;

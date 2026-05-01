@@ -109,27 +109,32 @@ XinputInput GetState() {
 	return input;
 }
 
-/*
-	Croc2.exe+2EEC0 - 83 EC 10              - sub esp,10
-	Croc2.exe+2EEC3 - 8B 0D ACA55200        - mov ecx,[Croc2.exe+12A5AC]
-*/
 void __stdcall PreInput() {
 	PollInput();
 }
 
 void PatchPreInput() {
-	api->HookFunction(0x42EEC0, 9, &PreInput, INJECT_BEFORE);
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+2EEC0 - 83 EC 10              - sub esp,10
+			Croc2.exe+2EEC3 - 8B 0D ACA55200        - mov ecx,[Croc2.exe+12A5AC]
+		*/
+		api->HookFunction(0x42EEC0, 9, &PreInput, INJECT_BEFORE);
+		break;
+	}
+	case GAMEVER_EU: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		break;
+	}
+	case GAMEVER_DEMO: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		break;
+	}
+	}
 }
 
 void PatchAnalogInput() {
-	/*
-		Inject before these lines, to replace analog input after
-		it's polled from directinput, but before further processing
-		Croc2.exe+2F1CA - 83 FD 7F              - cmp ebp,7F
-		Croc2.exe+2F1CD - 89 15 74A55200        - mov [Croc2.exe+12A574],edx
-	*/
-	uintptr_t hookAddress = 0x42F1CA;
-	uintptr_t analogYAddress = 0x52A574;
 	uintptr_t ptrX = (uintptr_t)&(input.leftStick.x);
 	uintptr_t ptrY = (uintptr_t)&(input.leftStick.y);
 	uint8_t hookCode[12];
@@ -147,7 +152,27 @@ void PatchAnalogInput() {
 	*(uintptr_t *)(hookCode + p) = ptrY;
 	p += 4;
 
-	api->InjectCode(hookAddress, 9, hookCode, p, INJECT_BEFORE);
+	/*
+		Inject before these lines, to replace analog input after
+		it's polled from directinput, but before further processing
+	*/
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+2F1CA - 83 FD 7F              - cmp ebp,7F
+			Croc2.exe+2F1CD - 89 15 74A55200        - mov [Croc2.exe+12A574],edx
+		*/
+		api->InjectCode(0x42F1CA, 9, hookCode, p, INJECT_BEFORE);
+	}
+	case GAMEVER_EU: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		return;
+	}
+	case GAMEVER_DEMO: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		return;
+	}
+	}
 }
 
 struct VibrationParams {
@@ -184,9 +209,6 @@ void vibrate(int strength, int durationMs) {
 	}
 }
 
-/*
-	Croc2.exe+81B80 - 83 3D 3C794B00 0B     - cmp dword ptr [Croc2.exe+B793C],0B
-*/
 void __stdcall PreDamage() {
 	if (vibrationEnabled) {
 		int strength = (int)(vibrationStrength * 65535);
@@ -195,7 +217,21 @@ void __stdcall PreDamage() {
 }
 
 void PatchPreDamage() {
-	api->HookFunction(0x481B80, 7, &PreDamage, INJECT_BEFORE);
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		// Croc2.exe+81B80 - 83 3D 3C794B00 0B     - cmp dword ptr [Croc2.exe+B793C],0B
+		api->HookFunction(0x481B80, 7, &PreDamage, INJECT_BEFORE);
+		break;
+	}
+	case GAMEVER_EU: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		break;
+	}
+	case GAMEVER_DEMO: {
+		api->LogWarning("[XinputManager] Not implemented.");
+		break;
+	}
+	}
 }
 
 void Setup() {

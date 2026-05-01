@@ -4,11 +4,8 @@
 #include <windows.h>
 
 ModApi *api = nullptr;
-
-uintptr_t addr_fog_distance, addr_render_distance;
-
-uintptr_t addr_base_fog_distance, addr_base_render_distance;
-int base_fog_distance, base_render_distance;
+uint32_t base_fog_distance;
+uint32_t base_render_distance;
 
 bool is_active;
 #define RENDER_MULTIPLIER_DEFAULT 3
@@ -17,9 +14,9 @@ int render_multiplier = RENDER_MULTIPLIER_DEFAULT;
 
 void RenderApply() {
 	int multiplier = is_active ? render_multiplier : 1;
-	int fogOffset = base_render_distance - base_fog_distance;
-	api->AddressSetInt(addr_fog_distance, base_render_distance * multiplier - fogOffset);
-	api->AddressSetInt(addr_render_distance, base_render_distance * multiplier);
+	uint32_t fogOffset = base_render_distance - base_fog_distance;
+	*fogDistance = base_render_distance * multiplier - fogOffset;
+	*renderDistance = base_render_distance * multiplier;
 }
 
 void __stdcall toggleExtender() {
@@ -99,25 +96,53 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 	return 0;
 }
 
-/*
-Croc2.exe+23D04 - 89 15 487B4B00        - mov [Croc2.exe+B7B48],edx { (16384) }
-Croc2.exe+23D0A - 8B 40 40              - mov eax,[eax+40]
-Croc2.exe+23D0D - A3 187B4B00           - mov [Croc2.exe+B7B18],eax { (28672) }
-*/
-uintptr_t hookAddr = 0x00423D0D;
-size_t hookLength = 5;
-
 void __stdcall OnDistancesWritten() {
-	// Read both values out of memory
-	uintptr_t base = (uintptr_t)GetModuleHandleA(NULL);
-	base_fog_distance = *(int *)(base + 0xB7B48);
-	base_render_distance = *(int *)(base + 0xB7B18);
-
-	std::string logMessage = "Render distance changed to: " + std::to_string(base_render_distance);
-	api->LogDebug(logMessage.c_str());
-
-	// Reapply change
+	base_fog_distance = *fogDistance;
+	base_render_distance = *renderDistance;
+	api->LogDebug(("Render distance changed to: " + std::to_string(base_render_distance)).c_str());
 	RenderApply();
+}
+
+void __stdcall OnDoorChange() {
+	api->LogDebug(("Door fog distance changed to: " + std::to_string((*doorStruct)->fogDistance)).c_str());
+	api->LogDebug(("Door render distance changed to: " + std::to_string((*doorStruct)->renderDistance)).c_str());
+	(*doorStruct)->fogDistance = INT_MAX;
+	(*doorStruct)->renderDistance = INT_MAX;
+}
+
+void hookDistanceChanges() {
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+23D04 - 89 15 487B4B00        - mov [Croc2.exe+B7B48],edx
+			Croc2.exe+23D0A - 8B 40 40              - mov eax,[eax+40]
+			Croc2.exe+23D0D - A3 187B4B00           - mov [Croc2.exe+B7B18],eax
+		*/
+		api->HookFunction(0x423D0D, 5, &OnDistancesWritten, INJECT_AFTER);
+		break;
+	}
+	case GAMEVER_EU: {
+		/*
+			Croc2.exe+243A4 - 89 15 38ED4B00        - mov [Croc2.exe+BED38],edx
+			Croc2.exe+243AA - 8B 40 40              - mov eax,[eax+40]
+			Croc2.exe+243AD - A3 08ED4B00           - mov [Croc2.exe+BED08],eax
+		*/
+		api->HookFunction(0x4243AD, 5, &OnDistancesWritten, INJECT_AFTER);
+		break;
+	}
+	case GAMEVER_DEMO: {
+		/*
+			Croc2.exe+24134 - 89 15 486B4B00        - mov [Croc2.exe+B6B48],edx
+			Croc2.exe+2413A - 8B 40 40              - mov eax,[eax+40]
+			Croc2.exe+2413D - A3 186B4B00           - mov [Croc2.exe+B6B18],eax
+		*/
+		api->HookFunction(0x42413D, 5, &OnDistancesWritten, INJECT_AFTER);
+		break;
+	}
+	}
+
+	// Commented out due to issues
+	// api->HookGame(GAME_HOOK_DOOR_CHANGE, OnDoorChange);
 }
 
 MenuActionRegistration __stdcall toggleExtenderRegistration() {
@@ -142,11 +167,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		if (!api)
 			return FALSE;
 
-		addr_fog_distance = api->ResolveAddress(ADDR_FOG_DISTANCE);
-		addr_render_distance = api->ResolveAddress(ADDR_RENDER_DISTANCE);
-
 		// Hook function
-		api->HookFunction(hookAddr, hookLength, &OnDistancesWritten, INJECT_AFTER);
+		hookDistanceChanges();
 
 		is_active = api->SetupIniBool(L"Config", L"Enabled", true);
 		render_multiplier = api->SetupIniInt(L"Config", L"RenderMultiplier", RENDER_MULTIPLIER_DEFAULT);

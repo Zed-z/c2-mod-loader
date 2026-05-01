@@ -20,13 +20,13 @@ enum class CameraMode {
 CameraMode cameraMode = CameraMode::Normal;
 bool noclipCameraFlag = false;
 
-RotPos3i cameraRotPos;
 double cameraYaw = 0;
 const double MIN_CAMERA_PITCH = -0.2;
 const double MAX_CAMERA_PITCH = 0.9;
 const double DEFAULT_CAMERA_PITCH = 0.3;
 double cameraPitch = DEFAULT_CAMERA_PITCH;
-Vec3i cameraLookAt;
+RotPos3i _cameraRotPos;
+Vec3i _cameraLookAt;
 
 constexpr double PI = 3.14159265358979323846;
 
@@ -95,11 +95,11 @@ bool orbitCameraDisabled() {
 	if (orbitBlockedOnLevel)
 		return true;
 
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
-	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
+	StratEntity *camera = api->GetEntity(cameraObjRef);
 
 	// Disable during in-game events
-	if (api->AddressGetInt(ADDR_MOVEMENT_ALLOWED_STATE) != 0)
+	if (*movementAllowedState != 0)
 		return true;
 
 	// Vehicles
@@ -138,7 +138,7 @@ bool orbitCameraDisabled() {
 }
 
 void orbitCameraOverridesPreAutoTurn() {
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 
 	// Flavio override
 	if (strcmp(croc->name, "FlavioCroc") == 0) {
@@ -213,8 +213,8 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	}
 	saveCameraMode();
 
-	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *camera = api->GetEntity(cameraObjRef);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 
 	if (camera == nullptr) {
 		cameraMode = CameraMode::Normal;
@@ -243,12 +243,12 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	case CameraMode::Orbit: {
 
 		// Get camera position and lookat
-		cameraRotPos = camera->newRotPos;
+		_cameraRotPos = camera->newRotPos;
 		orbitHasLastCrocPos = false;
 
 		// Get rotation from lookat
-		cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
-		cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
+		cameraYaw = -(double)(cameraRot->y) / 2048.0 * PI;
+		cameraPitch = (double)(cameraRot->x) / 2048.0 * PI;
 
 		api->LogInfo("Camera mode: Orbit");
 		api->ShowInfoToast("Camera mode: Orbit");
@@ -258,14 +258,14 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	case CameraMode::Freecam: {
 
 		// Get camera position and lookat
-		cameraRotPos = camera->newRotPos;
-		cameraLookAt.x = api->AddressGetInt(ADDR_CAMERA_LOOKAT_X);
-		cameraLookAt.y = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Y);
-		cameraLookAt.z = api->AddressGetInt(ADDR_CAMERA_LOOKAT_Z);
+		_cameraRotPos = camera->newRotPos;
+		_cameraLookAt.x = cameraLookAt->x;
+		_cameraLookAt.y = cameraLookAt->y;
+		_cameraLookAt.z = cameraLookAt->z;
 
 		// Get rotation from lookat
-		cameraYaw = -(double)(api->AddressGetInt(ADDR_CAMERA_ROT_Y)) / 2048.0 * PI;
-		cameraPitch = (double)(api->AddressGetInt(ADDR_CAMERA_ROT_X)) / 2048.0 * PI;
+		cameraYaw = -(double)(cameraRot->y) / 2048.0 * PI;
+		cameraPitch = (double)(cameraRot->x) / 2048.0 * PI;
 
 		api->LogInfo("Camera mode: Freecam");
 		api->ShowInfoToast("Camera mode: Freecam");
@@ -300,7 +300,7 @@ void __stdcall cameraSetFreecam() {
 }
 
 void __stdcall orbitCameraResetYaw() {
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (croc == nullptr) {
 		api->LogDebug("[orbitCameraReset] Croc not found!");
 		return;
@@ -344,8 +344,8 @@ void __stdcall PhysicsLoop() {
 	uint32_t controlMethod = api->GetCurrentSaveSlot()->controlMethod;
 
 	// Entities
-	StratEntity *camera = api->GetEntity(ADDR_CAMERA_OBJ);
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *camera = api->GetEntity(cameraObjRef);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 
 	// Toggle
 	if (inputs.stepLeft && inputs.stepRight && inputsPressed.flip) {
@@ -460,15 +460,15 @@ void __stdcall PhysicsLoop() {
 		double offsetY = sin(cameraPitch) * orbitCameraDistance;
 		double offsetZ = cos(cameraPitch) * cos(cameraYaw) * orbitCameraDistance;
 
-		cameraRotPos.position.x = croc->newRotPos.position.x + static_cast<int>(offsetX);
-		cameraRotPos.position.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y + static_cast<int>(offsetY);
-		cameraRotPos.position.z = croc->newRotPos.position.z + static_cast<int>(offsetZ);
+		_cameraRotPos.position.x = croc->newRotPos.position.x + static_cast<int>(offsetX);
+		_cameraRotPos.position.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y + static_cast<int>(offsetY);
+		_cameraRotPos.position.z = croc->newRotPos.position.z + static_cast<int>(offsetZ);
 
-		camera->OldRotPos = cameraRotPos;
-		camera->newRotPos = cameraRotPos;
-		api->AddressSetInt(ADDR_CAMERA_POS_X, cameraRotPos.position.x);
-		api->AddressSetInt(ADDR_CAMERA_POS_Y, cameraRotPos.position.y);
-		api->AddressSetInt(ADDR_CAMERA_POS_Z, cameraRotPos.position.z);
+		camera->OldRotPos = _cameraRotPos;
+		camera->newRotPos = _cameraRotPos;
+		cameraPos->x = _cameraRotPos.position.x;
+		cameraPos->y = _cameraRotPos.position.y;
+		cameraPos->z = _cameraRotPos.position.z;
 
 		break;
 	}
@@ -497,33 +497,30 @@ void __stdcall PhysicsLoop() {
 		double forwards_x = -cos(cameraYaw);
 		double forwards_z = -sin(cameraYaw);
 
-		cameraRotPos.position.x += static_cast<int>(forwards_x * input_x * 100);
-		cameraRotPos.position.z += static_cast<int>(forwards_z * input_x * 100);
+		_cameraRotPos.position.x += static_cast<int>(forwards_x * input_x * 100);
+		_cameraRotPos.position.z += static_cast<int>(forwards_z * input_x * 100);
 
 		double sidewards_x = cos(cameraYaw + PI / 2);
 		double sidewards_z = sin(cameraYaw + PI / 2);
 
-		cameraRotPos.position.x += static_cast<int>(sidewards_x * input_z * 100);
-		cameraRotPos.position.y += static_cast<int>(input_y * 100);
-		cameraRotPos.position.z += static_cast<int>(sidewards_z * input_z * 100);
+		_cameraRotPos.position.x += static_cast<int>(sidewards_x * input_z * 100);
+		_cameraRotPos.position.y += static_cast<int>(input_y * 100);
+		_cameraRotPos.position.z += static_cast<int>(sidewards_z * input_z * 100);
 
-		cameraLookAt.x = cameraRotPos.position.x + static_cast<int>(sin(-cameraYaw) * cos(-cameraPitch) * 100.0);
-		cameraLookAt.y = cameraRotPos.position.y + static_cast<int>(sin(-cameraPitch) * 100.0);
-		cameraLookAt.z = cameraRotPos.position.z + static_cast<int>(cos(-cameraYaw) * cos(-cameraPitch) * 100.0);
+		_cameraLookAt.x = _cameraRotPos.position.x + static_cast<int>(sin(-cameraYaw) * cos(-cameraPitch) * 100.0);
+		_cameraLookAt.y = _cameraRotPos.position.y + static_cast<int>(sin(-cameraPitch) * 100.0);
+		_cameraLookAt.z = _cameraRotPos.position.z + static_cast<int>(cos(-cameraYaw) * cos(-cameraPitch) * 100.0);
 
-		camera->OldRotPos = cameraRotPos;
-		camera->newRotPos = cameraRotPos;
-		api->AddressSetInt(ADDR_CAMERA_POS_X, cameraRotPos.position.x);
-		api->AddressSetInt(ADDR_CAMERA_POS_Y, cameraRotPos.position.y);
-		api->AddressSetInt(ADDR_CAMERA_POS_Z, cameraRotPos.position.z);
-
-		api->AddressSetInt(ADDR_CAMERA_LOOKAT_X, cameraLookAt.x);
-		api->AddressSetInt(ADDR_CAMERA_LOOKAT_Y, cameraLookAt.y);
-		api->AddressSetInt(ADDR_CAMERA_LOOKAT_Z, cameraLookAt.z);
-
-		api->AddressSetInt(ADDR_CAMERA_ROT_X, RadiansToGameRotation(-cameraPitch));
-		api->AddressSetInt(ADDR_CAMERA_ROT_Y, RadiansToGameRotation(-cameraYaw));
-
+		camera->OldRotPos = _cameraRotPos;
+		camera->newRotPos = _cameraRotPos;
+		cameraPos->x = _cameraRotPos.position.x;
+		cameraPos->y = _cameraRotPos.position.y;
+		cameraPos->z = _cameraRotPos.position.z;
+		cameraLookAt->x = _cameraLookAt.x;
+		cameraLookAt->y = _cameraLookAt.y;
+		cameraLookAt->z = _cameraLookAt.z;
+		cameraRot->x = RadiansToGameRotation(-cameraPitch);
+		cameraRot->y = RadiansToGameRotation(-cameraYaw);
 		break;
 	}
 	}

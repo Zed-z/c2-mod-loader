@@ -841,9 +841,15 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 
 				ImGui::Spacing();
 
-				if (ImGui::Button("Launch Game", ImVec2(listWidth - (16.0f * g_uiScale), 32.0f * g_uiScale))) {
-					start_game = true;
-					close_launcher = true;
+				if (api->GetGameVersion() == GAMEVER_UNKNOWN) {
+					ImGui::BeginDisabled();
+					ImGui::Button("Unsupported Game", ImVec2(listWidth - (16.0f * g_uiScale), 32.0f * g_uiScale));
+					ImGui::EndDisabled();
+				} else {
+					if (ImGui::Button("Launch Game", ImVec2(listWidth - (16.0f * g_uiScale), 32.0f * g_uiScale))) {
+						start_game = true;
+						close_launcher = true;
+					}
 				}
 			}
 			ImGui::EndChild();

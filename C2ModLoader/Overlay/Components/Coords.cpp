@@ -17,7 +17,7 @@ void RenderCoords() {
 	ImGui::Begin("Coords");
 	ImGui::PushFont(Fonts::GetFontCode());
 
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (croc == nullptr) {
 		ImGui::Text("Unavailable!");
 	} else {

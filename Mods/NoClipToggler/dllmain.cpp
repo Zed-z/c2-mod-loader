@@ -31,9 +31,14 @@ bool noclip_enabled = false;
 int noclip_y = 0;
 
 void __stdcall toggleNoclip() {
+	if (api->GetGameVersion() != GAMEVER_US) {
+		api->LogWarning("Not implemented.");
+		return;
+	}
+
 	noclip_enabled = !noclip_enabled;
 
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (croc == nullptr) {
 		noclip_enabled = false;
 		return;
@@ -65,7 +70,7 @@ void __stdcall PhysicsLoop() {
 	Inputs inputsReleased = api->GetInputsReleased();
 
 	// Entities
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 
 	// Toggle
 	if (inputs.stepLeft && inputs.stepRight && inputsPressed.attack) {

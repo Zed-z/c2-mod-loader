@@ -63,12 +63,6 @@ void __stdcall PhysicsStep() {
 			}
 		}
 	}
-
-	// Max stick strength
-	/*int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
-	if (analogStrength > 0 && analogStrength <= 180) {
-		api->AddressSetInt(ADDR_ANALOG_STRENGTH, 180);
-	}*/
 }
 
 void __stdcall toggleType1Flip() {
@@ -107,43 +101,47 @@ MenuActionRegistration __stdcall toggleTypeSwitchRegistration() {
 	return {label.c_str(), "Enable manual [CAPSLOCK] or automatic control type switching.", toggleTypeSwitchMode, true};
 }
 
-/*
-		0042f00a 89 3d 4c        MOV        dword ptr [analog_strength_0052a54c],EDI
-				 a5 52 00
-*/
 void __stdcall resetUsingKeyboard() {
 	if (typeSwitchMode == TypeSwitchMode::Automatic)
 		SetControlScheme(CTRL_TYPE_1);
 }
 
-/*
-		0042f0f8 85 f6           TEST       ESI,ESI
-		0042f0fa 66 a3 8e        MOV        [DAT_0052a58e],AX
-				 a5 52 00
-		0042f100 74 14           JZ         LAB_0042f116
-		0042f102 c7 05 4c        MOV        dword ptr [analog_strength_0052a54c],0xb5
-				 a5 52 00
-				 b5 00 00 00
-		0042f10c c7 05 60        MOV        dword ptr [DAT_0052a560],0x2
-				 a5 52 00
-				 02 00 00 00
-
-*/
 void __stdcall setUsingKeyboard() {
 	if (typeSwitchMode == TypeSwitchMode::Automatic)
 		SetControlScheme(CTRL_TYPE_2);
 }
 
 void PatchAutoModeSwitch() {
-	{
-		uintptr_t hookAddress1 = 0x0042f00a;
-		int hookSize1 = 6;
-		api->HookFunction(hookAddress1, hookSize1, &resetUsingKeyboard, INJECT_AFTER);
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			0042f00a 89 3d 4c        MOV        dword ptr [analog_strength_0052a54c],EDI
+					a5 52 00
+		*/
+		api->HookFunction(0x0042f00a, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			0042f0f8 85 f6           TEST       ESI,ESI
+			0042f0fa 66 a3 8e        MOV        [DAT_0052a58e],AX
+					a5 52 00
+			0042f100 74 14           JZ         LAB_0042f116
+			0042f102 c7 05 4c        MOV        dword ptr [analog_strength_0052a54c],0xb5
+					a5 52 00
+					b5 00 00 00
+			0042f10c c7 05 60        MOV        dword ptr [DAT_0052a560],0x2
+					a5 52 00
+					02 00 00 00
+		*/
+		api->HookFunction(0x0042f102, 10, &setUsingKeyboard, INJECT_AFTER);
+		break;
 	}
-	{
-		uintptr_t hookAddress1 = 0x0042f102;
-		int hookSize1 = 10;
-		api->HookFunction(hookAddress1, hookSize1, &setUsingKeyboard, INJECT_AFTER);
+	case GAMEVER_EU: {
+		api->LogWarning("Not implemented.");
+		break;
+	}
+	case GAMEVER_DEMO: {
+		api->LogWarning("Not implemented.");
+		break;
+	}
 	}
 }
 

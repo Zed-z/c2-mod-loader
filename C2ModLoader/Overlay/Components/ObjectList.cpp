@@ -26,15 +26,12 @@ void RenderObjectList() {
 
 	float itemWidth;
 
-	uintptr_t rootObjectAddress = api->ResolveAddress(ADDR_ROOT_OBJ);
-	uintptr_t crocObjectAddress = api->ResolveAddress(ADDR_CROC_OBJ);
-	uintptr_t stratCountAddress = api->ResolveAddress(ADDR_STRAT_COUNT);
-	if (
-		rootObjectAddress != 0 && !IsBadReadPtr((void *)rootObjectAddress, sizeof(StratEntity)) && stratCountAddress != 0 && !IsBadReadPtr((void *)stratCountAddress, sizeof(int))) {
-		int stratCount = api->AddressGetInt(stratCountAddress);
+	StratEntity *rootObject = api->GetEntity(rootObjRef);
+	StratEntity *crocObject = api->GetEntity(crocObjRef);
+	StratEntity *cameraObject = api->GetEntity(cameraObjRef);
+	int stratCountValue = *stratCount;
 
-		StratEntity *rootObject = (StratEntity *)rootObjectAddress;
-
+	if (rootObject != nullptr) {
 		if (rootObject->next != nullptr) {
 
 			// Reverse to the beginning of the list
@@ -43,23 +40,16 @@ void RenderObjectList() {
 				node = node->prev;
 			}
 
-			// Croc object
-			StratEntity *croc = nullptr;
-			if (crocObjectAddress != 0 && !IsBadReadPtr((void *)crocObjectAddress, sizeof(StratEntity))) {
-				croc = (StratEntity *)crocObjectAddress;
-				croc = croc->next;
-			}
-
 			// Max distance to player
 			StratEntity *distanceNode = node;
 			int maxDistanceToPlayer = 0;
-			if (croc == nullptr) {
+			if (crocObject == nullptr) {
 				maxDistanceToPlayer = -1;
 			} else {
 				while (distanceNode != nullptr) {
 
 					int playerDistance = static_cast<int>(std::sqrt(
-						std::pow(distanceNode->newPosition.x - croc->newPosition.x, 2) + std::pow(distanceNode->newPosition.y - croc->newPosition.y, 2) + std::pow(distanceNode->newPosition.z - croc->newPosition.z, 2)));
+						std::pow(distanceNode->newPosition.x - crocObject->newPosition.x, 2) + std::pow(distanceNode->newPosition.y - crocObject->newPosition.y, 2) + std::pow(distanceNode->newPosition.z - crocObject->newPosition.z, 2)));
 
 					if (playerDistance > maxDistanceToPlayer) {
 						maxDistanceToPlayer = playerDistance;
@@ -69,19 +59,25 @@ void RenderObjectList() {
 				}
 			}
 
-			ImGui::Text(("Object count: " + std::to_string(stratCount)).c_str());
+			ImGui::Text(("Object count: " + std::to_string(stratCountValue)).c_str());
 
 			ImGui::PushFont(Fonts::GetFontCode());
 			while (node != nullptr) {
 
-				int playerDistance = (croc != nullptr)
+				int playerDistance = (crocObject != nullptr)
 					? static_cast<int>(std::sqrt(
-						  std::pow(node->newPosition.x - croc->newPosition.x, 2) + std::pow(node->newPosition.y - croc->newPosition.y, 2) + std::pow(node->newPosition.z - croc->newPosition.z, 2)))
+						  std::pow(node->newPosition.x - crocObject->newPosition.x, 2) + std::pow(node->newPosition.y - crocObject->newPosition.y, 2) + std::pow(node->newPosition.z - crocObject->newPosition.z, 2)))
 					: 0;
 
 				std::ostringstream ss;
 				ss << "(" << std::hex << std::uppercase << (uintptr_t)node << ") ";
 				ss << std::nouppercase << node->name;
+				if (node == crocObject) {
+					ss << " [Player]";
+				}
+				if (node == cameraObject) {
+					ss << " [Camera]";
+				}
 
 				// Header colors
 				float distanceModifier = maxDistanceToPlayer != -1 ? (1 - ((float)playerDistance / (float)maxDistanceToPlayer)) : 1;
@@ -238,38 +234,38 @@ void RenderObjectList() {
 					ImGui::Text("Actions");
 
 					if (ImGui::Button((std::string("Teleport Here##tphere") + ss.str()).c_str())) {
-						if (croc != nullptr) {
-							node->newPosition.x = croc->newPosition.x;
-							node->newPosition.y = croc->newPosition.y;
-							node->newPosition.z = croc->newPosition.z;
+						if (crocObject != nullptr) {
+							node->newPosition.x = crocObject->newPosition.x;
+							node->newPosition.y = crocObject->newPosition.y;
+							node->newPosition.z = crocObject->newPosition.z;
 						}
 					}
 
 					ImGui::SameLine();
 
 					if (ImGui::Button((std::string("Teleport Start Here##tpstarthere") + ss.str()).c_str())) {
-						if (croc != nullptr) {
-							node->StartRotPos.position.x = croc->newPosition.x;
-							node->StartRotPos.position.y = croc->newPosition.y;
-							node->StartRotPos.position.z = croc->newPosition.z;
+						if (crocObject != nullptr) {
+							node->StartRotPos.position.x = crocObject->newPosition.x;
+							node->StartRotPos.position.y = crocObject->newPosition.y;
+							node->StartRotPos.position.z = crocObject->newPosition.z;
 						}
 					}
 
 					if (ImGui::Button((std::string("Teleport To##tphere") + ss.str()).c_str())) {
-						if (croc != nullptr) {
-							croc->newPosition.x = node->newPosition.x;
-							croc->newPosition.y = node->newPosition.y;
-							croc->newPosition.z = node->newPosition.z;
+						if (crocObject != nullptr) {
+							crocObject->newPosition.x = node->newPosition.x;
+							crocObject->newPosition.y = node->newPosition.y;
+							crocObject->newPosition.z = node->newPosition.z;
 						}
 					}
 
 					ImGui::SameLine();
 
 					if (ImGui::Button((std::string("Teleport To Start##tpstarthere") + ss.str()).c_str())) {
-						if (croc != nullptr) {
-							croc->newPosition.x = node->StartRotPos.position.x;
-							croc->newPosition.y = node->StartRotPos.position.y;
-							croc->newPosition.z = node->StartRotPos.position.z;
+						if (crocObject != nullptr) {
+							crocObject->newPosition.x = node->StartRotPos.position.x;
+							crocObject->newPosition.y = node->StartRotPos.position.y;
+							crocObject->newPosition.z = node->StartRotPos.position.z;
 						}
 					}
 
@@ -407,7 +403,7 @@ void RenderObjectList() {
 					node = node->next;
 				}
 
-				std::string objectListLog = "Object List: (" + std::to_string(stratCount) + ")\n" + ss.str();
+				std::string objectListLog = "Object List: (" + std::to_string(stratCountValue) + ")\n" + ss.str();
 				api->LogInfo(objectListLog.c_str());
 			}
 		} else {

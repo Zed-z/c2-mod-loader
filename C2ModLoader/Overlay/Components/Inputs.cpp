@@ -17,7 +17,7 @@ void RenderInputs() {
 	Inputs inputs = api->GetInputs();
 	std::bitset<32> inputBits(inputs.raw);
 
-	int analogStrength = api->AddressGetInt(ADDR_ANALOG_STRENGTH);
+	int analogStrengthValue = *analogStrength;
 
 	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
 	int controlScheme = currentSaveSlot->controlMethod;
@@ -35,7 +35,7 @@ void RenderInputs() {
 	ss2 << "Effective  | Up: " << inputs.effectiveUp << ", Down: " << inputs.effectiveDown << ", Left: " << inputs.effectiveLeft << ", Right: " << inputs.effectiveRight;
 
 	std::ostringstream ss3;
-	ss3 << "Analog Strength: " << analogStrength;
+	ss3 << "Analog Strength: " << analogStrengthValue;
 
 	std::ostringstream ss4;
 	ss4 << "Jump: " << inputs.jump << ", Attack: " << inputs.attack;

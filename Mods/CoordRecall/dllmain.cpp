@@ -29,7 +29,7 @@ struct SavedCoords {
 SavedCoords saved_coords[KEY_COUNT];
 
 void __stdcall positionSave(int key) {
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (croc == nullptr) {
 		api->ShowErrorToast("Croc entity not present!");
 		api->LogError("Croc entity not present!");
@@ -49,7 +49,7 @@ void __stdcall positionLoad(int key) {
 	if (!saved_coords[key].saved)
 		return;
 
-	StratEntity *croc = api->GetEntity(ADDR_CROC_OBJ);
+	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (croc == nullptr) {
 		api->ShowErrorToast("Croc entity not present!");
 		api->LogError("Croc entity not present!");

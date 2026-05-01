@@ -12,7 +12,7 @@ bool cheatsBonusCrystals = false;
 bool cheatsMusicSelect = false;
 
 void SetupCheats() {
-	cheatsValue = api->AddressGetInt(ADDR_CHEATS);
+	cheatsValue = *cheats;
 
 	cheatsDebugMenu = api->SetupIniBool(L"Cheats", L"DebugMenu", false);
 	setDebugMenu(cheatsDebugMenu);
@@ -31,7 +31,7 @@ void SetupCheats() {
 }
 
 void ApplyCheats() {
-	api->AddressSetInt(ADDR_CHEATS, cheatsValue);
+	*cheats = cheatsValue;
 }
 
 void setDebugMenu(bool enable) {

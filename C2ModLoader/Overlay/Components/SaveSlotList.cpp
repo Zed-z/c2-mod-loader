@@ -21,9 +21,6 @@ void RenderSaveSlotList() {
 		SaveSlot *slot = api->GetSaveSlot(i);
 		std::string slotId = std::string("slot") + std::to_string(i);
 		std::string slotName = std::string("Slot ") + std::to_string(i + 1) + " - " + slot->name;
-		/*if (i == api->AddressGetInt(ADDR_CURRENT_SAVE_SLOT)) {
-			slotName += " (Current)";
-		}*/
 
 		if (ImGui::CollapsingHeader((slotName + "##" + slotId).c_str())) {
 			ImGui::Indent();
@@ -56,12 +53,21 @@ void RenderSaveSlotList() {
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Keys##keys") + slotId).c_str(), reinterpret_cast<int *>(&slot->keys));
 			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputInt((std::string("Purple Gummis##purplegummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->purpleGummis));
-			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputInt((std::string("Blue Gummis##bluegummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->blueGummis));
-			ImGui::SetNextItemWidth(itemWidth);
-			ImGui::InputInt((std::string("Green Gummis##greengummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->greenGummis));
-			ImGui::SetNextItemWidth(itemWidth);
+			if (api->GetGameVersion() == GAMEVER_US) {
+				ImGui::InputInt((std::string("Purple Gummis##purplegummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->purpleGummis));
+				ImGui::SetNextItemWidth(itemWidth);
+				ImGui::InputInt((std::string("Blue Gummis##bluegummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->blueGummis));
+				ImGui::SetNextItemWidth(itemWidth);
+				ImGui::InputInt((std::string("Green Gummis##greengummis") + slotId).c_str(), reinterpret_cast<int *>(&slot->greenGummis));
+				ImGui::SetNextItemWidth(itemWidth);
+			} else {
+				ImGui::InputInt((std::string("Red Jellies##redjellies") + slotId).c_str(), reinterpret_cast<int *>(&slot->redJellies));
+				ImGui::SetNextItemWidth(itemWidth);
+				ImGui::InputInt((std::string("Orange Jellies##orangejellies") + slotId).c_str(), reinterpret_cast<int *>(&slot->orangeJellies));
+				ImGui::SetNextItemWidth(itemWidth);
+				ImGui::InputInt((std::string("Green Jellies##greenjellies") + slotId).c_str(), reinterpret_cast<int *>(&slot->greenJellies));
+				ImGui::SetNextItemWidth(itemWidth);
+			}
 			ImGui::InputInt((std::string("Clockwork Gobbos##clockworkgobbos") + slotId).c_str(), reinterpret_cast<int *>(&slot->clockworkGobbos));
 
 			ImGui::Text("Boss");

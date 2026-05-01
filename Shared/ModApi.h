@@ -22,44 +22,22 @@
 #define FILE_OVERRIDE_DIRECTORY "mods\\.overrides"
 #define FILE_OVERRIDE_DIRECTORY_L L"mods\\.overrides"
 
-// Addresses --------------------------------------------------------
-
-#define ADDR_FOG_DISTANCE {0x4B7B48}
-#define ADDR_RENDER_DISTANCE {0x4B7B18}
-
-#define ADDR_ROOT_OBJ {0x4A8C3C, {0x14, 0x28, 0x00}}
-#define ADDR_CROC_OBJ {0x4A8C3C, {0x14, 0x30, 0x00}}
-#define ADDR_CAMERA_OBJ {0x4A8C3C, {0x14, 0x3C, 0x00}}
-#define ADDR_DIALOG_OBJ {0x4A8C3C, {0x14, 0x40, 0x00}}
-#define ADDR_STRAT_COUNT {0x636160}
-
-#define ADDR_CURRENT_SAVE_SLOT {0x6220FC}
-#define ADDR_SAVE_SLOT_BASE 0x006040C0
-#define ADDR_SAVE_SLOT_OFFSET 0x2000
-#define SAVE_SLOT_NUMBER 5
-
-#define ADDR_INPUTS 0x52A590
-#define ADDR_INPUTS_PRESSED 0x52A554
-#define ADDR_INPUTS_RELEASED 0x52A558
-#define ADDR_ANALOG_STRENGTH 0x52A54C
-
-#define ADDR_CAMERA_POS_X 0x622B38
-#define ADDR_CAMERA_POS_Y 0x622B3C
-#define ADDR_CAMERA_POS_Z 0x622B40
-
-#define ADDR_CAMERA_ROT_X 0x4AF328
-#define ADDR_CAMERA_ROT_Y 0x4AF32C
-#define ADDR_CAMERA_ROT_Z 0x4AF330
-
-#define ADDR_CAMERA_LOOKAT_X 0x622B94
-#define ADDR_CAMERA_LOOKAT_Y 0x622B98
-#define ADDR_CAMERA_LOOKAT_Z 0x622B9C
-
-#define ADDR_MOVEMENT_ALLOWED_STATE 0x622C44
-
-#define ADDR_DOOR_STRUCT 0x4B7888
-
 // Game structs ----------------------------------------------------------
+
+#define MAX_OFFSETS 16
+typedef struct {
+	uintptr_t base;
+	uintptr_t offsets[MAX_OFFSETS];
+} MemoryAddress;
+
+typedef struct {
+	MemoryAddress us;
+	MemoryAddress eu;
+	MemoryAddress demo;
+} VersionAddresses;
+
+typedef int32_t StratEntityFlags;
+typedef int32_t bool32_t;
 
 struct Vec3i {
 	int x, y, z;
@@ -114,15 +92,9 @@ using ModelStruct = void;
 
 struct DoorStruct {
 	Vec3i position;
-	union {
-		struct // For DOOR_LEVEL
-		{
-			int GotoTribe;
-			int GotoLevel;
-			int GotoMap;
-		};
-		Vec3i Goto; // For everything else
-	};
+	int GotoTribe;
+	int GotoLevel;
+	int GotoMap;
 	WadFileType GotoType;
 	DoorRotY GotoRotY;
 	DoorRotY ThisRotY;
@@ -143,8 +115,6 @@ struct DoorStruct {
 	uint16_t ReverbType;
 	int MusicTrack;
 };
-
-typedef int32_t StratEntityFlags;
 
 #define LOCAL_VAR_COUNT 20
 struct LocalVarsStruct {
@@ -229,6 +199,7 @@ struct StratEntity {
 	int32_t gap14[1];
 };
 
+#define SAVE_SLOT_NUMBER 5
 struct SaveSlot {
 	uint8_t byte0;
 	uint8_t byte1;
@@ -330,7 +301,7 @@ struct SaveSlot {
 	int _pad8[1741];
 };
 
-enum GameStates : uint32_t {
+enum GameState : uint32_t {
 	GS_NONE = 0x0,
 	GS_SELECT_LOAD_SLOT = 0x1,
 	GS_SELECT_SAVE_SLOT = 0x2,
@@ -378,13 +349,6 @@ constexpr const char *gameStateNames[] = {
 	"Unknown 20",
 };
 
-inline GameStates *gameState = (GameStates *)0x004B793C;
-inline GameStates *gameStateComingFrom = (GameStates *)0x004B7894;
-inline GameStates *gameStateGoingTo = (GameStates *)0x004B7930;
-
-typedef int32_t bool32_t;
-inline bool32_t *gameStateTransitioning = (bool32_t *)0x004B7934;
-
 typedef void (*GotoLevelFunction)(int tribe, int level, int map, WadFileType type);
 typedef void (*GotoLevelSelectFunction)();
 
@@ -414,19 +378,10 @@ struct Inputs {
 };
 
 typedef void(__cdecl *fnFadeRoutine)();
-inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)0x004B776C;
-
 typedef void(__cdecl *fnInitFade)(uint32_t fadeType);
-inline fnInitFade initFade = (fnInitFade)0x00418240;
 #define FADE_NormalToBlack 1
 
 // Api definition --------------------------------------------------------
-
-#define MAX_OFFSETS 256
-typedef struct {
-	uintptr_t base;
-	uintptr_t offsets[MAX_OFFSETS];
-} MemoryAddress;
 
 #define CTRL_TYPE_1 1
 #define CTRL_TYPE_2 0
@@ -473,6 +428,7 @@ typedef void (*SetupIniStringFunction)(const wchar_t *section, const wchar_t *ke
 typedef void (*ReadIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *default_value, wchar_t *buffer, DWORD buffer_size);
 typedef bool (*WriteIniStringFunction)(const wchar_t *section, const wchar_t *key, const wchar_t *value);
 
+#define GAMEVER_UNCHECKED -1
 #define GAMEVER_UNKNOWN 0
 #define GAMEVER_US 1
 #define GAMEVER_EU 2
@@ -501,7 +457,6 @@ typedef Inputs (*GetInputsFunction)();
 typedef Inputs (*GetInputsPressedFunction)();
 typedef Inputs (*GetInputsReleasedFunction)();
 
-#define ADDR_LEVEL_INFO 0x4A8C44
 struct LevelInfo {
 	int tribe;
 	int level;
@@ -601,9 +556,83 @@ struct ModApi {
 	GotoLevelSelectFunction GotoLevelSelect;
 };
 
-extern "C" __declspec(dllexport) ModApi *GetModApi();
+// Address helpers --------------------------------------------------
+
+#ifdef IS_MOD_LOADER
+int GetGameVersion();
+#endif
+
+ModApi *LoadModApi(const char *moduleName);
+
+static int GetRuntimeGameVersion() {
+#ifdef IS_MOD_LOADER
+	return GetGameVersion();
+#else
+	ModApi *modApi = LoadModApi("C2ModLoader.asi");
+	if (modApi == nullptr)
+		return GAMEVER_UNKNOWN;
+
+	return modApi->GetGameVersion();
+#endif
+}
+
+static MemoryAddress _address(VersionAddresses address) {
+	int gameVersion = GetRuntimeGameVersion();
+	if (gameVersion == GAMEVER_US)
+		return address.us;
+	if (gameVersion == GAMEVER_EU)
+		return address.eu;
+	if (gameVersion == GAMEVER_DEMO)
+		return address.demo;
+	return address.us;
+}
+
+static void *_pointer(VersionAddresses address) {
+	return (void *)_address(address).base;
+}
+
+// Addresses --------------------------------------------------------
+
+inline uint32_t *cheats = (uint32_t *)_pointer({{0x4B7964}, {0x4BEB54}, {0x4B6964}});
+
+inline uint32_t *fogDistance = (uint32_t *)_pointer({{0x4B7B48}, {0x4BED38}, {0x4B6B48}});
+inline uint32_t *renderDistance = (uint32_t *)_pointer({{0x4B7B18}, {0x4BED08}, {0x4B6B18}});
+
+inline MemoryAddress rootObjRef = _address({{0x4A8C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}, {0x4A7C3C, {0x14, 0x28, 0x00}}});
+inline MemoryAddress crocObjRef = _address({{0x4A8C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}, {0x4A7C3C, {0x14, 0x30, 0x00}}});
+inline MemoryAddress cameraObjRef = _address({{0x4A8C3C, {0x14, 0x3C, 0x00}}, {0x4A9C3C, {0x14, 0x3C, 0x00}}, {0x4A7C3C, {0x14, 0x3C, 0x00}}});
+inline MemoryAddress dialogObjRef = _address({{0x4A8C3C, {0x14, 0x40, 0x00}}, {0x4A9C3C, {0x14, 0x40, 0x00}}, {0x4A7C3C, {0x14, 0x40, 0x00}}});
+inline uint32_t *stratCount = (uint32_t *)_pointer({{0x636160}, {0x63D350}, {0x635158}});
+
+inline uint32_t *inputsRaw = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}});
+inline uint32_t *inputsPressedRaw = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
+inline uint32_t *inputsReleasedRaw = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
+inline uint32_t *analogStrength = (uint32_t *)_pointer({{0x52A54C}, {0x53173C}, {0x529544}});
+
+inline Vec3i *cameraPos = (Vec3i *)_pointer({{0x622B38}, {0x629D28}, {0x621B30}});
+inline Vec3i *cameraRot = (Vec3i *)_pointer({{0x4AF328}, {0x4B0378}, {0x4AE3B0}});
+inline Vec3i *cameraLookAt = (Vec3i *)_pointer({{0x622B94}, {0x629D84}, {0x621B8C}});
+
+inline uint32_t *movementAllowedState = (uint32_t *)_pointer({{0x622C44}, {0x629E34}, {0x621C3C}});
+
+inline DoorStruct **doorStruct = (DoorStruct **)_pointer({{0x4B7888}, {0x4BEA78}, {0x4B6888}});
+
+inline SaveSlot *saveSlots = (SaveSlot *)_pointer({{0x6040C0}, {0x60B2B0}, {0x6030B8}});
+inline uint32_t *currentSaveSlotIndex = (uint32_t *)_pointer({{0x6220FC}, {0x6292EC}, {0x6210F4}});
+
+inline GameState *gameState = (GameState *)_pointer({{0x4B793C}, {0x4BEB2C}, {0x4B693C}});
+inline GameState *gameStateComingFrom = (GameState *)_pointer({{0x4B7894}, {0x4BEA84}, {0x4B6894}});
+inline GameState *gameStateGoingTo = (GameState *)_pointer({{0x4B7930}, {0x4BEB20}, {0x4B6930}});
+inline bool32_t *gameStateTransitioning = (bool32_t *)_pointer({{0x4B7934}, {0x4BEB24}, {0x4B6934}});
+
+inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)_pointer({{0x4B776C}, {0x4BE95C}, {0x4B676C}});
+inline fnInitFade initFade = (fnInitFade)_pointer({{0x418240}, {0x4186F0}, {0x418240}});
+
+inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x4A7C44}});
 
 // Api client --------------------------------------------------------
+
+extern "C" __declspec(dllexport) ModApi *GetModApi();
 
 inline ModApi *LoadModApi(const char *moduleName = "C2ModLoader.asi") {
 #ifdef IS_MOD_LOADER
