@@ -84,6 +84,7 @@ set(SOURCES
     Resource.rc
     Utils/Fonts.cpp
     Utils/ResourceLoader.cpp
+    Utils/Sha256.cpp
     Utils/Style.cpp
     Utils/UiScale.cpp
     XinputManager.cpp

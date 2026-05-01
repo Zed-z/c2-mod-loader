@@ -8,6 +8,7 @@
 #include "Overlay/Overlay.h"
 #include "Resource.h"
 #include "Utils.h"
+#include "Utils/Sha256.h"
 #include "XinputManager.h"
 
 #include <algorithm>
@@ -525,20 +526,19 @@ int GetGameVersion() {
 	char path[MAX_PATH];
 	GetModuleFileNameA(nullptr, path, MAX_PATH);
 
-	std::ifstream file(path, std::ios::binary | std::ios::ate);
-	if (!file) {
+	std::string hash = Sha256::ComputeFileHash(path);
+	if (hash.empty()) {
 		cachedVersion = GAMEVER_UNKNOWN;
 		return cachedVersion;
 	}
 
-	std::streamsize size = file.tellg();
-	file.close();
+	std::transform(hash.begin(), hash.end(), hash.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 
-	if (size == 0xB4000)
+	if (hash == "BAF84A039DB9581C56A52A8C1C5A318BCE13C3A72565FB6AC19B226D926BE0DE")
 		cachedVersion = GAMEVER_US;
-	else if (size == 0xBD000)
+	else if (hash == "38BDFCFF386F52824A718DE70B5710CF32F2263DD9C23FEED4FB39AE741C1720")
 		cachedVersion = GAMEVER_EU;
-	else if (size == 0xB3000)
+	else if (hash == "074C0E4333C76635D3F214E6D89AB2F758FE233E6D4B718F7C5A7E0F11B7D24B")
 		cachedVersion = GAMEVER_DEMO;
 	else
 		cachedVersion = GAMEVER_UNKNOWN;

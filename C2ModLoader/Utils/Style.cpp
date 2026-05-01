@@ -34,6 +34,7 @@ void ApplyStyle() {
 	imguiStyle.Colors[ImGuiCol_SeparatorHovered] = style.separatorHovered;
 	imguiStyle.Colors[ImGuiCol_SeparatorActive] = style.separatorActive;
 	imguiStyle.Colors[ImGuiCol_CheckMark] = style.checkMark;
+	imguiStyle.Colors[ImGuiCol_ModalWindowDimBg] = style.modalWindowDimBg;
 }
 
 } // namespace Style

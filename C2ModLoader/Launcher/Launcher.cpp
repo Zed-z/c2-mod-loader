@@ -686,6 +686,8 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 	bool start_game = false;
 	bool close_launcher = false;
 	bool showLicensesOverlay = false;
+	const bool unknownGameVersion = (api->GetGameVersion() == GAMEVER_UNKNOWN);
+	bool unknownVersionPopupPending = unknownGameVersion;
 
 	api->LogDebug("[Launcher] Setting up launcher window");
 
@@ -745,6 +747,11 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 				ImGuiWindowFlags_NoCollapse |
 				ImGuiWindowFlags_NoMove |
 				ImGuiWindowFlags_NoTitleBar);
+
+		if (unknownVersionPopupPending) {
+			ImGui::OpenPopup("Unknown Game Version");
+			unknownVersionPopupPending = false;
+		}
 
 		const float listWidth = 250.0f * g_uiScale;
 		const float footerHeight = 16.0f * g_uiScale;
@@ -919,6 +926,21 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 				}
 			}
 			ImGui::EndChild();
+		}
+
+		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowSize(ImVec2(400.0f * g_uiScale, 0.0f), ImGuiCond_Appearing);
+		if (ImGui::BeginPopupModal("Unknown Game Version", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::TextWrapped("Could not determine the game's version.");
+			ImGui::Spacing();
+			ImGui::TextWrapped("Make sure the game is unmodified and acquired from legitimate sources.");
+			ImGui::Spacing();
+			ImGui::TextWrapped("The launch button will be disabled.");
+			ImGui::Spacing();
+			if (ImGui::Button("OK", ImVec2(120.0f * g_uiScale, 0.0f))) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
 		}
 
 		ImGui::End();
