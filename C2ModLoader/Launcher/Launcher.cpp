@@ -292,9 +292,7 @@ void LoadAllConfigs() {
 	allParsedConfigs.resize(count);
 
 	for (int i = 0; i < count; ++i) {
-		const std::wstring configTypes = (i == 0)
-			? StringToWString(LOADER_CONFIG_TYPES)
-			: mods[i - 1].info.configTypes;
+		const std::wstring configTypes = (i == 0 ? modLoader.info.configTypes : mods[i - 1].info.configTypes);
 		const std::wstring configPath = GetConfigPath(i);
 		ParsedConfig parsedConfig = ParseConfigHints(configTypes);
 		parsedConfig.configEntries = LauncherIni::ParseIniFile(configPath);
@@ -493,26 +491,15 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 
 void RenderSelectedItemDetails() {
 
-	std::string name, version, author, description, hyperlink, filePath;
-	int apiVersion = -1;
-	if (g_selectedMod == 0) {
-		name = LOADER_NAME;
-		version = LOADER_VERSION;
-		author = AUTHOR_NAME;
-		description = LOADER_DESCRIPTION;
-		hyperlink = LOADER_HYPERLINK;
-		filePath = "";
-		apiVersion = API_VERSION;
-	} else {
-		Mod &mod = mods[g_selectedMod - 1];
-		name = WStringToString(mod.getName());
-		version = WStringToString(mod.info.version);
-		author = WStringToString(mod.info.author);
-		description = WStringToString(mod.info.description);
-		hyperlink = WStringToString(mod.info.hyperlink);
-		filePath = WStringToString(mod.path.path);
-		apiVersion = mod.info.apiVersion;
-	}
+	Mod &mod = g_selectedMod == 0 ? modLoader : mods[g_selectedMod - 1];
+	std::string name = WStringToString(mod.getName());
+	std::string version = WStringToString(mod.info.version);
+	std::string author = WStringToString(mod.info.author);
+	std::string description = WStringToString(mod.info.description);
+	std::string hyperlink = WStringToString(mod.info.hyperlink);
+	std::string filePath = WStringToString(mod.path.path);
+	std::string fileHash = mod.fileHash;
+	int apiVersion = mod.info.apiVersion;
 
 	ImGui::PushFont(Fonts::GetFontTitle(), fontSizeTitle);
 	ImGui::Text(name.c_str());
@@ -540,6 +527,11 @@ void RenderSelectedItemDetails() {
 			ImGui::SetTooltip("%s", hyperlink.c_str());
 		}
 	}
+	ImGui::PushFont(Fonts::GetFontCode(), 13);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.5f));
+	ImGui::TextWrapped("SHA256: %s", fileHash.empty() ? "N/A" : fileHash.c_str());
+	ImGui::PopStyleColor();
+	ImGui::PopFont();
 
 	float descriptionHeight = ImGui::GetContentRegionAvail().y;
 	if (descriptionHeight < 100.0f) {
@@ -566,10 +558,10 @@ void RenderSelectedItemConfig() {
 }
 
 void RenderSelectedItemFileOverrides() {
-	if (g_selectedMod == 0 || mods[g_selectedMod - 1].fileOverrides.empty()) {
+	const Mod &mod = g_selectedMod == 0 ? modLoader : mods[g_selectedMod - 1];
+	if (mod.fileOverrides.empty()) {
 		ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No file overrides available.");
 	} else {
-		const Mod &mod = mods[g_selectedMod - 1];
 		const std::wstring &overridePath = mod.overridePath;
 		const bool overridePathExists = !mod.fileOverrides.empty();
 
@@ -746,7 +738,30 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 			ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_NoCollapse |
 				ImGuiWindowFlags_NoMove |
-				ImGuiWindowFlags_NoTitleBar);
+				ImGuiWindowFlags_NoTitleBar |
+				ImGuiWindowFlags_MenuBar);
+
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("File")) {
+				if (ImGui::MenuItem("Open Game Folder")) {
+					ShellExecuteW(NULL, L"open", modLoader.path.directory.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				}
+				if (ImGui::MenuItem("Open Mods Folder")) {
+					ShellExecuteW(NULL, L"open", MOD_DIRECTORY_L, NULL, NULL, SW_SHOWNORMAL);
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem("View Licenses")) {
+					showLicensesOverlay = true;
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Exit")) {
+					start_game = false;
+					close_launcher = true;
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
 
 		if (unknownVersionPopupPending) {
 			ImGui::OpenPopup("Unknown Game Version");
@@ -866,7 +881,7 @@ bool ShowLauncherWindow(HINSTANCE hInstance) {
 			ImGui::BeginChild("DetailsPane", ImVec2(0, contentHeight), true);
 			{
 				const bool hasConfig = !allParsedConfigs[g_selectedMod].configEntries.empty();
-				const bool hasFileOverrides = g_selectedMod > 0 && !mods[g_selectedMod - 1].fileOverrides.empty();
+				const bool hasFileOverrides = !(g_selectedMod == 0 ? modLoader : mods[g_selectedMod - 1]).fileOverrides.empty();
 				if (ImGui::BeginTabBar("DetailsTabs")) {
 					if (ImGui::BeginTabItem("Overview")) {
 						RenderSelectedItemDetails();

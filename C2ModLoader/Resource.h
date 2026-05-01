@@ -13,6 +13,7 @@
 #define LOADER_DESCRIPTION_L L"Provides mod loading functionality and a lightweight API for mods."
 
 #define LOADER_HYPERLINK "https://zed-z.github.io/c2-mod-loader/"
+#define LOADER_HYPERLINK_L L"https://zed-z.github.io/c2-mod-loader/"
 
 #define LOADER_CONFIG_TYPES "\
 @Config[General Configuration|Configure the general settings];\

@@ -1,6 +1,8 @@
 #include "Loader.h"
 
 #include "Registry/RegistryManager.h"
+#include "Utils.h"
+#include "Utils/Sha256.h"
 #include "XinputManager.h"
 
 #include <algorithm>
@@ -10,6 +12,7 @@ namespace fs = std::filesystem;
 
 extern ModApi *api;
 
+Mod modLoader;
 std::vector<Mod> mods;
 int modsLoaded = 0;
 
@@ -131,6 +134,22 @@ void SaveDisabledMods(std::vector<Mod> mods) {
 	api->WriteIniString(L"Config", L"DisabledMods", disabledModsStr.c_str());
 }
 
+Mod GetModLoader() {
+	Mod loader;
+
+	std::wstring modPath = L"C2ModLoader.asi";
+	loader.info = GetFileVersionInfo(modPath);
+	loader.path = GetPathInfo(modPath);
+	loader.enabled = true;
+
+	loader.fileHash = Sha256::ComputeFileHash(WStringToString(modPath).c_str());
+
+	loader.overridePath = MOD_DIRECTORY_L L"\\C2ModLoader";
+	GetFileOverrides(loader.overridePath, loader.fileOverrides);
+
+	return loader;
+}
+
 std::vector<Mod> GetMods() {
 
 	std::vector<Mod> mods;
@@ -160,6 +179,8 @@ std::vector<Mod> GetMods() {
 			mod.info = GetFileVersionInfo(modPath);
 			mod.path = GetPathInfo(modPath);
 			mod.enabled = std::find(disabledMods.begin(), disabledMods.end(), modPath) == disabledMods.end();
+
+			mod.fileHash = Sha256::ComputeFileHash(WStringToString(modPath).c_str());
 
 			mod.overridePath = GetFileOverridePath(modPath);
 			GetFileOverrides(mod.overridePath, mod.fileOverrides);

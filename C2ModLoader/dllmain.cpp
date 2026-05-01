@@ -107,6 +107,7 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 
 	SetupDirectories();
 
+	modLoader = GetModLoader();
 	mods = GetMods();
 
 	if (!skipLauncher) {

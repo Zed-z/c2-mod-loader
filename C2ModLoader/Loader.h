@@ -4,6 +4,7 @@
 #include "Utils.h"
 
 #include <sstream>
+#include <string>
 #include <windows.h>
 
 struct Mod {
@@ -11,6 +12,7 @@ struct Mod {
 	PathInfo path;
 	bool enabled = true;
 	HMODULE handle = nullptr;
+	std::string fileHash;
 
 	std::wstring overridePath;
 	std::vector<FileOverrideEntry> fileOverrides;
@@ -20,6 +22,7 @@ struct Mod {
 
 void LoadConfig();
 
+extern Mod modLoader;
 extern std::vector<Mod> mods;
 extern int modsLoaded;
 
@@ -28,6 +31,7 @@ void SetupDirectories();
 std::vector<std::wstring> GetDisabledMods();
 void SaveDisabledMods(std::vector<Mod> disabledMods);
 
+Mod GetModLoader();
 std::vector<Mod> GetMods();
 void LoadMods(std::vector<Mod> &mods);
 
