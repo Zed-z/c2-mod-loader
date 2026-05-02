@@ -26,6 +26,7 @@ void __stdcall RunPostStepHooks() {
 std::vector<void(__stdcall *)()> doorChangeCallbacks;
 
 void __stdcall RunDoorChangeHooks() {
+	api->LogDebug("[GameHooks] Door change hook triggered.");
 	for (auto &callback : doorChangeCallbacks) {
 		callback();
 	}
@@ -34,6 +35,7 @@ void __stdcall RunDoorChangeHooks() {
 std::vector<void(__stdcall *)()> mapChangeCallbacks;
 
 void __stdcall RunMapChangeHooks() {
+	api->LogDebug("[GameHooks] Map change hook triggered.");
 	for (auto &callback : mapChangeCallbacks) {
 		callback();
 	}
@@ -42,6 +44,7 @@ void __stdcall RunMapChangeHooks() {
 std::vector<void(__stdcall *)()> playerDeathCallbacks;
 
 void __stdcall RunPlayerDeathHooks() {
+	api->LogDebug("[GameHooks] Player death hook triggered.");
 	for (auto &callback : playerDeathCallbacks) {
 		callback();
 	}
@@ -118,8 +121,8 @@ void ApplyHooks() {
 		api->HookFunction(0x480740, 6, RunDoorChangeHooks, INJECT_AFTER);
 		// Croc2.exe+192A3 - 89 3D 4C9C4A00        - mov [Croc2.exe+A9C4C],edi
 		api->HookFunction(0x4192A3, 6, RunMapChangeHooks, INJECT_AFTER);
-		//
-		api->LogWarning("[Loader RunPlayerDeathHooks] Not implemented.");
+		// Croc2.exe+82949 - C7 05 40EB4B00 01000000 - mov [Croc2.exe+BEB40],00000001
+		api->HookFunction(0x482949, 10, RunPlayerDeathHooks, INJECT_BEFORE);
 		break;
 	}
 	case GAMEVER_DEMO: {
@@ -146,8 +149,8 @@ void ApplyHooks() {
 		api->HookFunction(0x47F060, 6, RunDoorChangeHooks, INJECT_AFTER);
 		// Croc2.exe+18E44 - 89 3D 4C7C4A00        - mov [Croc2.exe+A7C4C],edi
 		api->HookFunction(0x418E44, 6, RunMapChangeHooks, INJECT_AFTER);
-		//
-		api->LogWarning("[Loader RunPlayerDeathHooks] Not implemented.");
+		// Croc2.exe+81289 - C7 05 50694B00 01000000 - mov [Croc2.exe+B6950],00000001
+		api->HookFunction(0x481289, 10, RunPlayerDeathHooks, INJECT_BEFORE);
 		break;
 	}
 	}
