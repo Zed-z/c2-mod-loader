@@ -55,10 +55,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 			api->HookFunction(0x41929D, 6, &onLevelEntry, INJECT_AFTER);
 			break;
 		}
-		case GAMEVER_DEMO: {
-			api->LogWarning("Not implemented.");
-			break;
-		}
 		}
 
 		api->RegisterMenuAction(hModule, restoreHealthRegistration);

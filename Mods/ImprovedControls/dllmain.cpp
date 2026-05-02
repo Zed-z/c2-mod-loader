@@ -118,7 +118,7 @@ void PatchAutoModeSwitch() {
 			0042f00a 89 3d 4c        MOV        dword ptr [analog_strength_0052a54c],EDI
 					a5 52 00
 		*/
-		api->HookFunction(0x0042f00a, 6, &resetUsingKeyboard, INJECT_AFTER);
+		api->HookFunction(0x42f00a, 6, &resetUsingKeyboard, INJECT_AFTER);
 		/*
 			0042f0f8 85 f6           TEST       ESI,ESI
 			0042f0fa 66 a3 8e        MOV        [DAT_0052a58e],AX
@@ -131,15 +131,37 @@ void PatchAutoModeSwitch() {
 					a5 52 00
 					02 00 00 00
 		*/
-		api->HookFunction(0x0042f102, 10, &setUsingKeyboard, INJECT_AFTER);
+		api->HookFunction(0x42f102, 10, &setUsingKeyboard, INJECT_AFTER);
 		break;
 	}
 	case GAMEVER_EU: {
-		api->LogWarning("Not implemented.");
+		/*
+			Croc2.exe+2F78A - 89 3D 3C175300        - mov [Croc2.exe+13173C],edi
+		*/
+		api->HookFunction(0x42F78A, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			Croc2.exe+2F878 - 85 F6                 - test esi,esi
+			Croc2.exe+2F87A - 66 A3 7E175300        - mov [Croc2.exe+13177E],ax
+			Croc2.exe+2F880 - 74 14                 - je Croc2.exe+2F896
+			Croc2.exe+2F882 - C7 05 3C175300 B5000000 - mov [Croc2.exe+13173C],000000B5
+			Croc2.exe+2F88C - C7 05 50175300 02000000 - mov [Croc2.exe+131750],00000002
+		*/
+		api->HookFunction(0x42F882, 10, &setUsingKeyboard, INJECT_AFTER);
 		break;
 	}
 	case GAMEVER_DEMO: {
-		api->LogWarning("Not implemented.");
+		/*
+			Croc2.exe+2F43A - 89 3D 44955200        - mov [Croc2.exe+129544],edi
+		*/
+		api->HookFunction(0x42F43A, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			Croc2.exe+2F528 - 85 F6                 - test esi,esi
+			Croc2.exe+2F52A - 66 A3 86955200        - mov [Croc2.exe+129586],ax
+			Croc2.exe+2F530 - 74 14                 - je Croc2.exe+2F546
+			Croc2.exe+2F532 - C7 05 44955200 B5000000 - mov [Croc2.exe+129544],000000B5
+			Croc2.exe+2F53C - C7 05 58955200 02000000 - mov [Croc2.exe+129558],00000002
+		*/
+		api->HookFunction(0x42F532, 10, &setUsingKeyboard, INJECT_AFTER);
 		break;
 	}
 	}

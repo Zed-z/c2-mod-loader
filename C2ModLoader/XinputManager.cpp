@@ -124,11 +124,19 @@ void PatchPreInput() {
 		break;
 	}
 	case GAMEVER_EU: {
-		api->LogWarning("[XinputManager] Not implemented.");
+		/*
+			Croc2.exe+2F640 - 83 EC 10              - sub esp,10
+			Croc2.exe+2F643 - 8B 0D 9C175300        - mov ecx,[Croc2.exe+13179C]
+		*/
+		api->HookFunction(0x42F640, 9, &PreInput, INJECT_BEFORE);
 		break;
 	}
 	case GAMEVER_DEMO: {
-		api->LogWarning("[XinputManager] Not implemented.");
+		/*
+			Croc2.exe+2F2F0 - 83 EC 10              - sub esp,10
+			Croc2.exe+2F2F3 - 8B 0D A4955200        - mov ecx,[Croc2.exe+1295A4]
+		*/
+		api->HookFunction(0x42F2F0, 9, &PreInput, INJECT_BEFORE);
 		break;
 	}
 	}
@@ -163,13 +171,22 @@ void PatchAnalogInput() {
 			Croc2.exe+2F1CD - 89 15 74A55200        - mov [Croc2.exe+12A574],edx
 		*/
 		api->InjectCode(0x42F1CA, 9, hookCode, p, INJECT_BEFORE);
+		break;
 	}
 	case GAMEVER_EU: {
-		api->LogWarning("[XinputManager] Not implemented.");
-		return;
+		/*
+			Croc2.exe+2F94A - 83 FD 7F              - cmp ebp,7F
+			Croc2.exe+2F94D - 89 15 64175300        - mov [Croc2.exe+131764],edx
+		*/
+		api->InjectCode(0x42F94A, 9, hookCode, p, INJECT_BEFORE);
+		break;
 	}
 	case GAMEVER_DEMO: {
-		api->LogWarning("[XinputManager] Not implemented.");
+		/*
+			Croc2.exe+2F5FA - 83 FD 7F              - cmp ebp,7F
+			Croc2.exe+2F5FD - 89 15 6C955200        - mov [Croc2.exe+12956C],edx
+		*/
+		api->InjectCode(0x42F5FA, 9, hookCode, p, INJECT_BEFORE);
 		return;
 	}
 	}
@@ -224,11 +241,13 @@ void PatchPreDamage() {
 		break;
 	}
 	case GAMEVER_EU: {
-		api->LogWarning("[XinputManager] Not implemented.");
+		// Croc2.exe+826D0 - 83 3D 2CEB4B00 0B     - cmp dword ptr [Croc2.exe+BEB2C],0B
+		api->HookFunction(0x4826D0, 7, &PreDamage, INJECT_BEFORE);
 		break;
 	}
 	case GAMEVER_DEMO: {
-		api->LogWarning("[XinputManager] Not implemented.");
+		// Croc2.exe+81010 - 83 3D 3C694B00 0B     - cmp dword ptr [Croc2.exe+B693C],0B
+		api->HookFunction(0x481010, 7, &PreDamage, INJECT_BEFORE);
 		break;
 	}
 	}
