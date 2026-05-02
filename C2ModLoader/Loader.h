@@ -35,18 +35,6 @@ Mod GetModLoader();
 std::vector<Mod> GetMods();
 void LoadMods(std::vector<Mod> &mods);
 
-extern std::vector<void(__stdcall *)()> physicsCallbacks;
-void __stdcall RunPhysicsHooks();
-
-extern std::vector<void(__stdcall *)()> doorChangeCallbacks;
-void __stdcall RunDoorChangeHooks();
-
-extern std::vector<void(__stdcall *)()> mapChangeCallbacks;
-void __stdcall RunMapChangeHooks();
-
-extern std::vector<void(__stdcall *)()> playerDeathCallbacks;
-void __stdcall RunPlayerDeathHooks();
-
 void ApiSetup();
 
 extern ModApi *api;

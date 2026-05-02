@@ -38,6 +38,7 @@ typedef struct {
 
 typedef int32_t StratEntityFlags;
 typedef int32_t bool32_t;
+typedef int16_t bool16_t;
 
 struct Vec3i {
 	int x, y, z;
@@ -406,11 +407,12 @@ typedef bool (*ReadBytesFunction)(uintptr_t address, void *out_buffer, size_t si
 typedef bool (*InjectCodeFunction)(uintptr_t hook_address, size_t hook_length, BYTE *code, size_t code_length, int inject_type);
 typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__stdcall *func)(), int inject_type);
 
-#define GAME_HOOK_PHYSICS 0
+#define GAME_HOOK_POST_STEP 0
 #define GAME_HOOK_DOOR_CHANGE 1
 #define GAME_HOOK_MAP_CHANGE 2
 #define GAME_HOOK_PLAYER_DEATH 3
-typedef bool (*HookGameFunction)(int hook_type, void(__stdcall *func)());
+#define GAME_HOOK_PRE_STEP 4
+typedef void (*HookGameFunction)(int hook_type, void(__stdcall *func)());
 
 typedef int (*SetupIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
 typedef int (*ReadIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
@@ -629,6 +631,8 @@ inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)_pointer({{0x4B776C}, {0x4B
 inline fnInitFade initFade = (fnInitFade)_pointer({{0x418240}, {0x4186F0}, {0x418240}});
 
 inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x4A7C44}});
+
+inline bool16_t *binocsActive = (bool16_t *)_pointer({{0x52AEAC}, {0x53209C}, {0x529EA4}});
 
 // Api client --------------------------------------------------------
 

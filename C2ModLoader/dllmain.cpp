@@ -84,7 +84,7 @@ static DWORD WINAPI HotkeyThread(LPVOID) {
 
 static DWORD WINAPI WindowTitleCallback(LPVOID param) {
 	Sleep(1000);
-	std::wstring gameName = L"Croc 2";
+	std::wstring gameName = api->GetGameVersion() == GAMEVER_DEMO ? L"Croc 2 Demo" : L"Croc 2";
 	HWND hwnd = FindWindow(NULL, gameName.c_str());
 	if (hwnd) {
 		std::wstring newTitle = gameName + L" (" + LOADER_NAME_L + L")";

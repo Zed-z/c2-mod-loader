@@ -331,6 +331,10 @@ void __stdcall deathChangeOrbitCameraReset() {
 
 void __stdcall PhysicsLoop() {
 
+	// Don't touch the camera on the main menu
+	if (levelInfo->tribe == 0)
+		return;
+
 	// Xinput
 	XinputInput input = api->GetXinputState();
 	const bool xinputEnabled = input.config.enabled;
@@ -367,7 +371,7 @@ void __stdcall PhysicsLoop() {
 		if (croc == nullptr)
 			return;
 
-		if (inputs.flip) {
+		if (inputs.flip || *binocsActive) {
 			orbitCameraReset();
 		}
 
@@ -474,12 +478,15 @@ void __stdcall PhysicsLoop() {
 	}
 	case CameraMode::Freecam: {
 
+		if (camera == nullptr)
+			return;
+
 		float input_x, input_y, input_z;
 		float input_rot_yaw, input_rot_pitch;
 		if (xinputEnabled) {
 			input_x = -((float)input.leftStick.x / stickScale);
 			input_z = ((float)input.leftStick.y / stickScale);
-			input_y = inputs.jump - inputs.attack;
+			input_y = ((float)input.rightTrigger / triggerScale) - ((float)input.leftTrigger / triggerScale);
 			input_rot_yaw = ((float)input.rightStick.x / stickScale) * (freecamInvertX ? -1 : 1);
 			input_rot_pitch = ((float)input.rightStick.y / stickScale) * (freecamInvertY ? -1 : 1);
 		} else {
@@ -570,7 +577,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
 
-		api->HookGame(GAME_HOOK_PHYSICS, PhysicsLoop);
+		api->HookGame(GAME_HOOK_POST_STEP, PhysicsLoop);
 		api->RegisterMenuAction(hModule, cameraNormalRegistration);
 		api->RegisterMenuAction(hModule, cameraOrbitRegistration);
 		api->RegisterMenuAction(hModule, cameraFreeRegistration);

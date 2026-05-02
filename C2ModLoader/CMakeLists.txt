@@ -56,6 +56,7 @@ set(SOURCES
     ConsoleLogging.cpp
     dllmain.cpp
     FileOverrides.cpp
+    GameHooks.cpp
     Launcher/Backend.cpp
     Launcher/EmbeddedLicenses.cpp
     Launcher/IniConfig.cpp

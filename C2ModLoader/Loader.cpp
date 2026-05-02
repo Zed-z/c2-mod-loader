@@ -1,5 +1,6 @@
 #include "Loader.h"
 
+#include "GameHooks.h"
 #include "Registry/RegistryManager.h"
 #include "Utils.h"
 #include "Utils/Sha256.h"
@@ -284,61 +285,7 @@ void LoadMods(std::vector<Mod> &mods) {
 	}
 }
 
-std::vector<void(__stdcall *)()> physicsCallbacks;
-
-void __stdcall RunPhysicsHooks() {
-	for (auto &callback : physicsCallbacks) {
-		callback();
-	}
-}
-
-std::vector<void(__stdcall *)()> doorChangeCallbacks;
-
-void __stdcall RunDoorChangeHooks() {
-	for (auto &callback : doorChangeCallbacks) {
-		callback();
-	}
-}
-
-std::vector<void(__stdcall *)()> mapChangeCallbacks;
-
-void __stdcall RunMapChangeHooks() {
-	for (auto &callback : mapChangeCallbacks) {
-		callback();
-	}
-}
-
-std::vector<void(__stdcall *)()> playerDeathCallbacks;
-
-void __stdcall RunPlayerDeathHooks() {
-	for (auto &callback : playerDeathCallbacks) {
-		callback();
-	}
-}
-
 void ApiSetup() {
-
-	switch (api->GetGameVersion()) {
-	case GAMEVER_US: {
-		// Croc2.exe+4A591 - 39 1D 0CA24A00 - cmp [Croc2.exe+AA20C], ebx
-		api->HookFunction(0x44A591, 6, RunPhysicsHooks, INJECT_AFTER);
-		// Croc2.exe + 7FBF0 - 89 3D 88784B00 - mov[Croc2.exe + B7888], edi
-		api->HookFunction(0x47FBF0, 6, RunDoorChangeHooks, INJECT_AFTER);
-		// Croc2.exe + 18DBB - 89 3D 4C8C4A00 - mov [Croc2.exe + A8C4C],edi
-		api->HookFunction(0x418DBB, 6, RunMapChangeHooks, INJECT_AFTER);
-		// Croc2.exe + 81DF9 - C7 05 50794B00 01000000 - mov [Croc2.exe + B7950],00000001
-		api->HookFunction(0x481DF9, 10, RunPlayerDeathHooks, INJECT_BEFORE);
-		break;
-	}
-	case GAMEVER_EU: {
-		api->LogWarning("[Loader] Not implemented.");
-		break;
-	}
-	case GAMEVER_DEMO: {
-		api->LogWarning("[Loader] Not implemented.");
-		break;
-	}
-	}
-
+	GameHooks::ApplyHooks();
 	XinputManager::Setup();
 }

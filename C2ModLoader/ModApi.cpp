@@ -2,6 +2,7 @@
 #include "ModApi.h"
 #include "Config.h"
 #include "ConsoleLogging.h"
+#include "GameHooks.h"
 #include "Loader.h"
 #include "Overlay/Components/MenuBar.h"
 #include "Overlay/Components/Toast.h"
@@ -356,22 +357,8 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall *func)(), int 
 	return true;
 }
 
-bool HookGame(int hook_type, void(__stdcall *func)()) {
-	switch (hook_type) {
-	case GAME_HOOK_PHYSICS:
-		physicsCallbacks.push_back(func);
-		break;
-	case GAME_HOOK_DOOR_CHANGE:
-		doorChangeCallbacks.push_back(func);
-		break;
-	case GAME_HOOK_MAP_CHANGE:
-		mapChangeCallbacks.push_back(func);
-		break;
-	case GAME_HOOK_PLAYER_DEATH:
-		playerDeathCallbacks.push_back(func);
-		break;
-	}
-	return true;
+void HookGame(int hook_type, void(__stdcall *func)()) {
+	GameHooks::RegisterHook(hook_type, func);
 }
 
 // Anonymous namespace for INI helpers

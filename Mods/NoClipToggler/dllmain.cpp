@@ -85,7 +85,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		if (!api)
 			return FALSE;
 
-		api->HookGame(GAME_HOOK_PHYSICS, PhysicsLoop);
+		api->HookGame(GAME_HOOK_POST_STEP, PhysicsLoop);
 		api->RegisterMenuAction(hModule, toggleNoclipRegistration);
 
 		DisableThreadLibraryCalls(hModule);
