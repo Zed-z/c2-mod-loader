@@ -1,10 +1,13 @@
 #include "XinputManager.h"
 #include "ModApi.h"
+#include <algorithm>
 #include <cmath>
 #include <string>
 #include <windows.h>
 #include <xinput.h>
 #pragma comment(lib, "xinput.lib")
+
+using std::min, std::max;
 
 extern ModApi *api;
 

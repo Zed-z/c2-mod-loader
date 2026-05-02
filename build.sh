@@ -6,7 +6,7 @@ RC=i686-w64-mingw32-windres
 TYPE=Release
 VERSION=US
 export WINEPREFIX="$HOME/.local/share/wineprefixes/croc2"
-PATH_TO_GAME="$WINEPREFIX/drive_c/Program Files (x86)/Fox/Croc 2/"$VERSION
+PATH_TO_GAME="$WINEPREFIX/drive_c/Program Files (x86)/Fox/Croc 2/$VERSION"
 DEPLOY=false
 PACKAGE=false
 LAUNCH=false
@@ -37,6 +37,25 @@ package() {
 launch() {
     wine "$PATH_TO_GAME/Croc2.exe"
 }
+
+command_availability() {
+    missing=0
+    for cmd in \
+        $CC \
+        $CXX \
+        $RC \
+        cmake \
+        wine
+    do
+        command -v $cmd >/dev/null 2>&1 || { echo "Command not found: $cmd"; missing=1; }
+    done
+
+    if [ $missing -eq 1 ]; then
+        exit 1;
+    fi
+}
+
+command_availability
 
 while getopts "c:v:Cdplh" opt; do
     case $opt in

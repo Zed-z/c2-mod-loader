@@ -81,13 +81,11 @@ void InstallHooks() {
 		return;
 	}
 
-	if (MH_CreateHookApi(L"advapi32", "RegQueryValueExA", &HookedRegQueryValueExA, reinterpret_cast<void **>(&g_originalRegQueryValueExA)) != MH_OK ||
-		MH_EnableHook(&RegQueryValueExA) != MH_OK) {
+	if (MH_CreateHookApi(L"advapi32", "RegQueryValueExA", (void *)&HookedRegQueryValueExA, reinterpret_cast<void **>(&g_originalRegQueryValueExA)) != MH_OK || MH_EnableHook((void *)&RegQueryValueExA) != MH_OK) {
 		api->LogWarning("[RegistryPathRemapper] Failed to hook RegQueryValueExA");
 	}
 
-	if (MH_CreateHookApi(L"advapi32", "RegSetValueExA", &HookedRegSetValueExA, reinterpret_cast<void **>(&g_originalRegSetValueExA)) != MH_OK ||
-		MH_EnableHook(&RegSetValueExA) != MH_OK) {
+	if (MH_CreateHookApi(L"advapi32", "RegSetValueExA", (void *)&HookedRegSetValueExA, reinterpret_cast<void **>(&g_originalRegSetValueExA)) != MH_OK || MH_EnableHook((void *)&RegSetValueExA) != MH_OK) {
 		api->LogWarning("[RegistryPathRemapper] Failed to hook RegSetValueExA");
 	}
 }
