@@ -134,7 +134,7 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	RegistryManager::InstallHooks();
 
 	if (guiEnabled) {
-		CreateThread(nullptr, 0, OverlayInitThread, hModule, 0, nullptr);
+		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
 	}
 
 	if (freeMouse) {

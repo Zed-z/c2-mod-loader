@@ -2,6 +2,7 @@
 
 #include "Loader.h"
 #include "ModApi.h"
+#include "Overlay/Backend.h"
 #include "Resource.h"
 #include "Utils/Fonts.h"
 #include "imgui.h"
@@ -26,7 +27,7 @@ void RenderVersionInfo() {
 
 		const float margin = 48.0f * displayScale;
 		float labelX = margin;
-		float labelY = io.DisplaySize.y - margin - labelSize.y * 2 * displayScale;
+		float labelY = io.DisplaySize.y - margin - labelSize.y * 2 * displayScale / Overlay::Backend::dpiScale;
 		float labelStrokeWidth = 2.0f * displayScale;
 
 		int labelOpacity = levelInfo.map == 0 ? 255 : 63;

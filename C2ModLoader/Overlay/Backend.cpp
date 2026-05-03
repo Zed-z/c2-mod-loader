@@ -21,7 +21,13 @@
 
 extern ModApi *api;
 
-static float g_dpiScale = 1.0f;
+// WndProc hook for ImGui input
+static WNDPROC oWndProc = nullptr;
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+namespace Overlay::Backend {
+
+float dpiScale = 1.0f;
 
 typedef HRESULT(__stdcall *PresentFunction)(IDXGISwapChain *, UINT, UINT);
 static PresentFunction oPresent = nullptr;
@@ -47,11 +53,6 @@ static void CreateRenderTarget(IDXGISwapChain *pSwap) {
 		bb->Release();
 	}
 }
-
-// WndProc hook for ImGui input
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-static WNDPROC oWndProc = nullptr;
 
 static LRESULT CALLBACK WndProcHook(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) {
@@ -84,11 +85,11 @@ static void InitOrRestoreImGui(IDXGISwapChain *pSwap) {
 			// Set fonts.
 			ImGuiIO &io = ImGui::GetIO();
 			io.FontDefault = Fonts::GetFontText();
-			io.FontGlobalScale = g_dpiScale;
+			io.FontGlobalScale = dpiScale;
 
 			// Apply DPI scale to style.
 			ImGuiStyle &style = ImGui::GetStyle();
-			style.ScaleAllSizes(g_dpiScale);
+			style.ScaleAllSizes(dpiScale);
 
 			if (g_hWnd && !oWndProc) {
 				oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
@@ -157,7 +158,7 @@ DWORD WINAPI OverlayInitThread(LPVOID lpParam) {
 
 	// Enable DPI awareness for accurate scaling.
 	UiScale::EnableDpiAwareness();
-	g_dpiScale = UiScale::ResolveUiScale(nullptr);
+	dpiScale = UiScale::ResolveUiScale(nullptr);
 
 	// Check if dgVoodoo is present.
 	// (ddraw.dll loaded from the game directory)
@@ -260,3 +261,5 @@ DWORD WINAPI OverlayInitThread(LPVOID lpParam) {
 
 	return 0;
 }
+
+} // namespace Overlay::Backend

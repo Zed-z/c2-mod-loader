@@ -21,6 +21,9 @@ void RenderSaveSlotList() {
 		SaveSlot *slot = api->GetSaveSlot(i);
 		std::string slotId = std::string("slot") + std::to_string(i);
 		std::string slotName = std::string("Slot ") + std::to_string(i + 1) + " - " + slot->name;
+		if (i == *currentSaveSlotIndex) {
+			slotName += " [Current]";
+		}
 
 		if (ImGui::CollapsingHeader((slotName + "##" + slotId).c_str())) {
 			ImGui::Indent();
@@ -46,6 +49,16 @@ void RenderSaveSlotList() {
 			ImGui::InputInt((std::string("Golden Gobbos##goldengobbos") + slotId).c_str(), reinterpret_cast<int *>(&slot->goldenGobbos));
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Jigsaw Pieces##jigsawpieces") + slotId).c_str(), reinterpret_cast<int *>(&slot->jigsawPieces));
+
+			ImGui::Text("Settings");
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Effect Volume##effectvolume") + slotId).c_str(), reinterpret_cast<int *>(&slot->effectVolume));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Music Volume##musicvolume") + slotId).c_str(), reinterpret_cast<int *>(&slot->musicVolume));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Dialog Volume##dialogvolume") + slotId).c_str(), reinterpret_cast<int *>(&slot->dialogVolume));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Control Method##controlmethod") + slotId).c_str(), reinterpret_cast<int *>(&slot->controlMethod));
 
 			ImGui::Text("Inventory");
 			ImGui::SetNextItemWidth(itemWidth);
@@ -75,6 +88,16 @@ void RenderSaveSlotList() {
 			ImGui::InputInt((std::string("Total Boss Hearts##totalbosshearts") + slotId).c_str(), reinterpret_cast<int *>(&slot->totalBossHearts));
 			ImGui::SetNextItemWidth(itemWidth);
 			ImGui::InputInt((std::string("Boss Hearts##bosshearts") + slotId).c_str(), reinterpret_cast<int *>(&slot->bossHearts));
+
+			ImGui::Text("Goto Level Variables");
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Goto Tribe##gototribe") + slotId).c_str(), reinterpret_cast<int *>(&slot->tribe0));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Goto Level##gotolevel") + slotId).c_str(), reinterpret_cast<int *>(&slot->level0));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Goto Map##gotomap") + slotId).c_str(), reinterpret_cast<int *>(&slot->map0));
+			ImGui::SetNextItemWidth(itemWidth);
+			ImGui::InputInt((std::string("Goto Type##gototype") + slotId).c_str(), reinterpret_cast<int *>(&slot->type0));
 
 			ImGui::Unindent();
 		}

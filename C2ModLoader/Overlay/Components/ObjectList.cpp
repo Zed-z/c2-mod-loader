@@ -29,6 +29,7 @@ void RenderObjectList() {
 	StratEntity *rootObject = api->GetEntity(rootObjRef);
 	StratEntity *crocObject = api->GetEntity(crocObjRef);
 	StratEntity *cameraObject = api->GetEntity(cameraObjRef);
+	StratEntity *dialogObject = api->GetEntity(dialogObjRef);
 	int stratCountValue = *stratCount;
 
 	if (rootObject != nullptr) {
@@ -77,6 +78,9 @@ void RenderObjectList() {
 				}
 				if (node == cameraObject) {
 					ss << " [Camera]";
+				}
+				if (node == dialogObject) {
+					ss << " [Dialog]";
 				}
 
 				// Header colors
