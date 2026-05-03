@@ -16,13 +16,23 @@ BEGIN
         BEGIN
             VALUE "Name", "Health Tweaks"
             VALUE "Author", "Zed-z"
-            VALUE "Description", "Provides some quality of life health mechanics tweaks."
+            VALUE "Description",
+                "Provides some quality of life health mechanics tweaks to attempt to make the game's infamously unforgiving health system easier to deal with.\n"
+                "\n"
+                "Full Health On Retry:\n"
+                "Fully replenish health when retrying after a game over.\n"
+                "\n"
+                "Full Health On Level Entry:\n"
+                "Fully replenish health when entering a level.\n"
+                "\n"
+                "Restore Health:\n"
+                "Instantly replenish your health via a button available on the menu bar.\n"
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#health-tweaks"
             VALUE "ApiVersion", API_VERSION_STR
             VALUE "ConfigTypes",
                 "@Config[General Configuration|General mod settings];"
-                "Config/FullHealthOnRetry[Full Health On Retry|Fully replenish health when retrying after game over]:bool=1;"
+                "Config/FullHealthOnRetry[Full Health On Retry|Fully replenish health when retrying after a game over]:bool=1;"
                 "Config/FullHealthOnLevelEntry[Full Health On Level Entry|Fully replenish health when entering a level]:bool=1"
         END
     END

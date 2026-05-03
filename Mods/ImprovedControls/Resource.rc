@@ -16,7 +16,14 @@ BEGIN
         BEGIN
             VALUE "Name", "Improved Controls"
             VALUE "Author", "Zed-z"
-            VALUE "Description", "Alters the way the game controls."
+            VALUE "Description",
+                "Adds extra options to improve the quality of life for the game's controls.\n"
+                "\n"
+                "Type 1 Flip:\n"
+                "Allows to do a 180 in Type 1 by double tapping the camera reset / 180 button.\n"
+                "\n"
+                "Type Switch Mode:\n"
+                "Enable manual (caps lock) or automatic control type switching.\n"
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#improved-controls"
             VALUE "ApiVersion", API_VERSION_STR

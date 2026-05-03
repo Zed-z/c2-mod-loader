@@ -17,7 +17,7 @@ BEGIN
             VALUE "Name", "Camera+"
             VALUE "Author", "Zed-z"
             VALUE "Description",
-                "Adds extra camera modes.\n"
+                "Adds extra camera modes to improve general gameplay and allow for easier exploration.\n"
                 "\n"
                 "Orbit Camera:\n"
                 "A manually controllable orbiting camera. Use side step controls to tilt left/right and inventory controls to tilt up/down. Optionally turns as you move.\n"
@@ -25,7 +25,7 @@ BEGIN
                 "Freecam:\n"
                 "A camera detached from the player character that can pass through objects. Move around with movement controls. Use side step controls to tilt left/right and inventory controls to tilt up/down. Jump to raise and attack to lower the camera.\n"
                 "\n"
-                "Change camera modes with [side step left] + [side step right] + [camera center / 180]."
+                "Change camera modes with [step left + step right + camera center / 180] or via the menu bar.\n"
             VALUE "Version", "1.1.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#camera-plus"
             VALUE "ApiVersion", API_VERSION_STR

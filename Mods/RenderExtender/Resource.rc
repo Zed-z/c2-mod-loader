@@ -16,7 +16,12 @@ BEGIN
         BEGIN
             VALUE "Name", "Render Extender"
             VALUE "Author", "Zed-z"
-            VALUE "Description", "Allows you to increase the game's render distance past its limits."
+            VALUE "Description",
+                "Allows you to increase the game's render distance past its limits.\n"
+                "\n"
+                "Toggle with [F1]. Decrease and increase the render multiplier with [-] / [+].\n"
+                "\n"
+                "Additionally, these can be configured via the menu bar.\n"
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#render-extender"
             VALUE "ApiVersion", API_VERSION_STR

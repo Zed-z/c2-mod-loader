@@ -102,8 +102,8 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 
 	ConsoleLogging::Initialize();
 
-	std::string gameVersionMessage = std::string("Game version: ") + GameVersions[api->GetGameVersion()];
-	api->LogInfo(gameVersionMessage.c_str());
+	api->LogInfo(LOADER_NAME " v" LOADER_VERSION);
+	api->LogInfo((std::string("Game version: ") + GameVersions[api->GetGameVersion()]).c_str());
 
 	SetupDirectories();
 

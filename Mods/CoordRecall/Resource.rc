@@ -16,7 +16,14 @@ BEGIN
         BEGIN
             VALUE "Name", "Coord Recall"
             VALUE "Author", "Zed-z"
-            VALUE "Description", "Allows you to save and recall coordinates using hotkeys."
+            VALUE "Description",
+                "Allows you to save and recall coordinates using hotkeys.\n"
+                "\n"
+                "[F5 + 0-9] - Save your current position and rotation.\n"
+                "\n"
+                "[0-9] - Recall a previously set position.\n"
+                "\n"
+                "Additionally, allows you to manage saved positions via the menu bar.\n"
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#coord-recall"
             VALUE "ApiVersion", API_VERSION_STR
