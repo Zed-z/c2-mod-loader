@@ -624,7 +624,7 @@ StratEntity *GetEntity(MemoryAddress address) {
 }
 
 SaveSlot *GetSaveSlot(int slot_number) {
-	return &saveSlots[slot_number];
+	return (SaveSlot *)((uintptr_t)saveSlots + slot_number * 0x2000);
 }
 
 SaveSlot *GetCurrentSaveSlot() {

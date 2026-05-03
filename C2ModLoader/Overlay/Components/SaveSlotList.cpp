@@ -25,7 +25,7 @@ void RenderSaveSlotList() {
 			slotName += " [Current]";
 		}
 
-		if (ImGui::CollapsingHeader((slotName + "##" + slotId).c_str())) {
+		if (ImGui::CollapsingHeader((slotName + "###" + slotId).c_str())) {
 			ImGui::Indent();
 
 			const float itemWidth = 128;

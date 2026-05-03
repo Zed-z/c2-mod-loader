@@ -298,8 +298,6 @@ struct SaveSlot {
 	int _pad7;
 
 	int saveChecksum;
-
-	int _pad8[1741];
 };
 
 enum GameState : uint32_t {
