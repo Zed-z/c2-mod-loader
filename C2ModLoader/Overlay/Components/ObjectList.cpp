@@ -28,6 +28,7 @@ void RenderObjectList() {
 
 	StratEntity *rootObject = api->GetEntity(rootObjRef);
 	StratEntity *crocObject = api->GetEntity(crocObjRef);
+	StratEntity *bossObject = api->GetEntity(bossObjRef);
 	StratEntity *cameraObject = api->GetEntity(cameraObjRef);
 	StratEntity *dialogObject = api->GetEntity(dialogObjRef);
 	int stratCountValue = *stratCount;
@@ -73,8 +74,14 @@ void RenderObjectList() {
 				std::ostringstream ss;
 				ss << "(" << std::hex << std::uppercase << (uintptr_t)node << ") ";
 				ss << std::nouppercase << node->name;
+				if (node == rootObject) {
+					ss << " [Root]";
+				}
 				if (node == crocObject) {
 					ss << " [Player]";
+				}
+				if (node == bossObject) {
+					ss << " [Boss]";
 				}
 				if (node == cameraObject) {
 					ss << " [Camera]";
