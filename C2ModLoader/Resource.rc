@@ -77,7 +77,9 @@ BEGIN
                 "Xinput/TriggerDeadzone[Trigger Deadzone|Deadzone for triggers]:int=10;"
                 "Xinput/TriggerOuterDeadzone[Trigger Outer|Outer deadzone for triggers]:int=90;"
                 "Xinput/VibrationEnabled[Vibration Enabled|Enable vibration]:bool=1;"
-                "Xinput/VibrationStrength[Vibration Strength|Strength of vibration effects]:int=100"
+                "Xinput/VibrationStrength[Vibration Strength|Strength of vibration effects]:int=100;"
+                "Xinput/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=0;"
+                "Xinput/DpadMovement[Dpad Movement|Allow for player movement with the directional pad]:bool=1"
         END
     END
     BLOCK "VarFileInfo"

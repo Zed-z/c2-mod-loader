@@ -13,6 +13,97 @@ extern ModApi *api;
 
 namespace {
 
+enum TypeSwitchMode {
+	None = 0,
+	Manual = 1,
+	Automatic = 2
+};
+
+std::string typeSwitchModeNames[] = {"None", "Manual", "Automatic"};
+TypeSwitchMode typeSwitchMode;
+bool dpadMovement;
+
+int GetControlScheme() {
+	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
+	return currentSaveSlot->controlMethod;
+}
+
+void SetControlScheme(int scheme) {
+	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
+	currentSaveSlot->controlMethod = scheme;
+}
+
+void __stdcall resetUsingKeyboard() {
+	if (typeSwitchMode == TypeSwitchMode::Automatic)
+		SetControlScheme(CTRL_TYPE_1);
+}
+
+void __stdcall setUsingKeyboard() {
+	if (typeSwitchMode == TypeSwitchMode::Automatic)
+		SetControlScheme(CTRL_TYPE_2);
+}
+
+void PatchAutoModeSwitch() {
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+2F00A - 89 3D 4CA55200        - mov [Croc2.exe+12A54C],edi
+		*/
+		api->HookFunction(0x42f00a, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			Croc2.exe+2F0F8 - 85 F6                 - test esi,esi
+			Croc2.exe+2F0FA - 66 A3 8EA55200        - mov [Croc2.exe+12A58E],ax
+			Croc2.exe+2F100 - 74 14                 - je Croc2.exe+2F116
+			Croc2.exe+2F102 - C7 05 4CA55200 B5000000 - mov [Croc2.exe+12A54C],000000B5
+			Croc2.exe+2F10C - C7 05 60A55200 02000000 - mov [Croc2.exe+12A560],00000002
+		*/
+		api->HookFunction(0x42f102, 10, &setUsingKeyboard, INJECT_AFTER);
+		break;
+	}
+	case GAMEVER_EU: {
+		/*
+			Croc2.exe+2F78A - 89 3D 3C175300        - mov [Croc2.exe+13173C],edi
+		*/
+		api->HookFunction(0x42F78A, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			Croc2.exe+2F878 - 85 F6                 - test esi,esi
+			Croc2.exe+2F87A - 66 A3 7E175300        - mov [Croc2.exe+13177E],ax
+			Croc2.exe+2F880 - 74 14                 - je Croc2.exe+2F896
+			Croc2.exe+2F882 - C7 05 3C175300 B5000000 - mov [Croc2.exe+13173C],000000B5
+			Croc2.exe+2F88C - C7 05 50175300 02000000 - mov [Croc2.exe+131750],00000002
+		*/
+		api->HookFunction(0x42F882, 10, &setUsingKeyboard, INJECT_AFTER);
+		break;
+	}
+	case GAMEVER_DEMO: {
+		/*
+			Croc2.exe+2F43A - 89 3D 44955200        - mov [Croc2.exe+129544],edi
+		*/
+		api->HookFunction(0x42F43A, 6, &resetUsingKeyboard, INJECT_AFTER);
+		/*
+			Croc2.exe+2F528 - 85 F6                 - test esi,esi
+			Croc2.exe+2F52A - 66 A3 86955200        - mov [Croc2.exe+129586],ax
+			Croc2.exe+2F530 - 74 14                 - je Croc2.exe+2F546
+			Croc2.exe+2F532 - C7 05 44955200 B5000000 - mov [Croc2.exe+129544],000000B5
+			Croc2.exe+2F53C - C7 05 58955200 02000000 - mov [Croc2.exe+129558],00000002
+		*/
+		api->HookFunction(0x42F532, 10, &setUsingKeyboard, INJECT_AFTER);
+		break;
+	}
+	}
+}
+
+void ManualModeSwitch() {
+	if (typeSwitchMode == TypeSwitchMode::Manual) {
+		bool changeControls = GetAsyncKeyState(VK_CAPITAL) & 1;
+		if (changeControls) {
+			int controlScheme = GetControlScheme();
+			SetControlScheme(!controlScheme);
+			api->ShowInfoToast(("Control scheme: " + std::string(ControlSchemeNames[!controlScheme])).c_str());
+		}
+	}
+}
+
 template <typename T>
 int sign(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -114,6 +205,7 @@ XinputInput GetState() {
 
 void __stdcall PreInput() {
 	PollInput();
+	ManualModeSwitch();
 }
 
 void PatchPreInput() {
@@ -141,6 +233,52 @@ void PatchPreInput() {
 		*/
 		api->HookFunction(0x42F2F0, 9, &PreInput, INJECT_BEFORE);
 		break;
+	}
+	}
+}
+
+void __stdcall doDpadMovement() {
+	if (!dpadMovement)
+		return;
+
+	if (input.dpad.up)
+		*analogY = 8128;
+	if (input.dpad.down)
+		*analogY = -8128;
+	if (input.dpad.left)
+		*analogX = 8128;
+	if (input.dpad.right)
+		*analogX = -8128;
+
+	if (input.dpad.up || input.dpad.down || input.dpad.left || input.dpad.right) {
+		*analogStrength = 181;
+		*inputDeviceType = 2;
+		setUsingKeyboard();
+	}
+}
+
+void PatchDpadMovement() {
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+2F0D1 - DB 05 64A55200        - fild dword ptr [Croc2.exe+12A564]
+		*/
+		api->HookFunction(0x42F0D1, 6, &doDpadMovement, INJECT_BEFORE);
+		break;
+	}
+	case GAMEVER_EU: {
+		/*
+			Croc2.exe+2F851 - DB 05 54175300        - fild dword ptr [Croc2.exe+131754]
+		*/
+		api->HookFunction(0x42F851, 6, &doDpadMovement, INJECT_BEFORE);
+		break;
+	}
+	case GAMEVER_DEMO: {
+		/*
+			Croc2.exe+2F501 - DB 05 5C955200        - fild dword ptr [Croc2.exe+12955C]
+		*/
+		api->HookFunction(0x42F501, 6, &doDpadMovement, INJECT_BEFORE);
+		return;
 	}
 	}
 }
@@ -271,6 +409,8 @@ void Setup() {
 	vibrationEnabled = api->SetupIniBool(L"Xinput", L"VibrationEnabled", true);
 	vibrationStrength = api->SetupIniInt(L"Xinput", L"VibrationStrength", 100) / 100.0f;
 	vibrationStrength = min(max(vibrationStrength, 0.0f), 1.0f);
+	typeSwitchMode = (TypeSwitchMode)api->SetupIniInt(L"Xinput", L"TypeSwitchMode", TypeSwitchMode::None);
+	dpadMovement = api->SetupIniBool(L"Xinput", L"DpadMovement", true);
 
 	PollInput();
 	if (!xinputEnabled)
@@ -280,6 +420,8 @@ void Setup() {
 	PatchPreInput();
 	PatchAnalogInput();
 	PatchPreDamage();
+	PatchAutoModeSwitch();
+	PatchDpadMovement();
 }
 
 } // namespace XinputManager
