@@ -449,6 +449,7 @@ typedef MenuActionRegistration(__stdcall *MenuActionRegistrationFunction)();
 typedef bool (*RegisterMenuActionFunction)(HMODULE handle, MenuActionRegistrationFunction registration);
 
 typedef StratEntity *(*GetEntityFunction)(MemoryAddress address);
+typedef StratEntity *(*FindEntityFunction)(const char *name);
 
 typedef SaveSlot *(*GetSaveSlotFunction)(int slot_number);
 typedef SaveSlot *(*GetCurrentSaveSlotFunction)();
@@ -544,6 +545,7 @@ struct ModApi {
 	RegisterMenuActionFunction RegisterMenuAction;
 
 	GetEntityFunction GetEntity;
+	FindEntityFunction FindEntity;
 
 	GetSaveSlotFunction GetSaveSlot;
 	GetCurrentSaveSlotFunction GetCurrentSaveSlot;
@@ -600,6 +602,7 @@ inline uint32_t *renderDistance = (uint32_t *)_pointer({{0x4B7B18}, {0x4BED08}, 
 
 inline MemoryAddress rootObjRef = _address({{0x4A8C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}, {0x4A7C3C, {0x14, 0x28, 0x00}}});
 inline MemoryAddress crocObjRef = _address({{0x4A8C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}, {0x4A7C3C, {0x14, 0x30, 0x00}}});
+inline MemoryAddress bossObjRef = _address({{0x4A8C3C, {0x14, 0x38, 0x00}}, {0x4A9C3C, {0x14, 0x38, 0x00}}, {0x4A7C3C, {0x14, 0x38, 0x00}}});
 inline MemoryAddress cameraObjRef = _address({{0x4A8C3C, {0x14, 0x3C, 0x00}}, {0x4A9C3C, {0x14, 0x3C, 0x00}}, {0x4A7C3C, {0x14, 0x3C, 0x00}}});
 inline MemoryAddress dialogObjRef = _address({{0x4A8C3C, {0x14, 0x40, 0x00}}, {0x4A9C3C, {0x14, 0x40, 0x00}}, {0x4A7C3C, {0x14, 0x40, 0x00}}});
 inline uint32_t *stratCount = (uint32_t *)_pointer({{0x636160}, {0x63D350}, {0x635158}});
@@ -607,6 +610,10 @@ inline uint32_t *stratCount = (uint32_t *)_pointer({{0x636160}, {0x63D350}, {0x6
 inline uint32_t *inputsRaw = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}});
 inline uint32_t *inputsPressedRaw = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
 inline uint32_t *inputsReleasedRaw = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
+
+inline uint32_t *analogX = (uint32_t *)_pointer({{0x52A564}, {0x531754}, {0x52955C}});
+inline uint32_t *analogY = (uint32_t *)_pointer({{0x52A574}, {0x531764}, {0x52956C}});
+inline uint32_t *inputDeviceType = (uint32_t *)_pointer({{0x52A560}, {0x531750}, {0x529558}});
 inline uint32_t *analogStrength = (uint32_t *)_pointer({{0x52A54C}, {0x53173C}, {0x529544}});
 
 inline Vec3i *cameraPos = (Vec3i *)_pointer({{0x622B38}, {0x629D28}, {0x621B30}});

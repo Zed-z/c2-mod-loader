@@ -623,6 +623,24 @@ StratEntity *GetEntity(MemoryAddress address) {
 	return entity;
 }
 
+StratEntity *FindEntity(const char *name) {
+	StratEntity *current = GetEntity(rootObjRef);
+	if (current == nullptr)
+		return nullptr;
+
+	while (current->prev != nullptr)
+		current = current->prev;
+
+	while (current != nullptr) {
+		if (strcmp(current->name, name) == 0) {
+			return current;
+		}
+		current = current->next;
+	}
+
+	return nullptr;
+}
+
 SaveSlot *GetSaveSlot(int slot_number) {
 	return (SaveSlot *)((uintptr_t)saveSlots + slot_number * 0x2000);
 }
@@ -709,6 +727,7 @@ ModApi g_ModApi = {
 	ShowErrorToast,
 	RegisterMenuAction,
 	GetEntity,
+	FindEntity,
 	GetSaveSlot,
 	GetCurrentSaveSlot,
 	GetLevelInfo,
