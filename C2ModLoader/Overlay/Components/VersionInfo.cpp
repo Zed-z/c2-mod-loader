@@ -30,9 +30,17 @@ void RenderVersionInfo() {
 		float labelY = io.DisplaySize.y - margin - labelSize.y * 2 * displayScale / Overlay::Backend::dpiScale;
 		float labelStrokeWidth = 2.0f * displayScale;
 
+		float hashLabelSize = fontSize * 0.4f;
+		float hashLabelX = labelX;
+		float hashLabelY = labelY + labelSize.y * 2 * displayScale / Overlay::Backend::dpiScale + 16.0f * displayScale;
+		float hashLabelStrokeWidth = 1.0f * displayScale;
+
 		int labelOpacity = levelInfo.map == 0 ? 255 : 63;
+		int hashLabelOpacity = labelOpacity * 0.75f;
 		ImU32 labelColor = IM_COL32(254, 254, 200, labelOpacity);
 		ImU32 labelStrokeColor = IM_COL32(101, 81, 24, labelOpacity);
+		ImU32 hashLabelColor = IM_COL32(254, 254, 200, hashLabelOpacity);
+		ImU32 hashLabelStrokeColor = IM_COL32(101, 81, 24, hashLabelOpacity);
 
 		ImDrawList *drawList = ImGui::GetBackgroundDrawList();
 		drawList->AddText(fontTitle, fontSize, ImVec2(labelX - labelStrokeWidth, labelY), labelStrokeColor, labelTextChar);
@@ -44,5 +52,15 @@ void RenderVersionInfo() {
 		drawList->AddText(fontTitle, fontSize, ImVec2(labelX + labelStrokeWidth, labelY - labelStrokeWidth), labelStrokeColor, labelTextChar);
 		drawList->AddText(fontTitle, fontSize, ImVec2(labelX + labelStrokeWidth, labelY + labelStrokeWidth), labelStrokeColor, labelTextChar);
 		drawList->AddText(fontTitle, fontSize, ImVec2(labelX, labelY), labelColor, labelTextChar);
+
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX - hashLabelStrokeWidth, hashLabelY), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX + hashLabelStrokeWidth, hashLabelY), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX, hashLabelY - hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX, hashLabelY + hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX - hashLabelStrokeWidth, hashLabelY - hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX - hashLabelStrokeWidth, hashLabelY + hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX + hashLabelStrokeWidth, hashLabelY - hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX + hashLabelStrokeWidth, hashLabelY + hashLabelStrokeWidth), hashLabelStrokeColor, loadedModsHash.c_str());
+		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX, hashLabelY), hashLabelColor, loadedModsHash.c_str());
 	}
 }

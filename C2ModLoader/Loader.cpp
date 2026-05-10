@@ -16,6 +16,7 @@ extern ModApi *api;
 Mod modLoader;
 std::vector<Mod> mods;
 int modsLoaded = 0;
+std::string loadedModsHash = "";
 
 std::wstring Mod::getName() {
 	return (this->info.name.length() > 0)
@@ -197,6 +198,7 @@ std::vector<Mod> GetMods() {
 void LoadMods(std::vector<Mod> &mods) {
 
 	std::vector<Mod> failedMods;
+	std::string modsHashConcat = modLoader.fileHash;
 
 	// Load file overrides
 	try {
@@ -266,7 +268,11 @@ void LoadMods(std::vector<Mod> &mods) {
 		std::string message = "Loaded mod: " + modName + " (API v" + std::to_string(mod.info.apiVersion) + ") - handle: " + std::to_string((int)mod.handle);
 		api->LogInfo(message.c_str());
 		modsLoaded++;
+
+		modsHashConcat += mod.fileHash;
 	}
+
+	loadedModsHash = Sha256::ComputeHash(modsHashConcat.c_str());
 
 	// Show message box when mods failed to load
 	if (failedMods.size() > 0) {

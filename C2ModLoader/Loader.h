@@ -25,6 +25,7 @@ void LoadConfig();
 extern Mod modLoader;
 extern std::vector<Mod> mods;
 extern int modsLoaded;
+extern std::string loadedModsHash;
 
 void SetupDirectories();
 

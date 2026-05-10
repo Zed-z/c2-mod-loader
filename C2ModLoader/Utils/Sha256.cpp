@@ -1,7 +1,7 @@
 #include "Sha256.h"
 
+#include <cstring>
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <wincrypt.h>
@@ -11,6 +11,55 @@
 
 namespace Sha256 {
 
+namespace {
+
+std::string HashToHex(const BYTE *hash, DWORD hashLength) {
+	std::ostringstream hashStream;
+	hashStream << std::hex << std::uppercase << std::setfill('0');
+	for (DWORD i = 0; i < hashLength; ++i) {
+		hashStream << std::setw(2) << static_cast<int>(hash[i]);
+	}
+	return hashStream.str();
+}
+
+void DestroyHashContext(HCRYPTPROV hProv, HCRYPTHASH hHash) {
+	if (hHash) {
+		CryptDestroyHash(hHash);
+	}
+	if (hProv) {
+		CryptReleaseContext(hProv, 0);
+	}
+}
+
+bool CreateHashContext(HCRYPTPROV &hProv, HCRYPTHASH &hHash) {
+	if (!CryptAcquireContextW(&hProv, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+		return false;
+	}
+
+	if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+		CryptReleaseContext(hProv, 0);
+		hProv = 0;
+		return false;
+	}
+
+	return true;
+}
+
+std::string FinalizeHash(HCRYPTPROV hProv, HCRYPTHASH hHash) {
+	BYTE hash[32];
+	DWORD hashLen = sizeof(hash);
+
+	if (!CryptGetHashParam(hHash, HP_HASHVAL, hash, &hashLen, 0)) {
+		DestroyHashContext(hProv, hHash);
+		return "";
+	}
+
+	DestroyHashContext(hProv, hHash);
+	return HashToHex(hash, hashLen);
+}
+
+} // namespace
+
 std::string ComputeFileHash(const char *filePath) {
 	HANDLE hFile = CreateFileA(filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {
@@ -19,14 +68,7 @@ std::string ComputeFileHash(const char *filePath) {
 
 	HCRYPTPROV hProv = 0;
 	HCRYPTHASH hHash = 0;
-
-	if (!CryptAcquireContextW(&hProv, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-		CloseHandle(hFile);
-		return "";
-	}
-
-	if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
-		CryptReleaseContext(hProv, 0);
+	if (!CreateHashContext(hProv, hHash)) {
 		CloseHandle(hFile);
 		return "";
 	}
@@ -37,32 +79,30 @@ std::string ComputeFileHash(const char *filePath) {
 
 	while (ReadFile(hFile, buffer, BUFFER_SIZE, &bytesRead, nullptr) && bytesRead > 0) {
 		if (!CryptHashData(hHash, buffer, bytesRead, 0)) {
-			CryptDestroyHash(hHash);
-			CryptReleaseContext(hProv, 0);
+			DestroyHashContext(hProv, hHash);
 			CloseHandle(hFile);
 			return "";
 		}
 	}
 
-	BYTE hash[32];
-	DWORD hashLen = 32;
-	if (!CryptGetHashParam(hHash, HP_HASHVAL, hash, &hashLen, 0)) {
-		CryptDestroyHash(hHash);
-		CryptReleaseContext(hProv, 0);
-		CloseHandle(hFile);
+	CloseHandle(hFile);
+	return FinalizeHash(hProv, hHash);
+}
+
+std::string ComputeHash(const char *data) {
+	HCRYPTPROV hProv = 0;
+	HCRYPTHASH hHash = 0;
+	if (!CreateHashContext(hProv, hHash)) {
 		return "";
 	}
 
-	CryptDestroyHash(hHash);
-	CryptReleaseContext(hProv, 0);
-	CloseHandle(hFile);
-
-	// Convert hash to uppercase hex string
-	std::ostringstream hashStream;
-	for (int i = 0; i < 32; ++i) {
-		hashStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+	DWORD dataLen = static_cast<DWORD>(strlen(data));
+	if (!CryptHashData(hHash, reinterpret_cast<const BYTE *>(data), dataLen, 0)) {
+		DestroyHashContext(hProv, hHash);
+		return "";
 	}
-	return hashStream.str();
+
+	return FinalizeHash(hProv, hHash);
 }
 
 } // namespace Sha256
