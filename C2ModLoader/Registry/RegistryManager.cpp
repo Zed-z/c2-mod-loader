@@ -71,22 +71,28 @@ void SetManagedKeys(const std::string &managedKeys) {
 
 void InstallHooks() {
 	if (!g_enabled) {
-		api->LogInfo("Registry path remapper disabled by config.");
+		api->LogInfo("[RegistryManager] Disabled by config.");
 		return;
 	}
 
 	MH_STATUS initStatus = MH_Initialize();
 	if (initStatus != MH_OK && initStatus != MH_ERROR_ALREADY_INITIALIZED) {
-		api->LogWarning("[RegistryPathRemapper] Failed to initialize MinHook");
+		api->LogWarning("[RegistryManager] Failed to initialize MinHook");
 		return;
+	} else {
+		api->LogInfo("[RegistryManager] MinHook initialized");
 	}
 
 	if (MH_CreateHookApi(L"advapi32", "RegQueryValueExA", (void *)&HookedRegQueryValueExA, reinterpret_cast<void **>(&g_originalRegQueryValueExA)) != MH_OK || MH_EnableHook((void *)&RegQueryValueExA) != MH_OK) {
-		api->LogWarning("[RegistryPathRemapper] Failed to hook RegQueryValueExA");
+		api->LogWarning("[RegistryManager] Failed to hook RegQueryValueExA");
+	} else {
+		api->LogInfo("[RegistryManager] Hooked RegQueryValueExA");
 	}
 
 	if (MH_CreateHookApi(L"advapi32", "RegSetValueExA", (void *)&HookedRegSetValueExA, reinterpret_cast<void **>(&g_originalRegSetValueExA)) != MH_OK || MH_EnableHook((void *)&RegSetValueExA) != MH_OK) {
-		api->LogWarning("[RegistryPathRemapper] Failed to hook RegSetValueExA");
+		api->LogWarning("[RegistryManager] Failed to hook RegSetValueExA");
+	} else {
+		api->LogInfo("[RegistryManager] Hooked RegSetValueExA");
 	}
 }
 
