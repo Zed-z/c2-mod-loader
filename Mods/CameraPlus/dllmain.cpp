@@ -56,6 +56,44 @@ std::vector<LevelInfo> orbitLevelBlocklist;
 bool orbitDisableRestrictions;
 bool centerOnType2;
 bool centerOnType2Current;
+bool orbitVehicleRearViewCamera;
+bool orbitImprovedBossCamera;
+bool orbitButtonResetPitch;
+bool orbitButtonResetZoom;
+
+double GameRotationToRadians(int game_rotation) {
+	return (game_rotation * PI) / 2048.0;
+}
+
+void __stdcall orbitCameraResetYaw() {
+	StratEntity *croc = api->GetEntity(crocObjRef);
+	if (croc == nullptr) {
+		api->LogDebug("[orbitCameraReset] Croc not found!");
+		return;
+	}
+	cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
+}
+
+void __stdcall orbitCameraResetDistance() {
+	orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+}
+
+void __stdcall orbitCameraResetPitch() {
+	cameraPitch = DEFAULT_CAMERA_PITCH;
+}
+
+void __stdcall orbitCameraResetTransitions() {
+	orbitCameraResetYaw();
+	orbitCameraResetPitch();
+}
+
+void __stdcall orbitCameraResetButton() {
+	orbitCameraResetYaw();
+	if (orbitButtonResetPitch)
+		orbitCameraResetPitch();
+	if (orbitButtonResetZoom)
+		orbitCameraResetDistance();
+}
 
 void populateOrbitBlocklist(wchar_t *orbitLevelBlockList, std::vector<LevelInfo> &blocklist) {
 	std::wstring orbitLevelBlocklistStr(orbitLevelBlockList);
@@ -97,6 +135,8 @@ bool orbitCameraDisabled() {
 
 	StratEntity *croc = api->GetEntity(crocObjRef);
 	StratEntity *camera = api->GetEntity(cameraObjRef);
+	StratEntity *boss = api->GetEntity(bossObjRef);
+	StratEntity *dialog = api->GetEntity(dialogObjRef);
 
 	// Disable during in-game events
 	if (*movementAllowedState != 0)
@@ -105,16 +145,19 @@ bool orbitCameraDisabled() {
 	// Vehicles
 	if (strcmp(croc->name, "ClockworkGobbo") == 0)
 		return true;
-	if (strcmp(croc->name, "Croc In a Boat") == 0)
-		return true;
 	if (strcmp(croc->name, "Croc Snowball PC") == 0)
+		return true;
+	if (strcmp(croc->name, "Croc Snowball") == 0)
 		return true;
 	if (strcmp(croc->name, "HangGlider PC") == 0)
 		return true;
-	if (strcmp(croc->name, "Croc In a Car") == 0)
-		return true;
 	if (strcmp(croc->name, "DPPlane") == 0)
 		return true;
+	if (orbitVehicleRearViewCamera ? !api->GetInputs().flip : true) {
+		bool isVehicle = strcmp(croc->name, "Croc In a Boat") == 0 || strcmp(croc->name, "Croc In a Car") == 0;
+		if (isVehicle)
+			return true;
+	}
 
 	// Cameras
 	if (strcmp(camera->name, "MineCartCam2") == 0)
@@ -123,11 +166,15 @@ bool orbitCameraDisabled() {
 		return true;
 	if (strcmp(camera->name, "DPCamera") == 0)
 		return true;
+	if (strcmp(camera->name, "Snowballfixedcam") == 0)
+		return true;
+	if (strcmp(camera->name, "SMP Camera") == 0)
+		return true;
 
 	// Binoc break fixes
 	if (strcmp(camera->name, "CrocCannonCamera") == 0) // Keith
 		return true;
-	if (strcmp(camera->name, "Blank") == 0) // Venus
+	if (boss != nullptr && strcmp(boss->name, "VenusVonFlyTrappe") == 0 && strcmp(camera->name, "Blank") == 0) // Venus
 		return true;
 
 	// Climbing
@@ -137,14 +184,43 @@ bool orbitCameraDisabled() {
 	return false;
 }
 
-void orbitCameraOverridesPreAutoTurn() {
+void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 	StratEntity *croc = api->GetEntity(crocObjRef);
+	StratEntity *camera = api->GetEntity(cameraObjRef);
+	StratEntity *boss = api->GetEntity(bossObjRef);
+	StratEntity *dialog = api->GetEntity(dialogObjRef);
 
 	// Flavio override
 	if (strcmp(croc->name, "FlavioCroc") == 0) {
 		orbitCameraDistance = 6000.0;
 		cameraPitch = min(max(cameraPitch, 0.75), 0.9);
 		orbitAutoTurn = false;
+	}
+
+	// Dante override
+	if (orbitImprovedBossCamera && levelInfo->tribe == 4 && levelInfo->level == 2 && levelInfo->map == 1 && levelInfo->type == WAD_TYPE_BOSS && dialog != nullptr) {
+		StratEntity *dante = api->FindEntity("DFDante");
+		if (dante != nullptr) {
+			if (input_rot_yaw == 0 && input_rot_pitch == 0) {
+				Vec3i positionDiff = {
+					dante->newPosition.x - croc->newPosition.x,
+					dante->newPosition.y - croc->newPosition.y,
+					dante->newPosition.z - croc->newPosition.z};
+				cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+				orbitAutoTurn = false;
+			}
+		}
+	}
+
+	// Vehicle rear view camera
+	if (orbitVehicleRearViewCamera) {
+		bool isVehicle = strcmp(croc->name, "Croc In a Boat") == 0 || strcmp(croc->name, "Croc In a Car") == 0;
+		if (isVehicle && api->GetInputs().flip) {
+			api->LogDebug("Vehicle rear view camera active");
+			orbitCameraResetYaw();
+			orbitCameraResetPitch();
+			cameraYaw += PI;
+		}
 	}
 }
 
@@ -189,10 +265,6 @@ int RadiansToGameRotation(double radians_input) {
 	}
 
 	return game_rotation_value;
-}
-
-double GameRotationToRadians(int game_rotation) {
-	return (game_rotation * PI) / 2048.0;
 }
 
 void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
@@ -299,25 +371,10 @@ void __stdcall cameraSetFreecam() {
 	cameraSet(CameraMode::Freecam);
 }
 
-void __stdcall orbitCameraResetYaw() {
-	StratEntity *croc = api->GetEntity(crocObjRef);
-	if (croc == nullptr) {
-		api->LogDebug("[orbitCameraReset] Croc not found!");
-		return;
-	}
-	cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
-}
-
-void __stdcall orbitCameraReset() {
-	orbitCameraResetYaw();
-	cameraPitch = DEFAULT_CAMERA_PITCH;
-	orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
-}
-
 static DWORD WINAPI delayedOrbitCameraResetThread(LPVOID param) {
 	int delay = (int)param;
 	Sleep(delay);
-	orbitCameraReset();
+	orbitCameraResetTransitions();
 	return 0;
 }
 
@@ -372,7 +429,7 @@ void __stdcall PhysicsLoop() {
 			return;
 
 		if (inputs.flip || *binocsActive) {
-			orbitCameraReset();
+			orbitCameraResetButton();
 		}
 
 		if (controlMethod == CTRL_TYPE_2) {
@@ -432,7 +489,7 @@ void __stdcall PhysicsLoop() {
 		cameraPitch += input_rot_pitch * CAMERA_PITCH_SPEED;
 		cameraPitch = min(max(cameraPitch, MIN_CAMERA_PITCH), MAX_CAMERA_PITCH);
 
-		orbitCameraOverridesPreAutoTurn();
+		orbitCameraOverridesPreAutoTurn(input_rot_yaw, input_rot_pitch);
 
 		// Auto turn
 		if (!orbitHasLastCrocPos) {
@@ -455,7 +512,7 @@ void __stdcall PhysicsLoop() {
 		orbitLastCrocPos = croc->newRotPos.position;
 
 		if (orbitCameraDisabled()) {
-			orbitCameraReset();
+			orbitCameraResetButton();
 			return;
 		}
 
@@ -559,7 +616,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
 		orbitAutoTurnSaved = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
 		orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
-		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 20), 0);
+		orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 65), 0);
 
 		const int zoomControlsValue = min(max(api->SetupIniInt(L"OrbitCamera", L"ZoomControls", 1), static_cast<int>(ZOOM_NONE)), static_cast<int>(ZOOM_RIGHT_STICK_CLICK));
 		orbitZoomControls = static_cast<ZoomControls>(zoomControlsValue);
@@ -573,6 +630,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
 		centerOnType2 = api->SetupIniBool(L"OrbitCamera", L"CenterOnType2", true);
 		centerOnType2Current = centerOnType2;
+
+		orbitVehicleRearViewCamera = api->SetupIniBool(L"OrbitCamera", L"VehicleRearViewCamera", true);
+		orbitImprovedBossCamera = api->SetupIniBool(L"OrbitCamera", L"ImprovedBossCamera", true);
+
+		orbitButtonResetPitch = api->SetupIniBool(L"OrbitCamera", L"ButtonResetPitch", true);
+		orbitButtonResetZoom = api->SetupIniBool(L"OrbitCamera", L"ButtonResetZoom", false);
 
 		freecamInvertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 		freecamInvertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
