@@ -1,10 +1,10 @@
 #include "Loader.h"
 
 #include "GameHooks.h"
+#include "Input/Input.h"
 #include "Registry/RegistryManager.h"
 #include "Utils.h"
 #include "Utils/Sha256.h"
-#include "XinputManager.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -293,5 +293,5 @@ void LoadMods(std::vector<Mod> &mods) {
 
 void ApiSetup() {
 	GameHooks::ApplyHooks();
-	XinputManager::Setup();
+	Input::Setup();
 }

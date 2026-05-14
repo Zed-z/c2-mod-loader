@@ -57,6 +57,11 @@ set(SOURCES
     dllmain.cpp
     FileOverrides.cpp
     GameHooks.cpp
+    Input/AnalogInput.cpp
+    Input/DpadMovement.cpp
+    Input/Input.cpp
+    Input/TypeSwitching.cpp
+    Input/Vibration.cpp
     Launcher/Backend.cpp
     Launcher/EmbeddedLicenses.cpp
     Launcher/IniConfig.cpp
@@ -88,7 +93,6 @@ set(SOURCES
     Utils/Sha256.cpp
     Utils/Style.cpp
     Utils/UiScale.cpp
-    XinputManager.cpp
 )
 
 # ImGui Core + Backends

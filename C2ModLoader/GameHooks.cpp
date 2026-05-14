@@ -50,8 +50,19 @@ void __stdcall RunPlayerDeathHooks() {
 	}
 }
 
+std::vector<void(__stdcall *)()> preInputCallbacks;
+
+void __stdcall RunPreInputHooks() {
+	for (auto &callback : preInputCallbacks) {
+		callback();
+	}
+}
+
 void RegisterHook(int hook_type, void(__stdcall *func)()) {
 	switch (hook_type) {
+	case GAME_HOOK_PRE_STEP:
+		preStepCallbacks.push_back(func);
+		break;
 	case GAME_HOOK_POST_STEP:
 		postStepCallbacks.push_back(func);
 		break;
@@ -63,6 +74,9 @@ void RegisterHook(int hook_type, void(__stdcall *func)()) {
 		break;
 	case GAME_HOOK_PLAYER_DEATH:
 		playerDeathCallbacks.push_back(func);
+		break;
+	case GAME_HOOK_PRE_INPUT:
+		preInputCallbacks.push_back(func);
 		break;
 	}
 }
@@ -95,6 +109,11 @@ void ApplyHooks() {
 		api->HookFunction(0x418DBB, 6, RunMapChangeHooks, INJECT_AFTER);
 		// Croc2.exe + 81DF9 - C7 05 50794B00 01000000 - mov [Croc2.exe + B7950],00000001
 		api->HookFunction(0x481DF9, 10, RunPlayerDeathHooks, INJECT_BEFORE);
+		/*
+			Croc2.exe+2EEC0 - 83 EC 10              - sub esp,10
+			Croc2.exe+2EEC3 - 8B 0D ACA55200        - mov ecx,[Croc2.exe+12A5AC]
+		*/
+		api->HookFunction(0x42EEC0, 9, RunPreInputHooks, INJECT_BEFORE);
 		break;
 	}
 	case GAMEVER_EU: {
@@ -123,6 +142,11 @@ void ApplyHooks() {
 		api->HookFunction(0x4192A3, 6, RunMapChangeHooks, INJECT_AFTER);
 		// Croc2.exe+82949 - C7 05 40EB4B00 01000000 - mov [Croc2.exe+BEB40],00000001
 		api->HookFunction(0x482949, 10, RunPlayerDeathHooks, INJECT_BEFORE);
+		/*
+			Croc2.exe+2F640 - 83 EC 10              - sub esp,10
+			Croc2.exe+2F643 - 8B 0D 9C175300        - mov ecx,[Croc2.exe+13179C]
+		*/
+		api->HookFunction(0x42F640, 9, RunPreInputHooks, INJECT_BEFORE);
 		break;
 	}
 	case GAMEVER_DEMO: {
@@ -151,6 +175,11 @@ void ApplyHooks() {
 		api->HookFunction(0x418E44, 6, RunMapChangeHooks, INJECT_AFTER);
 		// Croc2.exe+81289 - C7 05 50694B00 01000000 - mov [Croc2.exe+B6950],00000001
 		api->HookFunction(0x481289, 10, RunPlayerDeathHooks, INJECT_BEFORE);
+		/*
+			Croc2.exe+2F2F0 - 83 EC 10              - sub esp,10
+			Croc2.exe+2F2F3 - 8B 0D A4955200        - mov ecx,[Croc2.exe+1295A4]
+		*/
+		api->HookFunction(0x42F2F0, 9, RunPreInputHooks, INJECT_BEFORE);
 		break;
 	}
 	}

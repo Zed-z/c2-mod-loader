@@ -392,17 +392,16 @@ void __stdcall PhysicsLoop() {
 	if (levelInfo->tribe == 0)
 		return;
 
-	// Xinput
-	XinputInput input = api->GetXinputState();
-	const bool xinputEnabled = input.config.enabled;
-	const float stickScale = input.config.stickScale;
-	const float triggerScale = input.config.triggerScale;
-
 	// Inputs
 	Inputs inputs = api->GetInputs();
 	Inputs inputsPressed = api->GetInputsPressed();
 	Inputs inputsReleased = api->GetInputsReleased();
 	uint32_t controlMethod = api->GetCurrentSaveSlot()->controlMethod;
+
+	ModernInput modernInput = api->GetModernInputState();
+	const bool modernInputEnabled = modernInput.config.enabled;
+	const float stickScale = modernInput.config.stickScale;
+	const float triggerScale = modernInput.config.triggerScale;
 
 	// Entities
 	StratEntity *camera = api->GetEntity(cameraObjRef);
@@ -437,7 +436,7 @@ void __stdcall PhysicsLoop() {
 				centerOnType2Current = centerOnType2;
 			}
 
-			if (input.rightStick.x != 0 || input.rightStick.y != 0) {
+			if (modernInput.rightStick.x != 0 || modernInput.rightStick.y != 0) {
 				centerOnType2Current = false;
 			}
 
@@ -447,16 +446,16 @@ void __stdcall PhysicsLoop() {
 		}
 
 		// Zoom controls
-		if (xinputEnabled) {
+		if (modernInputEnabled) {
 			switch (orbitZoomControls) {
 			case ZOOM_TRIGGERS: {
-				orbitCameraDistance += ((input.leftTrigger - input.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
+				orbitCameraDistance += ((modernInput.leftTrigger - modernInput.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
 				orbitCameraDistance = min(max(orbitCameraDistance, ORBIT_MIN_DISTANCE), ORBIT_MAX_DISTANCE);
 				break;
 			}
 			case ZOOM_RIGHT_STICK_CLICK: {
 				static bool wasRightStickClicked = false;
-				if (input.rightStick.click && !wasRightStickClicked) {
+				if (modernInput.rightStick.click && !wasRightStickClicked) {
 					wasRightStickClicked = true;
 					if (orbitCameraDistance == ORBIT_MAX_DISTANCE) {
 						orbitCameraDistance = ORBIT_MIN_DISTANCE;
@@ -467,7 +466,7 @@ void __stdcall PhysicsLoop() {
 					} else {
 						orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
 					}
-				} else if (!input.rightStick.click) {
+				} else if (!modernInput.rightStick.click) {
 					wasRightStickClicked = false;
 				}
 				break;
@@ -477,9 +476,9 @@ void __stdcall PhysicsLoop() {
 
 		// Camera rotation
 		float input_rot_yaw, input_rot_pitch;
-		if (xinputEnabled) {
-			input_rot_yaw = ((float)input.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
-			input_rot_pitch = ((float)input.rightStick.y / stickScale) * (orbitInvertY ? -1 : 1);
+		if (modernInputEnabled) {
+			input_rot_yaw = ((float)modernInput.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
+			input_rot_pitch = ((float)modernInput.rightStick.y / stickScale) * (orbitInvertY ? -1 : 1);
 		} else {
 			input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
 			input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);
@@ -540,12 +539,12 @@ void __stdcall PhysicsLoop() {
 
 		float input_x, input_y, input_z;
 		float input_rot_yaw, input_rot_pitch;
-		if (xinputEnabled) {
-			input_x = -((float)input.leftStick.x / stickScale);
-			input_z = ((float)input.leftStick.y / stickScale);
-			input_y = ((float)input.rightTrigger / triggerScale) - ((float)input.leftTrigger / triggerScale);
-			input_rot_yaw = ((float)input.rightStick.x / stickScale) * (freecamInvertX ? -1 : 1);
-			input_rot_pitch = ((float)input.rightStick.y / stickScale) * (freecamInvertY ? -1 : 1);
+		if (modernInputEnabled) {
+			input_x = -((float)modernInput.leftStick.x / stickScale);
+			input_z = ((float)modernInput.leftStick.y / stickScale);
+			input_y = ((float)modernInput.rightTrigger / triggerScale) - ((float)modernInput.leftTrigger / triggerScale);
+			input_rot_yaw = ((float)modernInput.rightStick.x / stickScale) * (freecamInvertX ? -1 : 1);
+			input_rot_pitch = ((float)modernInput.rightStick.y / stickScale) * (freecamInvertY ? -1 : 1);
 		} else {
 			input_x = inputs.right - inputs.left;
 			input_z = -(inputs.down - inputs.up);

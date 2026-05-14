@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "ConsoleLogging.h"
 #include "GameHooks.h"
+#include "Input/Input.h"
 #include "Loader.h"
 #include "Overlay/Components/MenuBar.h"
 #include "Overlay/Components/Toast.h"
@@ -10,7 +11,6 @@
 #include "Resource.h"
 #include "Utils.h"
 #include "Utils/Sha256.h"
-#include "XinputManager.h"
 
 #include <algorithm>
 #include <chrono>
@@ -653,8 +653,8 @@ LevelInfo GetLevelInfo() {
 	return *levelInfo;
 }
 
-XinputInput GetXinputState() {
-	return XinputManager::GetState();
+ModernInput GetModernInputState() {
+	return Input::GetState();
 }
 
 void GotoLevel(int tribe, int level, int map, WadFileType type) {
@@ -731,7 +731,7 @@ ModApi g_ModApi = {
 	GetSaveSlot,
 	GetCurrentSaveSlot,
 	GetLevelInfo,
-	GetXinputState,
+	GetModernInputState,
 	GotoLevel,
 	GotoLevelSelect,
 };

@@ -410,6 +410,7 @@ typedef bool (*HookFunctionFunction)(uintptr_t target, size_t length, void(__std
 #define GAME_HOOK_MAP_CHANGE 2
 #define GAME_HOOK_PLAYER_DEATH 3
 #define GAME_HOOK_PRE_STEP 4
+#define GAME_HOOK_PRE_INPUT 5
 typedef void (*HookGameFunction)(int hook_type, void(__stdcall *func)());
 
 typedef int (*SetupIniIntFunction)(const wchar_t *section, const wchar_t *key, int default_value);
@@ -466,7 +467,7 @@ struct LevelInfo {
 };
 typedef LevelInfo (*GetLevelInfoFunction)();
 
-struct XinputInput {
+struct ModernInput {
 	struct {
 		bool enabled;
 		float stickScale;
@@ -495,7 +496,7 @@ struct XinputInput {
 	bool backButton;
 };
 
-typedef XinputInput (*GetXinputStateFunction)();
+typedef ModernInput (*GetModernInputStateFunction)();
 
 struct ModApi {
 	LogFunction LogInfo;
@@ -552,7 +553,7 @@ struct ModApi {
 
 	GetLevelInfoFunction GetLevelInfo;
 
-	GetXinputStateFunction GetXinputState;
+	GetModernInputStateFunction GetModernInputState;
 
 	GotoLevelFunction GotoLevel;
 	GotoLevelSelectFunction GotoLevelSelect;
