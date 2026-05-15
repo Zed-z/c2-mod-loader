@@ -35,6 +35,7 @@ const double ORBIT_MIN_DISTANCE = 1200.0;
 const double ORBIT_MAX_DISTANCE = 3600.0;
 const double DEFAULT_ORBIT_DISTANCE = 2400.0;
 double orbitCameraDistance = DEFAULT_ORBIT_DISTANCE;
+double orbitCameraCurrentDistance = DEFAULT_ORBIT_DISTANCE;
 
 const double CAMERA_YAW_SPEED = 0.15;
 const double CAMERA_PITCH_SPEED = 0.05;
@@ -192,20 +193,52 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 
 	// Flavio override
 	if (strcmp(croc->name, "FlavioCroc") == 0) {
-		orbitCameraDistance = 6000.0;
+		orbitCameraCurrentDistance = 6000.0;
 		cameraPitch = min(max(cameraPitch, 0.75), 0.9);
 		orbitAutoTurn = false;
 	}
 
-	// Dante override
-	if (orbitImprovedBossCamera && levelInfo->tribe == 4 && levelInfo->level == 2 && levelInfo->map == 1 && levelInfo->type == WAD_TYPE_BOSS && dialog != nullptr) {
-		StratEntity *dante = api->FindEntity("DFDante");
-		if (dante != nullptr) {
-			if (input_rot_yaw == 0 && input_rot_pitch == 0) {
+	// Boss Cameras
+	if (orbitImprovedBossCamera) {
+		// Dante
+		if (levelInfo->tribe == 4 && levelInfo->level == 2 && levelInfo->map == 1 && levelInfo->type == WAD_TYPE_BOSS && dialog != nullptr) {
+			StratEntity *dante = api->FindEntity("DFDante");
+			if (dante != nullptr) {
+				if (input_rot_yaw == 0 && input_rot_pitch == 0) {
+					Vec3i positionDiff = {
+						dante->newPosition.x - croc->newPosition.x,
+						dante->newPosition.y - croc->newPosition.y,
+						dante->newPosition.z - croc->newPosition.z};
+					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+					orbitAutoTurn = false;
+				}
+			}
+		}
+		// Goo Man Chu
+		if (levelInfo->tribe == 4 && levelInfo->level == 6 && levelInfo->map == 1 && levelInfo->type == WAD_TYPE_LEVEL) {
+			StratEntity *gooManChu = api->GetEntity(dialogObjRef);
+			if (gooManChu != nullptr && strcmp(gooManChu->name, "Blank") == 0) {
+				orbitCameraCurrentDistance = 1200.0;
+				if (input_rot_yaw == 0 && input_rot_pitch == 0) {
+					Vec3i positionDiff = {
+						gooManChu->newPosition.x - croc->newPosition.x,
+						gooManChu->newPosition.y - croc->newPosition.y,
+						gooManChu->newPosition.z - croc->newPosition.z};
+					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+					orbitAutoTurn = false;
+				}
+			}
+		}
+		// Flavio
+		if (strcmp(croc->name, "FlavioCroc") == 0) {
+			StratEntity *flavio = api->GetEntity(bossObjRef);
+			if (flavio != nullptr) {
+				orbitCameraCurrentDistance = 8000.0;
+				cameraPitch = min(max(cameraPitch, 0.75), 0.9);
 				Vec3i positionDiff = {
-					dante->newPosition.x - croc->newPosition.x,
-					dante->newPosition.y - croc->newPosition.y,
-					dante->newPosition.z - croc->newPosition.z};
+					flavio->newPosition.x - croc->newPosition.x,
+					flavio->newPosition.y - croc->newPosition.y,
+					flavio->newPosition.z - croc->newPosition.z};
 				cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
 				orbitAutoTurn = false;
 			}
@@ -474,6 +507,8 @@ void __stdcall PhysicsLoop() {
 			}
 		}
 
+		orbitCameraCurrentDistance = orbitCameraDistance;
+
 		// Camera rotation
 		float input_rot_yaw, input_rot_pitch;
 		if (modernInputEnabled) {
@@ -516,9 +551,9 @@ void __stdcall PhysicsLoop() {
 		}
 
 		// Apply camera position
-		double offsetX = cos(cameraPitch) * sin(cameraYaw) * orbitCameraDistance;
-		double offsetY = sin(cameraPitch) * orbitCameraDistance;
-		double offsetZ = cos(cameraPitch) * cos(cameraYaw) * orbitCameraDistance;
+		double offsetX = cos(cameraPitch) * sin(cameraYaw) * orbitCameraCurrentDistance;
+		double offsetY = sin(cameraPitch) * orbitCameraCurrentDistance;
+		double offsetZ = cos(cameraPitch) * cos(cameraYaw) * orbitCameraCurrentDistance;
 
 		_cameraRotPos.position.x = croc->newRotPos.position.x + static_cast<int>(offsetX);
 		_cameraRotPos.position.y = static_cast<int>(CAMERA_ORBIT_Y_OFFSET) + croc->newRotPos.position.y + static_cast<int>(offsetY);
