@@ -36,7 +36,7 @@ a:hover {
 }
 
 li + li {
-	margin-top: 8px;
+	margin-top: 16px;
 }
 
 
@@ -121,4 +121,23 @@ footer a {
 }
 footer a:hover {
 	text-decoration: underline;
+}
+
+.code {
+	font-family: monospace;
+	display: block;
+	background: var(--background-2);
+	padding: 16px;
+	border-radius: 8px;
+	overflow-x: auto;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.code-inline {
+	font-family: monospace;
+	display: inline-block;
+	background: var(--background-2);
+	padding: 4px;
+	border-radius: 4px;
 }

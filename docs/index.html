@@ -39,9 +39,9 @@
 			<h2>Compatible versions</h2>
 			<p>Croc 2 Mod Loader supports all official, unmodified PC releases of the game, that is:</p>
 			<ul>
-				<li>US (SHA256:<code style="overflow-wrap: break-word;">BAF84A039DB9581C56A52A8C1C5A318BCE13C3A72565FB6AC19B226D926BE0DE</code>)</li>
-				<li>EU (SHA256:<code style="overflow-wrap: break-word;">38BDFCFF386F52824A718DE70B5710CF32F2263DD9C23FEED4FB39AE741C1720</code>)</li>
-				<li>DEMO (SHA256:<code style="overflow-wrap: break-word;">074C0E4333C76635D3F214E6D89AB2F758FE233E6D4B718F7C5A7E0F11B7D24B</code>)</li>
+				<li>US (SHA256:<span class="code-inline">BAF84A039DB9581C56A52A8C1C5A318BCE13C3A72565FB6AC19B226D926BE0DE</span>)</li>
+				<li>EU (SHA256:<span class="code-inline">38BDFCFF386F52824A718DE70B5710CF32F2263DD9C23FEED4FB39AE741C1720</span>)</li>
+				<li>DEMO (SHA256:<span class="code-inline">074C0E4333C76635D3F214E6D89AB2F758FE233E6D4B718F7C5A7E0F11B7D24B</span>)</li>
 			</ul>
 			<p>Make sure that the game files are not modified and acquired from legitimate sources.</p>
 			<p>The mod loader will not launch other versions to avoid crashing and corruption.</p>
@@ -49,23 +49,68 @@
 		</section>
 		<section>
 			<h2>Installation instructions</h2>
+			<h3>Prerequisites and downloads</h3>
+			<p>Windows:</p>
+			<ul>
+				<li>Download and install the <a href="https://aka.ms/vs/17/release/vc_redist.x86.exe">Microsoft Visual C++ Redistributable (x86)</a></li>
+			</ul>
+			<p>Linux:</p>
+			<ul>
+				<li>Install <span class="code-inline">wine</span> and <span class="code-inline">winetricks</span> from your distribution's package manager</li>
+			</ul>
+			<p>Download <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest/dinput-Win32.zip">dinput8.dll</a> from ThirteenAG's <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader">Ultimate ASI Loader</a></p>
+			<p>Download the mod loader files from <a href="https://github.com/Zed-z/c2-mod-loader/releases">Releases</a></p>
+			<h3>Installation steps</h3>
 			<ol>
-				<li>Make sure you have <a href="https://aka.ms/vs/17/release/vc_redist.x86.exe">Microsoft Visual C++ Redistributable (x86)</a> installed</li>
-				<li>Download <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest/dinput-Win32.zip">dinput8.dll</a> from ThirteenAG's <a href="https://github.com/ThirteenAG/Ultimate-ASI-Loader">Ultimate ASI Loader</a></li>
-				<li>Download the mod loader files from <a href="https://github.com/Zed-z/c2-mod-loader/releases">Releases</a></li>
-				<li>Extract both and place them into the game's directory</li>
-				<li>You're done, the game will now load mods from the <code>mods/</code> folder!</li>
-				<li><b>EXTRA:</b> Unpack the provided example mods into the <code>mods/</code> folder after installation</li>
+				<li>Extract downloaded files and place them into the game's directory</li>
+				<li>Unpack the provided example mods into the <span class="code-inline">mods/</span> folder after installation</li>
 			</ol>
+			<h3>dgVoodoo2 setup for custom GUI overlay</h3>
 			<p>To display custom GUIs, the mod loader needs the game to have <a href="https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/">dgVoodoo2</a> applied.<br>
 			Without it, the mod loader will continue to function, but you will not see the custom GUI overlay.</p>
 			<ol>
 				<li>Download dgVoodoo2 from <a href="https://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/">here</a></li>
-				<li>Extract <code>dgVoodoo.exe</code> and <code>dgVoodoo.conf</code> into the game's directory</li>
-				<li>Additionally, extract the contents of the <code>MS/x86/</code> directory into the game's directory as well</li>
-				<li>Launch <code>dgVoodoo.exe</code></li>
+				<li>Extract <span class="code-inline">dgVoodoo.exe</span> and <span class="code-inline">dgVoodoo.conf</span> into the game's directory</li>
+				<li>Additionally, extract the contents of the <span class="code-inline">MS/x86/</span> directory into the game's directory as well</li>
+				<li>Launch <span class="code-inline">dgVoodoo.exe</span></li>
 				<li>Configure the settings in the <i>General</i> and <i>DirectX</i> tabs as needed</li>
-				<li>If you encounter graphical issues, try an older version of dgVoodoo2, such as v2.82.1</li>
+				<li>If you encounter graphical errors, or compatility issues on Linux, try an older version, such as <a href="https://community.pcgamingwiki.com/files/file/3600-dgvoodoo2-v2793-v2813-wineproton-compatible/">v2.81.3</a></li>
+			</ol>
+			<h3>Wine prefix setup for Linux</h3>
+			<p>NOTE: You will have to re-export <span class="code-inline">WINEPREFIX</span> and <span class="code-inline">WINEDLLOVERRIDES</span> every time you want to play the game. This can be automated with the use of a shell script or one of many available Wine wrappers.</p>
+			<ol>
+				<li>
+					Create a Wine prefix for the game and setup DLL overrides:
+					<span class="code">
+						$ export WINEPREFIX=$HOME/.local/share/wineprefixes/croc2<br>
+						$ export WINEDLLOVERRIDES="d3d8=n,b;d3d9=n,b;d3dimm=n,b;ddraw=n,b;dinput=n,b"
+					</span>
+				</li>
+				<li>
+					Install dependencies (VC++ Redistributable and DXVK) with winetricks:
+					<span class="code">$ winetricks vcrun2022 dxvk</span>
+				</li>
+				<li>
+					Proceed with standard installation steps to install the mod loader and dgVoodoo2.
+				</li>
+				<li>
+					You can launch the game with the following command (adjust for your install directory):
+					<span class="code">$ wine "$HOME/.local/share/wineprefixes/croc2/drive_c/Program Files (x86)/Fox/Croc 2/Croc2.exe"</span>
+				</li>
+				<li>
+					WARNING:
+					Occasionally, the game might not launch because of two things:
+					<ul>
+						<li>
+							<span class="code">Error creating file override directory</span>
+							Relaunch the game. If that doesn't work at all, simply remove the mods\.overrides folder in the game directory and try again.
+						</li>
+						<li>
+							<span class="code">err:sync:RtlpWaitForCriticalSection</span>
+							Relaunch the game (possibly multiple times). Also note that Wine stops responding to any key presses when that happens, so you will have to close the terminal or kill the Wine process.
+						</li>
+					</ul>
+				</li>
 			</ol>
 		</section>
 		<section>
@@ -84,7 +129,7 @@
 			<h3>Q: The game does not access the registry / does not remember settings!</h3>
 			<p>A: It appears to be an issue with Windows permissions of the game's executable. To fix it, run the game as an administrator once and change some settings for the game to set up registry keys.</p>
 			<h3>Q: The game does not recognize controller input!</h3>
-			<p>To make sure controller input works, plug your controller in before starting the game. You may also need to click out and back into the game's window for it to be recognized fully.</p>
+			<p>A: To make sure controller input works, plug your controller in before starting the game. You may also need to click out and back into the game's window for it to be recognized fully.</p>
 		</section>
 		<section>
 			<h2>Special Thanks</h2>
@@ -94,6 +139,7 @@
 				<li>Thanks to ocornut for developing Dear ImGui (support <a href="https://github.com/ocornut/imgui/wiki/Funding">here</a>)</li>
 				<li>Thanks to TsudaKageyu for developing Minhook (support <a href="https://github.com/TsudaKageyu">here</a>)</li>
 				<li>Thanks to Thermospore, hdc0, limbus, Ray and Rartrin from the Croc & Stuff Discord server for valuable insight about the game!</li>
+				<li>Thanks to Trev for his patches to make the loader compile and run on Linux, and for providing installation instructions!</li>
 				<li>Thanks to Argonaut Games for developing Croc 2!</li>
 			</ul>
 		</section>
