@@ -6,6 +6,7 @@ ModApi *api = nullptr;
 
 bool fullHealthOnRetry = true;
 bool fullHealthOnLevelEntry = true;
+bool infiniteHazardBounce = false;
 
 void __stdcall restoreHealth() {
 	SaveSlot *slot = api->GetCurrentSaveSlot();
@@ -15,6 +16,45 @@ void __stdcall restoreHealth() {
 
 MenuActionRegistration __stdcall restoreHealthRegistration() {
 	return {"Restore Health", "Set your health to the maximum value.", restoreHealth, true};
+}
+
+MenuActionRegistration __stdcall toggleFullHealthOnRetryRegistration() {
+	static std::string label;
+	label = std::string("Full Health On Retry: ") + (fullHealthOnRetry ? "Enabled" : "Disabled");
+	return {
+		label.c_str(),
+		"Fully replenish health when retrying after a game over.",
+		[]() {
+			fullHealthOnRetry = !fullHealthOnRetry;
+			api->WriteIniBool(L"Config", L"FullHealthOnRetry", fullHealthOnRetry);
+		},
+		true};
+}
+
+MenuActionRegistration __stdcall toggleFullHealthOnLevelEntryRegistration() {
+	static std::string label;
+	label = std::string("Full Health On Level Entry: ") + (fullHealthOnLevelEntry ? "Enabled" : "Disabled");
+	return {
+		label.c_str(),
+		"Fully replenish health when entering a level.",
+		[]() {
+			fullHealthOnLevelEntry = !fullHealthOnLevelEntry;
+			api->WriteIniBool(L"Config", L"FullHealthOnLevelEntry", fullHealthOnLevelEntry);
+		},
+		true};
+}
+
+MenuActionRegistration __stdcall toggleInfiniteHazardBounceRegistration() {
+	static std::string label;
+	label = std::string("Infinite Hazard Bounce: ") + (infiniteHazardBounce ? "Enabled" : "Disabled");
+	return {
+		label.c_str(),
+		"Bounce on hazards indefinitely without respawning.",
+		[]() {
+			infiniteHazardBounce = !infiniteHazardBounce;
+			api->WriteIniBool(L"Config", L"InfiniteHazardBounce", infiniteHazardBounce);
+		},
+		true};
 }
 
 void __stdcall onRetry() {
@@ -31,6 +71,15 @@ void __stdcall onLevelEntry() {
 	slot->health = slot->heartPots;
 }
 
+void __stdcall postStep() {
+	if (infiniteHazardBounce) {
+		StratEntity *croc = api->GetEntity(crocObjRef);
+		if (croc != nullptr && strcmp((char *)api->GetEntity(rootObjRef)->name, "WalkingCroc") == 0) {
+			croc->localVars[CROC_VAR_HAZARD_BOUNCE_COUNT] = 0;
+		}
+	}
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 	if (reason == DLL_PROCESS_ATTACH) {
 		api = LoadModApi();
@@ -39,6 +88,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 
 		fullHealthOnRetry = api->SetupIniInt(L"Config", L"FullHealthOnRetry", true);
 		fullHealthOnLevelEntry = api->SetupIniInt(L"Config", L"FullHealthOnLevelEntry", true);
+		infiniteHazardBounce = api->SetupIniInt(L"Config", L"InfiniteHazardBounce", false);
 
 		switch (api->GetGameVersion()) {
 		case GAMEVER_US: {
@@ -58,6 +108,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		}
 
 		api->RegisterMenuAction(hModule, restoreHealthRegistration);
+		api->RegisterMenuAction(hModule, toggleFullHealthOnRetryRegistration);
+		api->RegisterMenuAction(hModule, toggleFullHealthOnLevelEntryRegistration);
+		api->RegisterMenuAction(hModule, toggleInfiniteHazardBounceRegistration);
+
+		api->HookGame(GAME_HOOK_POST_STEP, &postStep);
 	}
 	return TRUE;
 }

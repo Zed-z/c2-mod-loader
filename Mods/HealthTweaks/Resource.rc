@@ -27,6 +27,9 @@ BEGIN
                 "\n"
                 "Restore Health:\n"
                 "Instantly replenish your health via a button available on the menu bar.\n"
+                "\n"
+                "Infinite Hazard Bounce:\n"
+                "Bounce on hazards indefinitely without respawning. It still gradually depletes your health, but makes escaping from lava pits more forgiving.\n"
             VALUE "Version", "1.0.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#health-tweaks"
             VALUE "ApiVersion", API_VERSION_STR
@@ -34,6 +37,7 @@ BEGIN
                 "@Config[General Configuration|General mod settings];"
                 "Config/FullHealthOnRetry[Full Health On Retry|Fully replenish health when retrying after a game over]:bool=1;"
                 "Config/FullHealthOnLevelEntry[Full Health On Level Entry|Fully replenish health when entering a level]:bool=1"
+                "Config/InfiniteHazardBounce[Infinite Hazard Bounce|Bounce on hazards indefinitely without respawning]:bool=0"
         END
     END
     BLOCK "VarFileInfo"

@@ -117,12 +117,6 @@ struct DoorStruct {
 	int MusicTrack;
 };
 
-#define LOCAL_VAR_COUNT 20
-struct LocalVarsStruct {
-	int32_t vars[LOCAL_VAR_COUNT];
-	int32_t *triggers;
-};
-
 struct StratEntity {
 	StratEntity *next;
 	StratEntity *prev;
@@ -165,7 +159,8 @@ struct StratEntity {
 
 	void *map;
 
-	LocalVarsStruct *localVars;
+	/*int localVarCount = ((Int32*)strat->triggers - (Int32*)strat->LocalVars) - 20;*/
+	int32_t *localVars;
 	void *triggers;
 
 	int16_t wField0;
@@ -639,6 +634,9 @@ inline fnInitFade initFade = (fnInitFade)_pointer({{0x418240}, {0x4186F0}, {0x41
 inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x4A7C44}});
 
 inline bool16_t *binocsActive = (bool16_t *)_pointer({{0x52AEAC}, {0x53209C}, {0x529EA4}});
+
+#define CROC_VAR_HAZARD_BOUNCE_COUNT 19
+#define CROC_VAR_FALL_TIMER 201
 
 // Api client --------------------------------------------------------
 
