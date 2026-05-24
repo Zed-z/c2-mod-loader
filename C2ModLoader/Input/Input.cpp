@@ -9,6 +9,7 @@
 
 #include "Input/AnalogInput.h"
 #include "Input/DpadMovement.h"
+#include "Input/MidAirTurning.h"
 #include "Input/TypeSwitching.h"
 #include "Input/Vibration.h"
 
@@ -139,6 +140,7 @@ void Setup() {
 	Vibration::Setup();
 	TypeSwitching::Setup();
 	DpadMovement::Setup();
+	MidAirTurning::Setup();
 }
 
 } // namespace Input

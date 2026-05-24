@@ -79,7 +79,8 @@ BEGIN
                 "Input/VibrationEnabled[Vibration Enabled|Enable vibration]:bool=1;"
                 "Input/VibrationStrength[Vibration Strength|Strength of vibration effects]:int=100;"
                 "Input/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=0;"
-                "Input/DpadMovement[Dpad Movement|Allow for player movement with the directional pad]:bool=1"
+                "Input/DpadMovement[Dpad Movement|Allow for player movement with the directional pad]:bool=1;"
+                "Input/MidAirTurning[Mid Air Turning|Turn mid air in Type 2 controls with the side step buttons, akin to Croc 1]:bool=1"
         END
     END
     BLOCK "VarFileInfo"

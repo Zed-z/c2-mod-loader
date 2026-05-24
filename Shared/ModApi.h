@@ -636,7 +636,16 @@ inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x
 inline bool16_t *binocsActive = (bool16_t *)_pointer({{0x52AEAC}, {0x53209C}, {0x529EA4}});
 
 #define CROC_VAR_HAZARD_BOUNCE_COUNT 19
+#define CROC_VAR_STATE 190
+#define CROC_VAR_IN_AIR 197
 #define CROC_VAR_FALL_TIMER 201
+
+#define CROC_STATE_NORMAL 4096
+#define CROC_STATE_ATTACKING 8192
+#define CROC_STATE_STOMPING 24576
+#define CROC_STATE_FLIP_JUMPING 36864
+#define CROC_STATE_CLIMBING_WALL 49152
+#define CROC_STATE_HANGING_CEILING 53248
 
 // Api client --------------------------------------------------------
 
