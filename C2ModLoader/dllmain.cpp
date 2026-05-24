@@ -30,7 +30,6 @@ ModApi *api;
 
 bool loaderEnabled = true;
 bool skipLauncher = false;
-bool guiEnabled = true;
 
 static HANDLE g_mainThreadHandle = nullptr;
 
@@ -53,33 +52,6 @@ static BOOL CALLBACK FindGameWindowCallback(HWND h, LPARAM lp) {
 	}
 	c.result = h;
 	return FALSE;
-}
-
-// Keyboard input thread
-static DWORD WINAPI HotkeyThread(LPVOID) {
-	DWORD pid = GetCurrentProcessId();
-
-	bool prevTab = false;
-
-	while (true) {
-		DWORD foregroundPid = 0;
-		GetWindowThreadProcessId(GetForegroundWindow(), &foregroundPid);
-		bool isForeground = pid == foregroundPid;
-
-		if (isForeground) {
-
-			// Toggle GUI
-			bool currTab = GetAsyncKeyState(VK_TAB) & 0x8000;
-			if (currTab && !prevTab) {
-				showGui = !showGui;
-				api->WriteIniInt(L"GUI", L"ShowGui", (int)showGui);
-			}
-			prevTab = currTab;
-		}
-
-		Sleep(20);
-	}
-	return 0;
 }
 
 static DWORD WINAPI WindowTitleCallback(LPVOID param) {
@@ -129,19 +101,13 @@ static DWORD WINAPI ModLoaderMainThread(LPVOID param) {
 	// Window title
 	CreateThread(nullptr, 0, WindowTitleCallback, nullptr, 0, nullptr);
 
-	ApiSetup();
+	ApiSetup(hModule);
 	SetupCheats();
 	RegistryManager::InstallHooks();
-
-	if (guiEnabled) {
-		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
-	}
 
 	if (freeMouse) {
 		CreateThread(nullptr, 0, MouseInitThread, nullptr, 0, nullptr);
 	}
-
-	CreateThread(nullptr, 0, HotkeyThread, nullptr, 0, nullptr);
 
 	if (g_mainThreadHandle) {
 		ResumeThread(g_mainThreadHandle);

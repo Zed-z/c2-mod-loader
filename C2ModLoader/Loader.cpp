@@ -2,12 +2,14 @@
 
 #include "GameHooks.h"
 #include "Input/Input.h"
+#include "Overlay/Overlay.h"
 #include "Registry/RegistryManager.h"
 #include "Utils.h"
 #include "Utils/Sha256.h"
 
 #include <algorithm>
 #include <filesystem>
+#include <windows.h>
 
 namespace fs = std::filesystem;
 
@@ -27,23 +29,6 @@ std::wstring Mod::getName() {
 extern bool loaderEnabled;
 extern bool skipLauncher;
 extern bool freeMouse;
-extern bool guiEnabled;
-extern bool showGui;
-extern bool showLog;
-extern bool showInputs;
-extern bool showObjectList;
-extern bool showCoords;
-extern bool showLevelInfo;
-extern bool showLevelSelect;
-extern bool showSaveSlotList;
-extern bool showLogInfo;
-extern bool showLogDebug;
-extern bool showLogWarning;
-extern bool showLogError;
-extern bool showToastInfo;
-extern bool showToastDebug;
-extern bool showToastWarning;
-extern bool showToastError;
 
 void LoadConfig() {
 	loaderEnabled = api->SetupIniBool(L"Config", L"LoaderEnabled", true);
@@ -55,26 +40,6 @@ void LoadConfig() {
 	wchar_t managedOverrides[registryOverridesLength] = {};
 	api->SetupIniString(L"RegistryBypass", L"ManagedValues", L"", managedOverrides, registryOverridesLength);
 	RegistryManager::SetManagedKeys(WStringToString(managedOverrides));
-
-	guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
-	showGui = api->SetupIniBool(L"GUI", L"ShowGui", false);
-	showLog = api->SetupIniBool(L"GUI", L"ShowLog", false);
-	showInputs = api->SetupIniBool(L"GUI", L"ShowInputs", false);
-	showObjectList = api->SetupIniBool(L"GUI", L"ShowObjectList", false);
-	showCoords = api->SetupIniBool(L"GUI", L"ShowCoords", false);
-	showLevelInfo = api->SetupIniBool(L"GUI", L"ShowLevelInfo", false);
-	showLevelSelect = api->SetupIniBool(L"GUI", L"ShowLevelSelect", false);
-	showSaveSlotList = api->SetupIniBool(L"GUI", L"ShowSaveSlotList", false);
-
-	showLogInfo = api->SetupIniBool(L"Logging", L"Info", true);
-	showLogDebug = api->SetupIniBool(L"Logging", L"Debug", false);
-	showLogWarning = api->SetupIniBool(L"Logging", L"Warning", true);
-	showLogError = api->SetupIniBool(L"Logging", L"Error", true);
-
-	showToastInfo = api->SetupIniBool(L"Toasts", L"Info", true);
-	showToastDebug = api->SetupIniBool(L"Toasts", L"Debug", false);
-	showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
-	showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
 }
 
 void SetupDirectories() {
@@ -291,7 +256,8 @@ void LoadMods(std::vector<Mod> &mods) {
 	}
 }
 
-void ApiSetup() {
+void ApiSetup(HMODULE hModule) {
 	GameHooks::ApplyHooks();
 	Input::Setup();
+	Overlay::Setup(hModule);
 }

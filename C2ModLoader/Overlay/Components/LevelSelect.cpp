@@ -120,17 +120,25 @@ void DiscoverWadFiles() {
 
 } // namespace
 
+namespace Overlay::LevelSelect {
+
 bool showLevelSelect;
+
+void Setup() {
+	showLevelSelect = api->SetupIniBool(L"GUI", L"ShowLevelSelect", false);
+}
 
 void RenderLevelSelect() {
 	if (!showLevelSelect)
 		return;
 
+	bool prevShow = showLevelSelect;
+
 	if (!levelsDiscovered) {
 		DiscoverWadFiles();
 	}
 
-	ImGui::Begin("Level Select");
+	ImGui::Begin("Level Select", &showLevelSelect);
 
 	if (discoveredLevels.empty()) {
 		ImGui::Text("No WAD files found in Wads/ directory");
@@ -168,4 +176,10 @@ void RenderLevelSelect() {
 		}
 	}
 	ImGui::End();
+
+	if (prevShow != showLevelSelect) {
+		api->WriteIniBool(L"GUI", L"ShowLevelSelect", showLevelSelect);
+	}
 }
+
+} // namespace Overlay::LevelSelect

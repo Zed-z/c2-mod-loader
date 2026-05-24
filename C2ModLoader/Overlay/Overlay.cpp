@@ -10,25 +10,59 @@
 #include "Components/SaveSlotList.h"
 #include "Components/Toast.h"
 #include "Components/VersionInfo.h"
+#include "Loader.h"
+#include "Overlay/Backend.h"
 #include "Utils/Style.h"
+#include "imgui.h"
 
-bool showGui;
+#include <windows.h>
 
-void ImGuiDraw() {
+namespace Overlay {
+
+bool guiEnabled;
+bool showWindows;
+
+void Setup(HMODULE hModule) {
+	guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
+	showWindows = api->SetupIniBool(L"GUI", L"ShowWindows", true);
+
+	Overlay::Coords::Setup();
+	Overlay::InputsComponent::Setup();
+	Overlay::LevelInfoComponent::Setup();
+	Overlay::LevelSelect::Setup();
+	Overlay::Log::Setup();
+	Overlay::ObjectList::Setup();
+	Overlay::SaveSlotList::Setup();
+	Overlay::Toast::Setup();
+
+	if (guiEnabled) {
+		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
+	}
+}
+
+void Draw() {
 	Style::ApplyStyle();
 
-	RenderVersionInfo();
-
-	if (showGui) {
-		RenderCoords();
-		RenderInputs();
-		RenderLevelInfo();
-		RenderLevelSelect();
-		RenderLog();
-		RenderMenuBar();
-		RenderObjectList();
-		RenderSaveSlotList();
+	ImGuiIO &io = ImGui::GetIO();
+	if (ImGui::IsKeyPressed(ImGuiKey_Tab) && !io.WantCaptureKeyboard) {
+		showWindows = !showWindows;
+		api->WriteIniBool(L"GUI", L"ShowWindows", showWindows);
 	}
 
-	RenderToasts();
+	Overlay::VersionInfo::RenderVersionInfo();
+	Overlay::MenuBar::RenderMenuBar();
+
+	if (showWindows) {
+		Overlay::Coords::RenderCoords();
+		Overlay::InputsComponent::RenderInputs();
+		Overlay::LevelInfoComponent::RenderLevelInfo();
+		Overlay::LevelSelect::RenderLevelSelect();
+		Overlay::Log::RenderLog();
+		Overlay::ObjectList::RenderObjectList();
+		Overlay::SaveSlotList::RenderSaveSlotList();
+	}
+
+	Overlay::Toast::RenderToasts();
 }
+
+} // namespace Overlay

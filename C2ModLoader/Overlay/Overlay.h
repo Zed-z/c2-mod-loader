@@ -1,5 +1,14 @@
 #pragma once
 
-extern bool showGui;
+#include <windows.h>
 
-void ImGuiDraw();
+namespace Overlay {
+
+extern bool guiEnabled;
+extern bool showWindows;
+
+void Setup(HMODULE hModule);
+
+void Draw();
+
+} // namespace Overlay

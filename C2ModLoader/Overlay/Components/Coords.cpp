@@ -8,13 +8,21 @@
 
 extern ModApi *api;
 
+namespace Overlay::Coords {
+
 bool showCoords;
+
+void Setup() {
+	showCoords = api->SetupIniBool(L"GUI", L"ShowCoords", false);
+}
 
 void RenderCoords() {
 	if (!showCoords)
 		return;
 
-	ImGui::Begin("Coords");
+	bool prevShow = showCoords;
+
+	ImGui::Begin("Coords", &showCoords);
 	ImGui::PushFont(Fonts::GetFontCode());
 
 	StratEntity *croc = api->GetEntity(crocObjRef);
@@ -31,4 +39,10 @@ void RenderCoords() {
 
 	ImGui::PopFont();
 	ImGui::End();
+
+	if (prevShow != showCoords) {
+		api->WriteIniBool(L"GUI", L"ShowCoords", showCoords);
+	}
 }
+
+} // namespace Overlay::Coords

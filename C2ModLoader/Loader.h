@@ -36,7 +36,7 @@ Mod GetModLoader();
 std::vector<Mod> GetMods();
 void LoadMods(std::vector<Mod> &mods);
 
-void ApiSetup();
+void ApiSetup(HMODULE hModule);
 
 extern ModApi *api;
 inline Mod *GetModByHandle(HMODULE handle) {

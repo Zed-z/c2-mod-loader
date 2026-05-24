@@ -68,6 +68,7 @@ set(SOURCES
     Launcher/Launcher.cpp
     Loader.cpp
     Logs.cpp
+    MenuActions.cpp
     ModApi.cpp
     MouseCaptureRemover.cpp
     Overlay/Backend.cpp
@@ -88,6 +89,7 @@ set(SOURCES
     Registry/RegistryManager.cpp
     Registry/ValueMapParser.cpp
     Resource.rc
+    Toasts.cpp
     Utils/Fonts.cpp
     Utils/ResourceLoader.cpp
     Utils/Sha256.cpp

@@ -5,10 +5,9 @@
 #include "GameHooks.h"
 #include "Input/Input.h"
 #include "Loader.h"
-#include "Overlay/Components/MenuBar.h"
-#include "Overlay/Components/Toast.h"
-#include "Overlay/Overlay.h"
+#include "MenuActions.h"
 #include "Resource.h"
+#include "Toasts.h"
 #include "Utils.h"
 #include "Utils/Sha256.h"
 
@@ -581,23 +580,23 @@ Inputs GetInputsReleased() {
 }
 
 void ShowInfoToast(const char *message) {
-	ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Info);
+	Toasts::ShowToast(message != nullptr ? message : "", LogSeverity::Info);
 }
 
 void ShowDebugToast(const char *message) {
-	ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Debug);
+	Toasts::ShowToast(message != nullptr ? message : "", LogSeverity::Debug);
 }
 
 void ShowWarningToast(const char *message) {
-	ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Warning);
+	Toasts::ShowToast(message != nullptr ? message : "", LogSeverity::Warning);
 }
 
 void ShowErrorToast(const char *message) {
-	ImGuiShowToast(message != nullptr ? message : "", LogSeverity::Error);
+	Toasts::ShowToast(message != nullptr ? message : "", LogSeverity::Error);
 }
 
 bool RegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
-	return ImGuiRegisterMenuAction(handle, registration);
+	return MenuActions::RegisterMenuAction(handle, registration);
 }
 
 StratEntity *GetEntity(MemoryAddress address) {

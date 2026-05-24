@@ -7,17 +7,29 @@
 
 extern ModApi *api;
 
+namespace Overlay::Log {
+
 bool showLog;
 bool showLogInfo;
 bool showLogDebug;
 bool showLogWarning;
 bool showLogError;
 
+void Setup() {
+	showLog = api->SetupIniBool(L"GUI", L"ShowLog", false);
+	showLogInfo = api->SetupIniBool(L"Logging", L"Info", true);
+	showLogDebug = api->SetupIniBool(L"Logging", L"Debug", false);
+	showLogWarning = api->SetupIniBool(L"Logging", L"Warning", true);
+	showLogError = api->SetupIniBool(L"Logging", L"Error", true);
+}
+
 void RenderLog() {
 	if (!showLog)
 		return;
 
-	ImGui::Begin("Console Log");
+	bool prevShow = showLog;
+
+	ImGui::Begin("Console Log", &showLog);
 
 	if (ImGui::Checkbox("Show Info##log_showinfo", &showLogInfo)) {
 		api->WriteIniBool(L"Logging", L"Info", showLogInfo);
@@ -88,4 +100,10 @@ void RenderLog() {
 	ImGui::EndChild();
 	ImGui::PopFont();
 	ImGui::End();
+
+	if (prevShow != showLog) {
+		api->WriteIniBool(L"GUI", L"ShowLog", showLog);
+	}
 }
+
+} // namespace Overlay::Log

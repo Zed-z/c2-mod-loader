@@ -2,6 +2,7 @@
 
 #include "CheatsManager.h"
 #include "Loader.h"
+#include "MenuActions.h"
 #include "ModApi.h"
 #include "Overlay/Components/Coords.h"
 #include "Overlay/Components/Inputs.h"
@@ -12,83 +13,135 @@
 #include "Overlay/Components/SaveSlotList.h"
 #include "Overlay/Components/Toast.h"
 #include "Overlay/Components/VersionInfo.h"
+#include "Overlay/Overlay.h"
 #include "Utils.h"
 #include "imgui.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
 extern ModApi *api;
 
-std::vector<MenuAction> menuActionRegistrations;
-
-bool ImGuiRegisterMenuAction(HMODULE handle, MenuActionRegistrationFunction registration) {
-	menuActionRegistrations.push_back({handle, registration});
-	return true;
-}
+namespace Overlay::MenuBar {
 
 void RenderMenuBar() {
+	static bool menuOpen = false;
+	static float alpha = 1.0f;
+	static const float revealZone = 36.0f;
+	static const float fadeSpeed = 12.0f;
+
+	ImGuiViewport *vp = ImGui::GetMainViewport();
+	ImGuiIO &io = ImGui::GetIO();
+	float now = ImGui::GetTime();
+	float dt = ImGui::GetIO().DeltaTime;
+
+	float mouseY = io.MousePos.y;
+	float topY = vp->Pos.y;
+
+	float scaledReveal = revealZone * io.FontGlobalScale * io.DisplayFramebufferScale.y;
+	float styleBarHeight = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f;
+	bool inRevealZone = (mouseY >= 0.0f && mouseY <= topY + scaledReveal) || (mouseY >= topY && mouseY <= topY + styleBarHeight);
+
+	static float lastRevealTime = 0.0f;
+	static const float hideDelay = 0.6f;
+	if (inRevealZone || menuOpen) {
+		lastRevealTime = now;
+	}
+	bool recentlyRevealed = (now - lastRevealTime) <= hideDelay;
+
+	bool shouldReveal = inRevealZone || menuOpen || recentlyRevealed;
+
+	float targetAlpha = shouldReveal ? 1.0f : 0.0f;
+	alpha += (targetAlpha - alpha) * std::clamp(fadeSpeed * dt, 0.0f, 1.0f);
+
+	if (alpha <= 0.001f)
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+	bool anyMenuOpenThisFrame = false;
 	if (ImGui::BeginMainMenuBar()) {
-		if (ImGui::BeginMenu("Mod Loader")) {
-			if (ImGui::MenuItem("Show Log", nullptr, &showLog)) {
-				api->WriteIniBool(L"GUI", L"ShowLog", showLog);
-			}
+
+		if (ImGui::BeginMenu("Loader")) {
+			anyMenuOpenThisFrame = true;
+
 			if (ImGui::BeginMenu("Logging")) {
-
-				if (ImGui::MenuItem("Show Info", nullptr, &showLogInfo)) {
-					api->WriteIniBool(L"Logging", L"Info", showLogInfo);
+				if (ImGui::MenuItem("Show Info", nullptr, &Overlay::Log::showLogInfo)) {
+					api->WriteIniBool(L"Logging", L"Info", Overlay::Log::showLogInfo);
 				}
-				if (ImGui::MenuItem("Show Debug", nullptr, &showLogDebug)) {
-					api->WriteIniBool(L"Logging", L"Debug", showLogDebug);
+				if (ImGui::MenuItem("Show Debug", nullptr, &Overlay::Log::showLogDebug)) {
+					api->WriteIniBool(L"Logging", L"Debug", Overlay::Log::showLogDebug);
 				}
-				if (ImGui::MenuItem("Show Warnings", nullptr, &showLogWarning)) {
-					api->WriteIniBool(L"Logging", L"Warning", showLogWarning);
+				if (ImGui::MenuItem("Show Warnings", nullptr, &Overlay::Log::showLogWarning)) {
+					api->WriteIniBool(L"Logging", L"Warning", Overlay::Log::showLogWarning);
 				}
-				if (ImGui::MenuItem("Show Errors", nullptr, &showLogError)) {
-					api->WriteIniBool(L"Logging", L"Error", showLogError);
+				if (ImGui::MenuItem("Show Errors", nullptr, &Overlay::Log::showLogError)) {
+					api->WriteIniBool(L"Logging", L"Error", Overlay::Log::showLogError);
 				}
-
 				ImGui::EndMenu();
 			}
+
 			if (ImGui::BeginMenu("Toasts")) {
-
-				if (ImGui::MenuItem("Show Info", nullptr, &showToastInfo)) {
-					api->WriteIniBool(L"Toasts", L"Info", showToastInfo);
+				anyMenuOpenThisFrame = true;
+				if (ImGui::MenuItem("Show Info", nullptr, &Overlay::Toast::showToastInfo)) {
+					api->WriteIniBool(L"Toasts", L"Info", Overlay::Toast::showToastInfo);
 				}
-				if (ImGui::MenuItem("Show Debug", nullptr, &showToastDebug)) {
-					api->WriteIniBool(L"Toasts", L"Debug", showToastDebug);
+				if (ImGui::MenuItem("Show Debug", nullptr, &Overlay::Toast::showToastDebug)) {
+					api->WriteIniBool(L"Toasts", L"Debug", Overlay::Toast::showToastDebug);
 				}
-				if (ImGui::MenuItem("Show Warnings", nullptr, &showToastWarning)) {
-					api->WriteIniBool(L"Toasts", L"Warning", showToastWarning);
+				if (ImGui::MenuItem("Show Warnings", nullptr, &Overlay::Toast::showToastWarning)) {
+					api->WriteIniBool(L"Toasts", L"Warning", Overlay::Toast::showToastWarning);
 				}
-				if (ImGui::MenuItem("Show Errors", nullptr, &showToastError)) {
-					api->WriteIniBool(L"Toasts", L"Error", showToastError);
+				if (ImGui::MenuItem("Show Errors", nullptr, &Overlay::Toast::showToastError)) {
+					api->WriteIniBool(L"Toasts", L"Error", Overlay::Toast::showToastError);
 				}
-
 				ImGui::EndMenu();
 			}
-			if (ImGui::MenuItem("Show Inputs", nullptr, &showInputs)) {
-				api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("View")) {
+			anyMenuOpenThisFrame = true;
+
+			if (ImGui::MenuItem("Show Windows", nullptr, &Overlay::showWindows)) {
+				api->WriteIniBool(L"GUI", L"ShowWindows", Overlay::showWindows);
 			}
-			if (ImGui::MenuItem("Show Object List", nullptr, &showObjectList)) {
-				api->WriteIniBool(L"GUI", L"ShowObjectList", showObjectList);
+
+			ImGui::Separator();
+
+			ImGui::BeginDisabled(!Overlay::showWindows);
+
+			if (ImGui::MenuItem("Show Log", nullptr, &Overlay::Log::showLog)) {
+				api->WriteIniBool(L"GUI", L"ShowLog", Overlay::Log::showLog);
 			}
-			if (ImGui::MenuItem("Show Coords", nullptr, &showCoords)) {
-				api->WriteIniBool(L"GUI", L"ShowCoords", showCoords);
+			if (ImGui::MenuItem("Show Inputs", nullptr, &Overlay::InputsComponent::showInputs)) {
+				api->WriteIniBool(L"GUI", L"ShowInputs", Overlay::InputsComponent::showInputs);
 			}
-			if (ImGui::MenuItem("Show Level Info", nullptr, &showLevelInfo)) {
-				api->WriteIniBool(L"GUI", L"ShowLevelInfo", showLevelInfo);
+			if (ImGui::MenuItem("Show Object List", nullptr, &Overlay::ObjectList::showObjectList)) {
+				api->WriteIniBool(L"GUI", L"ShowObjectList", Overlay::ObjectList::showObjectList);
 			}
-			if (ImGui::MenuItem("Show Save Slot List", nullptr, &showSaveSlotList)) {
-				api->WriteIniBool(L"GUI", L"ShowSaveSlotList", showSaveSlotList);
+			if (ImGui::MenuItem("Show Coords", nullptr, &Overlay::Coords::showCoords)) {
+				api->WriteIniBool(L"GUI", L"ShowCoords", Overlay::Coords::showCoords);
 			}
-			if (ImGui::MenuItem("Show Level Select", nullptr, &showLevelSelect)) {
-				api->WriteIniBool(L"GUI", L"ShowLevelSelect", showLevelSelect);
+			if (ImGui::MenuItem("Show Level Info", nullptr, &Overlay::LevelInfoComponent::showLevelInfo)) {
+				api->WriteIniBool(L"GUI", L"ShowLevelInfo", Overlay::LevelInfoComponent::showLevelInfo);
 			}
+			if (ImGui::MenuItem("Show Save Slot List", nullptr, &Overlay::SaveSlotList::showSaveSlotList)) {
+				api->WriteIniBool(L"GUI", L"ShowSaveSlotList", Overlay::SaveSlotList::showSaveSlotList);
+			}
+			if (ImGui::MenuItem("Show Level Select", nullptr, &Overlay::LevelSelect::showLevelSelect)) {
+				api->WriteIniBool(L"GUI", L"ShowLevelSelect", Overlay::LevelSelect::showLevelSelect);
+			}
+
+			ImGui::EndDisabled();
+
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Cheats")) {
+			anyMenuOpenThisFrame = true;
 
 			if (ImGui::MenuItem("Debug Menu", nullptr, &cheatsDebugMenu)) {
 				setDebugMenu(cheatsDebugMenu);
@@ -136,12 +189,13 @@ void RenderMenuBar() {
 		}
 
 		if (ImGui::BeginMenu("Mods")) {
+			anyMenuOpenThisFrame = true;
 
-			if (menuActionRegistrations.empty()) {
+			if (MenuActions::menuActionRegistrations.empty()) {
 				ImGui::MenuItem("(Empty)", nullptr, nullptr, false);
 			}
 
-			for (const auto &registration : menuActionRegistrations) {
+			for (const auto &registration : MenuActions::menuActionRegistrations) {
 				Mod *mod = GetModByHandle(registration.handle);
 				std::string category = mod ? WStringToString(mod->getName()) : "Unknown";
 
@@ -167,4 +221,10 @@ void RenderMenuBar() {
 
 		ImGui::EndMainMenuBar();
 	}
+
+	menuOpen = anyMenuOpenThisFrame;
+
+	ImGui::PopStyleVar();
 }
+
+} // namespace Overlay::MenuBar

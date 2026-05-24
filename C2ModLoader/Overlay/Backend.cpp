@@ -140,7 +140,7 @@ static HRESULT __stdcall hkPresent(IDXGISwapChain *pSwap, UINT sync, UINT flags)
 	ImGui::NewFrame();
 
 	// Draw the GUI.
-	ImGuiDraw();
+	Overlay::Draw();
 
 	// Render on top of the game's backbuffer.
 	ImGui::Render();

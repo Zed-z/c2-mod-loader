@@ -1,21 +1,28 @@
 #include "Toast.h"
 
 #include "Logs.h"
+#include "Toasts.h"
 #include "Utils/Fonts.h"
 #include "imgui.h"
 
 #include <deque>
 #include <string>
 
+#include "ModApi.h"
+extern ModApi *api;
+
+namespace Overlay::Toast {
+
 bool showToastInfo;
 bool showToastDebug;
 bool showToastWarning;
 bool showToastError;
 
-std::deque<Toast> toastQueue;
-
-void ImGuiShowToast(const std::string &message, const LogSeverity &severity, float duration) {
-	toastQueue.push_front({message, severity, duration});
+void Setup() {
+	showToastInfo = api->SetupIniBool(L"Toasts", L"Info", true);
+	showToastDebug = api->SetupIniBool(L"Toasts", L"Debug", false);
+	showToastWarning = api->SetupIniBool(L"Toasts", L"Warning", true);
+	showToastError = api->SetupIniBool(L"Toasts", L"Error", true);
 }
 
 void RenderToasts() {
@@ -39,8 +46,8 @@ void RenderToasts() {
 
 	float fontSize = 24.0f * displayScale;
 
-	for (size_t i = 0; i < toastQueue.size();) {
-		Toast &toast = toastQueue[i];
+	for (size_t i = 0; i < Toasts::toastQueue.size();) {
+		Toasts::Toast &toast = Toasts::toastQueue[i];
 		toast.timeRemaining -= io.DeltaTime;
 
 		// Fade out in the last 0.5 seconds
@@ -102,9 +109,11 @@ void RenderToasts() {
 
 		// Erase toast if needed
 		if (toast.timeRemaining <= 0.0f) {
-			toastQueue.erase(toastQueue.begin() + i);
+			Toasts::toastQueue.erase(Toasts::toastQueue.begin() + i);
 		} else {
 			i++;
 		}
 	}
 }
+
+} // namespace Overlay::Toast

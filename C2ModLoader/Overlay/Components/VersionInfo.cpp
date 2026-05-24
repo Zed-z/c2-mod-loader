@@ -11,6 +11,8 @@
 
 extern ModApi *api;
 
+namespace Overlay::VersionInfo {
+
 void RenderVersionInfo() {
 	ImGuiIO &io = ImGui::GetIO();
 
@@ -64,3 +66,5 @@ void RenderVersionInfo() {
 		drawList->AddText(fontTitle, hashLabelSize, ImVec2(hashLabelX, hashLabelY), hashLabelColor, loadedModsHash.c_str());
 	}
 }
+
+} // namespace Overlay::VersionInfo

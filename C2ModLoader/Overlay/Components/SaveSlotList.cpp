@@ -8,14 +8,22 @@
 
 extern ModApi *api;
 
+namespace Overlay::SaveSlotList {
+
 bool showSaveSlotList;
+
+void Setup() {
+	showSaveSlotList = api->SetupIniBool(L"GUI", L"ShowSaveSlotList", false);
+}
 
 void RenderSaveSlotList() {
 	if (!showSaveSlotList)
 		return;
 
+	bool prevShow = showSaveSlotList;
+
 	ImGui::SetNextWindowSizeConstraints(ImVec2(300, 400), ImVec2(FLT_MAX, FLT_MAX));
-	ImGui::Begin("Save Slot List");
+	ImGui::Begin("Save Slot List", &showSaveSlotList);
 	ImGui::PushFont(Fonts::GetFontCode());
 	for (int i = 0; i < SAVE_SLOT_NUMBER; i++) {
 		SaveSlot *slot = api->GetSaveSlot(i);
@@ -104,4 +112,10 @@ void RenderSaveSlotList() {
 	}
 	ImGui::PopFont();
 	ImGui::End();
+
+	if (prevShow != showSaveSlotList) {
+		api->WriteIniBool(L"GUI", L"ShowSaveSlotList", showSaveSlotList);
+	}
 }
+
+} // namespace Overlay::SaveSlotList

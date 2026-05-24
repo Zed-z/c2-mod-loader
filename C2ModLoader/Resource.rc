@@ -45,7 +45,7 @@ BEGIN
                 "RegistryBypass/ManagedValues[Registry Values|Key-value map for game settings, reset to clear settings]:string=;"
                 "@GUI[GUI|Configure in-game GUI settings];"
                 "GUI/GuiEnabled[GUI Enabled|Enable the GUI]:bool=1;"
-                "GUI/ShowGui[Show GUI|Show or hide the GUI]:bool=0;"
+                "GUI/ShowWindows[Show Windows|Show or hide windows]:bool=1;"
                 "GUI/ShowLog[Show Log|Show the log window]:bool=0;"
                 "GUI/ShowInputs[Show Inputs|Show input configuration]:bool=0;"
                 "GUI/ShowObjectList[Show Object List|Show the object list]:bool=0;"

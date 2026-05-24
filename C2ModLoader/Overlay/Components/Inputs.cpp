@@ -8,11 +8,19 @@
 
 extern ModApi *api;
 
+namespace Overlay::InputsComponent {
+
 bool showInputs;
+
+void Setup() {
+	showInputs = api->SetupIniBool(L"GUI", L"ShowInputs", false);
+}
 
 void RenderInputs() {
 	if (!showInputs)
 		return;
+
+	bool prevShow = showInputs;
 
 	Inputs inputs = api->GetInputs();
 	std::bitset<32> inputBits(inputs.raw);
@@ -22,7 +30,7 @@ void RenderInputs() {
 	SaveSlot *currentSaveSlot = api->GetCurrentSaveSlot();
 	int controlScheme = currentSaveSlot->controlMethod;
 
-	ImGui::Begin("Inputs");
+	ImGui::Begin("Inputs", &showInputs);
 	ImGui::PushFont(Fonts::GetFontCode());
 
 	std::ostringstream ss0;
@@ -60,4 +68,10 @@ void RenderInputs() {
 
 	ImGui::PopFont();
 	ImGui::End();
+
+	if (prevShow != showInputs) {
+		api->WriteIniBool(L"GUI", L"ShowInputs", showInputs);
+	}
 }
+
+} // namespace Overlay::InputsComponent
