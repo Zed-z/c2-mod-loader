@@ -36,7 +36,7 @@ BEGIN
             VALUE "ConfigTypes",
                 "@Config[General Configuration|General mod settings];"
                 "Config/FullHealthOnRetry[Full Health On Retry|Fully replenish health when retrying after a game over]:bool=1;"
-                "Config/FullHealthOnLevelEntry[Full Health On Level Entry|Fully replenish health when entering a level]:bool=1"
+                "Config/FullHealthOnLevelEntry[Full Health On Level Entry|Fully replenish health when entering a level]:bool=1;"
                 "Config/InfiniteHazardBounce[Infinite Hazard Bounce|Bounce on hazards indefinitely without respawning]:bool=0"
         END
     END
