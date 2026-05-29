@@ -1,5 +1,6 @@
 #include "Overlay.h"
 
+#include "Components/CameraStack.h"
 #include "Components/Coords.h"
 #include "Components/Inputs.h"
 #include "Components/LevelInfo.h"
@@ -34,6 +35,7 @@ void Setup(HMODULE hModule) {
 	Overlay::ObjectList::Setup();
 	Overlay::SaveSlotList::Setup();
 	Overlay::Toast::Setup();
+	Overlay::CameraStack::Setup();
 
 	if (guiEnabled) {
 		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
@@ -60,6 +62,7 @@ void Draw() {
 		Overlay::Log::RenderLog();
 		Overlay::ObjectList::RenderObjectList();
 		Overlay::SaveSlotList::RenderSaveSlotList();
+		Overlay::CameraStack::RenderCameraStack();
 	}
 
 	Overlay::Toast::RenderToasts();

@@ -375,6 +375,89 @@ typedef void(__cdecl *fnFadeRoutine)();
 typedef void(__cdecl *fnInitFade)(uint32_t fadeType);
 #define FADE_NormalToBlack 1
 
+struct CameraStackEntry {
+	StratEntity *target;
+	StratEntity *camera;
+	RotPos3i rotPos0;
+	RotPos3i rotPos1;
+	Vec3i Goto;
+};
+
+typedef void MapStrat;
+typedef void WorldCell;
+typedef void Waypoint;
+typedef void PieceStruct;
+typedef void LightStruct;
+typedef uint32_t WadFlags;
+typedef void FontStruct;
+typedef void ADSData;
+
+struct WadChunkData {
+	byte *fileData;
+	StratEntity *FirstStrat;
+	StratEntity *RootEntity;
+	StratEntity *Player;
+	StratEntity *OldPlayer;
+	StratEntity *TargetStrat;
+	StratEntity *TargetStrat2;
+	StratEntity *Boss;
+	StratEntity *Camera;
+	StratEntity *Dialog;
+	CameraStackEntry cameraStack[8];
+	uint32_t cameraStackCount;
+};
+
+struct WadChunk {
+	MapStrat *Background;
+	WorldCell ***worldCells;
+	int cellCountTotal;
+	int cellCountX;
+	int cellCountZ;
+	int lightCount;
+	LightStruct **lights;
+	WadChunkData data;
+	int gap1[3];
+	int *ZoneData;
+	RotPos3i *Positions;
+	int *modelIndices;
+	int gap3[2];
+	int doorCount;
+	DoorStruct *doors;
+	int alienCount;
+	Waypoint *aliens;
+	int StratCount;
+	int MaxStrats;
+	MapStrat *MapStrats;
+	int ParamCount;
+	int *Params;
+	PieceStruct *pieces;
+	int pieceCount;
+	int16_t wField2;
+	int16_t wField3;
+	int array3Count;
+	char (*strArray)[0x30];
+};
+
+struct WadFile {
+	WadFlags WadFlags;
+	uint32_t tribe;
+	uint32_t level;
+	uint32_t map;
+	WadFileType type;
+	WadChunk *chunkData;
+	FontStruct *font;
+	uint8_t stratLoadedMaybe;
+	uint8_t bytes1[3];
+	ADSData **soundCount; // Named incorrectly
+	uint32_t adsElement0Count;
+	ADSData **adsResources;
+	uint32_t adsResourceCount;
+	char ***LanguageStrings;
+	uint32_t languageCount;
+	uint32_t languageStringCount;
+	uint32_t **languageStringLengths;
+};
+
 // Api definition --------------------------------------------------------
 
 #define CTRL_TYPE_1 1
@@ -595,6 +678,8 @@ inline uint32_t *cheats = (uint32_t *)_pointer({{0x4B7964}, {0x4BEB54}, {0x4B696
 
 inline uint32_t *fogDistance = (uint32_t *)_pointer({{0x4B7B48}, {0x4BED38}, {0x4B6B48}});
 inline uint32_t *renderDistance = (uint32_t *)_pointer({{0x4B7B18}, {0x4BED08}, {0x4B6B18}});
+
+inline WadFile **currentWadFile = (WadFile **)_pointer({{0x4A8C3C}, {0x4A9C3C}, {0x4A7C3C}});
 
 inline MemoryAddress rootObjRef = _address({{0x4A8C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}, {0x4A7C3C, {0x14, 0x28, 0x00}}});
 inline MemoryAddress crocObjRef = _address({{0x4A8C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}, {0x4A7C3C, {0x14, 0x30, 0x00}}});

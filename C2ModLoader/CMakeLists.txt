@@ -73,6 +73,7 @@ set(SOURCES
     ModApi.cpp
     MouseCaptureRemover.cpp
     Overlay/Backend.cpp
+    Overlay/Components/CameraStack.cpp
     Overlay/Components/Coords.cpp
     Overlay/Components/Inputs.cpp
     Overlay/Components/LevelInfo.cpp

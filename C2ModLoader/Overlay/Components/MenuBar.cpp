@@ -4,6 +4,7 @@
 #include "Loader.h"
 #include "MenuActions.h"
 #include "ModApi.h"
+#include "Overlay/Components/CameraStack.h"
 #include "Overlay/Components/Coords.h"
 #include "Overlay/Components/Inputs.h"
 #include "Overlay/Components/LevelInfo.h"
@@ -133,6 +134,9 @@ void RenderMenuBar() {
 			}
 			if (ImGui::MenuItem("Show Level Select", nullptr, &Overlay::LevelSelect::showLevelSelect)) {
 				api->WriteIniBool(L"GUI", L"ShowLevelSelect", Overlay::LevelSelect::showLevelSelect);
+			}
+			if (ImGui::MenuItem("Show Camera Stack", nullptr, &Overlay::CameraStack::showCameraStack)) {
+				api->WriteIniBool(L"GUI", L"ShowCameraStack", Overlay::CameraStack::showCameraStack);
 			}
 
 			ImGui::EndDisabled();
