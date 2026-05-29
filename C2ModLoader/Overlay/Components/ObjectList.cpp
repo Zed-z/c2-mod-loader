@@ -270,22 +270,32 @@ void RenderObjectList() {
 
 	float itemWidth;
 
-	StratEntity *rootObject = api->GetEntity(rootObjRef);
-	StratEntity *crocObject = api->GetEntity(crocObjRef);
-	StratEntity *bossObject = api->GetEntity(bossObjRef);
-	StratEntity *cameraObject = api->GetEntity(cameraObjRef);
-	StratEntity *dialogObject = api->GetEntity(dialogObjRef);
+	StratEntity *firstObject = nullptr;
+	StratEntity *playerObject = nullptr;
+	StratEntity *bossObject = nullptr;
+	StratEntity *cameraObject = nullptr;
+	StratEntity *dialogObject = nullptr;
+	if (currentWadFile != nullptr && *currentWadFile != nullptr) {
+		WadFile *wad = *currentWadFile;
+		if (wad->chunkData != nullptr) {
+			firstObject = wad->chunkData->data.FirstStrat;
+			playerObject = wad->chunkData->data.Player;
+			bossObject = wad->chunkData->data.Boss;
+			cameraObject = wad->chunkData->data.Camera;
+			dialogObject = wad->chunkData->data.Dialog;
+		}
+	}
 	int stratCountValue = *stratCount;
 	int maxDistanceToPlayer = 0;
 
 	static uintptr_t selectedObjectKey = 0;
 
 	auto getPlayerDistance = [&](StratEntity *object) {
-		if (object == nullptr || crocObject == nullptr)
+		if (object == nullptr || playerObject == nullptr)
 			return 0;
 
 		return static_cast<int>(std::sqrt(
-			std::pow(object->newPosition.x - crocObject->newPosition.x, 2) + std::pow(object->newPosition.y - crocObject->newPosition.y, 2) + std::pow(object->newPosition.z - crocObject->newPosition.z, 2)));
+			std::pow(object->newPosition.x - playerObject->newPosition.x, 2) + std::pow(object->newPosition.y - playerObject->newPosition.y, 2) + std::pow(object->newPosition.z - playerObject->newPosition.z, 2)));
 	};
 
 	auto buildObjectLabel = [&](StratEntity *object, const char *tag) {
@@ -398,17 +408,17 @@ void RenderObjectList() {
 			maxDistanceToPlayer = playerDistance;
 	};
 
-	if (crocObject == nullptr) {
+	if (playerObject == nullptr) {
 		maxDistanceToPlayer = -1;
 	} else {
-		considerDistance(rootObject);
-		considerDistance(crocObject);
+		considerDistance(firstObject);
+		considerDistance(playerObject);
 		considerDistance(cameraObject);
 		considerDistance(bossObject);
 		considerDistance(dialogObject);
 
-		if (rootObject != nullptr && rootObject->next != nullptr) {
-			StratEntity *distanceNode = rootObject->next;
+		if (firstObject != nullptr && firstObject->next != nullptr) {
+			StratEntity *distanceNode = firstObject->next;
 			while (distanceNode->prev != nullptr) {
 				distanceNode = distanceNode->prev;
 			}
@@ -420,10 +430,10 @@ void RenderObjectList() {
 		}
 	}
 
-	ImGui::Text("Root");
-	renderObjectRow(rootObject, "Root", true);
-	ImGui::Text("Croc");
-	renderObjectRow(crocObject, "Player", true);
+	ImGui::Text("First");
+	renderObjectRow(firstObject, "First", true);
+	ImGui::Text("Player");
+	renderObjectRow(playerObject, "Player", true);
 	ImGui::Text("Camera");
 	renderObjectRow(cameraObject, "Camera", true);
 	ImGui::Text("Boss");
@@ -436,8 +446,8 @@ void RenderObjectList() {
 	ImGui::Text("All Objects (Count: %d)", stratCountValue);
 	ImGui::Separator();
 
-	if (rootObject != nullptr && rootObject->next != nullptr) {
-		StratEntity *node = rootObject->next;
+	if (firstObject != nullptr && firstObject->next != nullptr) {
+		StratEntity *node = firstObject->next;
 		while (node->prev != nullptr) {
 			node = node->prev;
 		}
@@ -448,9 +458,9 @@ void RenderObjectList() {
 
 		while (node != nullptr) {
 			std::string tag;
-			if (node == rootObject) {
-				tag = "Root";
-			} else if (node == crocObject) {
+			if (node == firstObject) {
+				tag = "First";
+			} else if (node == playerObject) {
 				tag = "Player";
 			} else if (node == bossObject) {
 				tag = "Boss";
@@ -526,8 +536,8 @@ void RenderObjectList() {
 		StratEntity *selectedObject = reinterpret_cast<StratEntity *>(selectedObjectKey);
 		if (selectedObject != nullptr && api != nullptr) {
 			bool isValid = false;
-			if (rootObject != nullptr && rootObject->next != nullptr) {
-				StratEntity *node = rootObject->next;
+			if (firstObject != nullptr && firstObject->next != nullptr) {
+				StratEntity *node = firstObject->next;
 				while (node->prev != nullptr) {
 					node = node->prev;
 				}
@@ -541,7 +551,7 @@ void RenderObjectList() {
 			}
 
 			if (isValid) {
-				RenderObjectDetailsContent(selectedObject, crocObject);
+				RenderObjectDetailsContent(selectedObject, playerObject);
 			} else {
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Object no longer valid");
 				selectedObjectKey = 0;
