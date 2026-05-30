@@ -247,9 +247,17 @@ void RenderObjectDetailsContent(StratEntity *entity, StratEntity *playerObject) 
 namespace Overlay::ObjectList {
 
 bool showObjectList;
+static uintptr_t selectedObjectKey = 0;
+static bool focusObjectListWindow = false;
 
 void Setup() {
 	showObjectList = api->SetupIniBool(L"GUI", L"ShowObjectList", false);
+}
+
+void SelectObject(StratEntity *object) {
+	selectedObjectKey = object != nullptr ? reinterpret_cast<uintptr_t>(object) : 0;
+	showObjectList = true;
+	focusObjectListWindow = true;
 }
 
 void RenderObjectList() {
@@ -257,6 +265,10 @@ void RenderObjectList() {
 		return;
 
 	bool prevShow = showObjectList;
+	if (focusObjectListWindow) {
+		ImGui::SetNextWindowFocus();
+		focusObjectListWindow = false;
+	}
 
 	ImGui::SetNextWindowSizeConstraints(ImVec2(640, 360), ImVec2(FLT_MAX, FLT_MAX));
 	ImGui::Begin("Object List", &showObjectList);
@@ -287,8 +299,6 @@ void RenderObjectList() {
 	}
 	int stratCountValue = *stratCount;
 	int maxDistanceToPlayer = 0;
-
-	static uintptr_t selectedObjectKey = 0;
 
 	auto getPlayerDistance = [&](StratEntity *object) {
 		if (object == nullptr || playerObject == nullptr)

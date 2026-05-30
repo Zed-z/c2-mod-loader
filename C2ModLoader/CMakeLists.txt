@@ -76,6 +76,7 @@ set(SOURCES
     Overlay/Components/CameraStack.cpp
     Overlay/Components/Coords.cpp
     Overlay/Components/Inputs.cpp
+    Overlay/Components/Minimap.cpp
     Overlay/Components/LevelInfo.cpp
     Overlay/Components/LevelSelect.cpp
     Overlay/Components/Log.cpp

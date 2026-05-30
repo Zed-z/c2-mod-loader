@@ -24,6 +24,8 @@ struct Style {
 	ImVec4 separator = ImVec4(0.30f, 0.55f, 0.15f, 1.0f);
 	ImVec4 separatorHovered = ImVec4(0.40f, 0.65f, 0.25f, 1.0f);
 	ImVec4 separatorActive = ImVec4(0.50f, 0.75f, 0.35f, 1.0f);
+	ImVec4 sliderGrab = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	ImVec4 sliderGrabActive = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	ImVec4 link = ImVec4(0.40f, 0.65f, 0.25f, 1.0f);
 	ImVec4 checkMark = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	ImVec4 modalWindowDimBg = ImVec4(0.10f, 0.10f, 0.10f, 0.75f);

@@ -7,6 +7,7 @@
 #include "Components/LevelSelect.h"
 #include "Components/Log.h"
 #include "Components/MenuBar.h"
+#include "Components/Minimap.h"
 #include "Components/ObjectList.h"
 #include "Components/SaveSlotList.h"
 #include "Components/Toast.h"
@@ -36,7 +37,8 @@ void Setup(HMODULE hModule) {
 	Overlay::SaveSlotList::Setup();
 	Overlay::Toast::Setup();
 	Overlay::CameraStack::Setup();
-
+	Overlay::Minimap::Setup();
+	
 	if (guiEnabled) {
 		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
 	}
@@ -63,6 +65,7 @@ void Draw() {
 		Overlay::ObjectList::RenderObjectList();
 		Overlay::SaveSlotList::RenderSaveSlotList();
 		Overlay::CameraStack::RenderCameraStack();
+		Overlay::Minimap::RenderMinimap();
 	}
 
 	Overlay::Toast::RenderToasts();

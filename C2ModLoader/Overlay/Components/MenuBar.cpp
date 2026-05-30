@@ -10,6 +10,7 @@
 #include "Overlay/Components/LevelInfo.h"
 #include "Overlay/Components/LevelSelect.h"
 #include "Overlay/Components/Log.h"
+#include "Overlay/Components/Minimap.h"
 #include "Overlay/Components/ObjectList.h"
 #include "Overlay/Components/SaveSlotList.h"
 #include "Overlay/Components/Toast.h"
@@ -125,6 +126,9 @@ void RenderMenuBar() {
 			}
 			if (ImGui::MenuItem("Show Coords", nullptr, &Overlay::Coords::showCoords)) {
 				api->WriteIniBool(L"GUI", L"ShowCoords", Overlay::Coords::showCoords);
+			}
+			if (ImGui::MenuItem("Show Minimap", nullptr, &Overlay::Minimap::showMinimap)) {
+				api->WriteIniBool(L"GUI", L"ShowMinimap", Overlay::Minimap::showMinimap);
 			}
 			if (ImGui::MenuItem("Show Level Info", nullptr, &Overlay::LevelInfoComponent::showLevelInfo)) {
 				api->WriteIniBool(L"GUI", L"ShowLevelInfo", Overlay::LevelInfoComponent::showLevelInfo);

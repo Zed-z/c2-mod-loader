@@ -33,6 +33,8 @@ void ApplyStyle() {
 	imguiStyle.Colors[ImGuiCol_Separator] = style.separator;
 	imguiStyle.Colors[ImGuiCol_SeparatorHovered] = style.separatorHovered;
 	imguiStyle.Colors[ImGuiCol_SeparatorActive] = style.separatorActive;
+	imguiStyle.Colors[ImGuiCol_SliderGrab] = style.sliderGrab;
+	imguiStyle.Colors[ImGuiCol_SliderGrabActive] = style.sliderGrabActive;
 	imguiStyle.Colors[ImGuiCol_CheckMark] = style.checkMark;
 	imguiStyle.Colors[ImGuiCol_ModalWindowDimBg] = style.modalWindowDimBg;
 	imguiStyle.Colors[ImGuiCol_TextDisabled] = style.textDisabled;
