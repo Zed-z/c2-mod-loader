@@ -63,9 +63,10 @@ void __stdcall PhysicsLoop() {
 	// Croc movement
 	StratEntity *croc = api->GetEntity(crocObjRef);
 	if (noclip_enabled && croc != nullptr) {
-		noclip_y += 100 * (inputs.stepRight - inputs.stepLeft);
+		noclip_y += 100 * (inputs.jump - inputs.attack);
 		croc->newRotPos.position.y = noclip_y;
 		croc->localVars[CROC_VAR_FALL_TIMER] = 0;
+		croc->verticalVelocity = 0;
 	}
 }
 
