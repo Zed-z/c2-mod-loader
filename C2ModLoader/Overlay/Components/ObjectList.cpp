@@ -76,7 +76,7 @@ std::string formatAddress(uintptr_t addr) {
 	return ss.str();
 }
 
-void RenderObjectDetailsContent(StratEntity *entity, StratEntity *playerObject) {
+void RenderObjectDetailsContent(StratEntity *entity, StratEntity *croc) {
 	if (entity == nullptr) {
 		ImGui::Text("Object no longer valid");
 		return;
@@ -102,6 +102,10 @@ void RenderObjectDetailsContent(StratEntity *entity, StratEntity *playerObject) 
 
 	ImGui::Spacing();
 
+	ImGui::InputInt("Vertical Velocity##vertvel_", &(entity->verticalVelocity), 0, 0);
+
+	ImGui::Spacing();
+
 	ImGui::Text((std::string("Distance from player: ") + std::to_string(entity->distanceToPlayer)).c_str());
 
 	ImGui::Separator();
@@ -116,34 +120,34 @@ void RenderObjectDetailsContent(StratEntity *entity, StratEntity *playerObject) 
 
 	ImGui::Text("Actions");
 	if (ImGui::Button((std::string("Teleport Here##tphere_") + idSuffix).c_str())) {
-		if (playerObject != nullptr) {
-			entity->newPosition.x = playerObject->newPosition.x;
-			entity->newPosition.y = playerObject->newPosition.y;
-			entity->newPosition.z = playerObject->newPosition.z;
+		if (croc != nullptr) {
+			entity->newPosition.x = croc->newPosition.x;
+			entity->newPosition.y = croc->newPosition.y;
+			entity->newPosition.z = croc->newPosition.z;
 		}
 	}
 	ImGui::SameLine();
 	if (ImGui::Button((std::string("Teleport Start Here##tpstarthere_") + idSuffix).c_str())) {
-		if (playerObject != nullptr) {
-			entity->StartRotPos.position.x = playerObject->newPosition.x;
-			entity->StartRotPos.position.y = playerObject->newPosition.y;
-			entity->StartRotPos.position.z = playerObject->newPosition.z;
+		if (croc != nullptr) {
+			entity->StartRotPos.position.x = croc->newPosition.x;
+			entity->StartRotPos.position.y = croc->newPosition.y;
+			entity->StartRotPos.position.z = croc->newPosition.z;
 		}
 	}
 
 	if (ImGui::Button((std::string("Teleport To##tptot_") + idSuffix).c_str())) {
-		if (playerObject != nullptr) {
-			playerObject->newPosition.x = entity->newPosition.x;
-			playerObject->newPosition.y = entity->newPosition.y;
-			playerObject->newPosition.z = entity->newPosition.z;
+		if (croc != nullptr) {
+			croc->newPosition.x = entity->newPosition.x;
+			croc->newPosition.y = entity->newPosition.y;
+			croc->newPosition.z = entity->newPosition.z;
 		}
 	}
 	ImGui::SameLine();
 	if (ImGui::Button((std::string("Teleport To Start##tptostart_") + idSuffix).c_str())) {
-		if (playerObject != nullptr) {
-			playerObject->newPosition.x = entity->StartRotPos.position.x;
-			playerObject->newPosition.y = entity->StartRotPos.position.y;
-			playerObject->newPosition.z = entity->StartRotPos.position.z;
+		if (croc != nullptr) {
+			croc->newPosition.x = entity->StartRotPos.position.x;
+			croc->newPosition.y = entity->StartRotPos.position.y;
+			croc->newPosition.z = entity->StartRotPos.position.z;
 		}
 	}
 
@@ -217,6 +221,16 @@ void RenderObjectDetailsContent(StratEntity *entity, StratEntity *playerObject) 
 
 	int localVarCount = ((int32_t *)entity->triggers - (int32_t *)entity->localVars) - 20;
 	if (ImGui::CollapsingHeader((std::string("Local Variables(") + std::to_string(localVarCount) + ")##localvars_" + idSuffix).c_str())) {
+
+		if (entity == croc && strcmp(entity->name, "WalkingCroc") == 0) {
+			ImGui::InputInt("Hazard Bounce Count##hazardbounce_", &(entity->localVars[CROC_VAR_HAZARD_BOUNCE_COUNT]), 0, 0);
+			ImGui::InputInt("State##state_", &(entity->localVars[CROC_VAR_STATE]), 0, 0);
+			ImGui::InputInt("In Air ##inair_", &(entity->localVars[CROC_VAR_IN_AIR]), 0, 0);
+			ImGui::InputInt("Fall Timer##falltimer_", &(entity->localVars[CROC_VAR_FALL_TIMER]), 0, 0);
+
+			ImGui::Spacing();
+		}
+
 		float availWidth = ImGui::GetContentRegionAvail().x;
 		float spacing = ImGui::GetStyle().ItemSpacing.x;
 

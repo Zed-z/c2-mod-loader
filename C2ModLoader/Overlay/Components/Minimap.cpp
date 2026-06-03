@@ -17,6 +17,7 @@ constexpr double PI = 3.14159265358979323846;
 constexpr float MINIMAP_ZOOM_MIN = 0.05f;
 constexpr float MINIMAP_ZOOM_MAX = 1.0f;
 constexpr float MINIMAP_ZOOM_SCROLL_STEP = 0.05f;
+constexpr float MINIMAP_ZOOM_INTERPOLATION_SPEED = 12.0f;
 constexpr float MINIMAP_DRAG_HANDLE_HEIGHT = 12.0f;
 
 float ClampMinimapZoom(float zoom) {
@@ -57,10 +58,22 @@ MapDot getMapDot(const StratEntity *object) {
 
 	// Crystals
 	if (strncmp(object->name, "crystal", 7) == 0)
-		return MapDot{ImVec4(0.25f, 0.75f, 1.0f, 1.0f), MapDotShape::Diamond, 5.0f, false};
+		return MapDot{ImVec4(0.5f, 0.75f, 1.0f, 1.0f), MapDotShape::Diamond, 5.0f, false};
 
-	if (strncmp(object->name, "bonus crystal", 13) == 0)
-		return MapDot{ImVec4(0.45f, 0.95f, 1.0f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+	if (strncmp(object->name, "bonus crystal", 13) == 0) {
+		switch (object->localVars[0] >> 12) {
+		case 0: // Red Crystal
+			return MapDot{ImVec4(1.0f, 0.25f, 0.25f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+		case 1: // Green Crystal
+			return MapDot{ImVec4(0.25f, 1.0f, 0.25f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+		case 2: // Purple Crystal
+			return MapDot{ImVec4(1.0f, 0.25f, 1.0f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+		case 3: // Blue Crystal
+			return MapDot{ImVec4(0.25f, 0.25f, 1.0f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+		case 4: // Yellow Crystal
+			return MapDot{ImVec4(1.0f, 1.0f, 0.25f, 1.0f), MapDotShape::Diamond, 8.0f, true};
+		}
+	}
 
 	if (strncmp(object->name, "Smash Box", 9) == 0)
 		return MapDot{ImVec4(0.95f, 0.5f, 0.25f, 1.0f), MapDotShape::Square, 8.0f, false};
@@ -118,6 +131,7 @@ namespace Overlay::Minimap {
 
 bool showMinimap;
 float minimapZoom;
+float minimapRenderZoom;
 bool minimapAutoRotate;
 
 enum class MinimapStyle {
@@ -129,6 +143,7 @@ MinimapStyle minimapStyle;
 void Setup() {
 	showMinimap = api->SetupIniBool(L"GUI", L"ShowMinimap", false);
 	minimapZoom = ClampMinimapZoom(api->SetupIniFloat(L"GUI", L"MinimapZoom", MINIMAP_ZOOM_MAX));
+	minimapRenderZoom = minimapZoom;
 	minimapAutoRotate = api->SetupIniBool(L"GUI", L"MinimapAutoRotate", true);
 	minimapStyle = static_cast<MinimapStyle>(api->SetupIniInt(L"GUI", L"MinimapStyle", static_cast<int>(MinimapStyle::Circle)));
 }
@@ -184,7 +199,16 @@ void RenderMinimap() {
 		cameraDistanceMultiplier = cameraDistance / baselineCameraDistance;
 	}
 
-	const float zoom = (std::max)(minimapZoom / cameraDistanceMultiplier, MINIMAP_ZOOM_MIN);
+	const float safeCameraDistanceMultiplier = (std::max)(cameraDistanceMultiplier, 0.001f);
+	const float targetZoom = (std::max)(minimapZoom / safeCameraDistanceMultiplier, MINIMAP_ZOOM_MIN);
+	const float deltaTime = (std::max)(ImGui::GetIO().DeltaTime, 0.0f);
+	const float interpolationAlpha = 1.0f - std::exp(-MINIMAP_ZOOM_INTERPOLATION_SPEED * deltaTime);
+	minimapRenderZoom += (targetZoom - minimapRenderZoom) * interpolationAlpha;
+
+	minimapRenderZoom = (std::min)(minimapRenderZoom, MINIMAP_ZOOM_MAX);
+	minimapRenderZoom = (std::max)(minimapRenderZoom, MINIMAP_ZOOM_MIN);
+
+	const float zoom = minimapRenderZoom;
 	const float scale = mapRadius * zoom / worldRadius;
 	const float crocRotationRadians = hasCroc ? (float)GameRotationToRadians(crocObject->newRotPos.rotation.y >> 12) : 0.0f;
 	const float cameraYawRadians = (cameraRot != nullptr) ? (float)GameRotationToRadians(cameraRot->y) : -crocRotationRadians;

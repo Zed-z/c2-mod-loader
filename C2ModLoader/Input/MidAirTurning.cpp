@@ -19,6 +19,8 @@ namespace Input::MidAirTurning {
 
 bool midAirTurning;
 
+const int turnSpeed = 64 << 12;
+
 void __stdcall doMidAirTurning() {
 	if (!midAirTurning || GetControlScheme() != CTRL_TYPE_2)
 		return;
@@ -28,9 +30,9 @@ void __stdcall doMidAirTurning() {
 		if (croc->localVars[CROC_VAR_IN_AIR] == 4096) {
 			Inputs inputs = api->GetInputs();
 			if (inputs.stepLeft)
-				croc->newRotPos.rotation.y += 0x40000;
+				croc->newRotPos.rotation.y += turnSpeed;
 			if (inputs.stepRight)
-				croc->newRotPos.rotation.y -= 0x40000;
+				croc->newRotPos.rotation.y -= turnSpeed;
 		}
 	}
 }
