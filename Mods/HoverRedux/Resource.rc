@@ -1,0 +1,38 @@
+#include <windows.h>
+#include "ModApi.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_DLL
+FILESUBTYPE     0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "Name", "Hover Redux"
+            VALUE "Author", "Zed-z"
+            VALUE "Description",
+                "Bring back the hover glitch, just like in the first game.\n"
+                "\n"
+                "Jump, then attack mid air and jump again to start a hover.\n"
+                "\n"
+                "The distance travelled will depend on the timing: frame 11 is the sweet spot, frame 10 and 9 will grant you a smaller hover\n"
+                "Enable Easy Mode in the config to always execute a perfect hover regardless of timing.\n"
+            VALUE "Version", "1.0.0"
+            VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#camera-plus"
+            VALUE "ApiVersion", API_VERSION_STR
+            VALUE "ConfigTypes",
+                "@Config[General Configuration|General mod settings];"
+                "Config/EasyMode[Easy Mode|Makes hovers guaranteed regardless of timing]:bool=0;"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
