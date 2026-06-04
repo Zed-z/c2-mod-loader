@@ -1,11 +1,14 @@
 #include "FreeCamera.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "Utils.h"
 
 #include "ModApi.h"
 extern ModApi *api;
+
+using std::min, std::max, std::sin, std::cos;
 
 namespace {
 

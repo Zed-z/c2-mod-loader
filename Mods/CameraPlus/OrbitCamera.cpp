@@ -3,6 +3,7 @@
 #include "Utils.h"
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -10,6 +11,8 @@
 
 #include "ModApi.h"
 extern ModApi *api;
+
+using std::cos, std::sin, std::min, std::max, std::atan2;
 
 namespace {
 

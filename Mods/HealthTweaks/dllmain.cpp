@@ -18,17 +18,24 @@ MenuActionRegistration __stdcall restoreHealthRegistration() {
 	return {"Restore Health", "Set your health to the maximum value.", restoreHealth, true};
 }
 
+void __stdcall toggleFullHealthOnRetryFunction() {
+	fullHealthOnRetry = !fullHealthOnRetry;
+	api->WriteIniBool(L"Config", L"FullHealthOnRetry", fullHealthOnRetry);
+}
+
 MenuActionRegistration __stdcall toggleFullHealthOnRetryRegistration() {
 	static std::string label;
 	label = std::string("Full Health On Retry: ") + (fullHealthOnRetry ? "Enabled" : "Disabled");
 	return {
 		label.c_str(),
 		"Fully replenish health when retrying after a game over.",
-		[]() {
-			fullHealthOnRetry = !fullHealthOnRetry;
-			api->WriteIniBool(L"Config", L"FullHealthOnRetry", fullHealthOnRetry);
-		},
+		toggleFullHealthOnRetryFunction,
 		true};
+}
+
+void __stdcall toggleFullHealthOnLevelEntryFunction() {
+	fullHealthOnLevelEntry = !fullHealthOnLevelEntry;
+	api->WriteIniBool(L"Config", L"FullHealthOnLevelEntry", fullHealthOnLevelEntry);
 }
 
 MenuActionRegistration __stdcall toggleFullHealthOnLevelEntryRegistration() {
@@ -37,11 +44,13 @@ MenuActionRegistration __stdcall toggleFullHealthOnLevelEntryRegistration() {
 	return {
 		label.c_str(),
 		"Fully replenish health when entering a level.",
-		[]() {
-			fullHealthOnLevelEntry = !fullHealthOnLevelEntry;
-			api->WriteIniBool(L"Config", L"FullHealthOnLevelEntry", fullHealthOnLevelEntry);
-		},
+		toggleFullHealthOnLevelEntryFunction,
 		true};
+}
+
+void __stdcall toggleInfiniteHazardBounceFunction() {
+	infiniteHazardBounce = !infiniteHazardBounce;
+	api->WriteIniBool(L"Config", L"InfiniteHazardBounce", infiniteHazardBounce);
 }
 
 MenuActionRegistration __stdcall toggleInfiniteHazardBounceRegistration() {
@@ -50,10 +59,7 @@ MenuActionRegistration __stdcall toggleInfiniteHazardBounceRegistration() {
 	return {
 		label.c_str(),
 		"Bounce on hazards indefinitely without respawning.",
-		[]() {
-			infiniteHazardBounce = !infiniteHazardBounce;
-			api->WriteIniBool(L"Config", L"InfiniteHazardBounce", infiniteHazardBounce);
-		},
+		toggleInfiniteHazardBounceFunction,
 		true};
 }
 
