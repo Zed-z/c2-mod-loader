@@ -168,6 +168,7 @@ bool orbitCameraDisabled() {
 }
 
 void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
+	uint32_t controlMethod = api->GetCurrentSaveSlot()->controlMethod;
 	StratEntity *croc = api->GetEntity(crocObjRef);
 	StratEntity *camera = api->GetEntity(cameraObjRef);
 	StratEntity *boss = api->GetEntity(bossObjRef);
@@ -212,7 +213,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 			}
 		}
 		// Flavio
-		if (strcmp(croc->name, "FlavioCroc") == 0) {
+		if (controlMethod == CTRL_TYPE_1 && strcmp(croc->name, "FlavioCroc") == 0) {
 			StratEntity *flavio = api->GetEntity(bossObjRef);
 			if (flavio != nullptr) {
 				cameraDistanceCurrent = 8000.0;
