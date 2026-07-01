@@ -2,6 +2,7 @@
 
 #include "ModApi.h"
 #include "Utils/Fonts.h"
+#include "WadNames.h"
 #include "imgui.h"
 
 #include <cctype>
@@ -148,7 +149,6 @@ void RenderLevelSelect() {
 			std::string tribeName = "Tribe " + std::to_string(tribe);
 
 			if (ImGui::CollapsingHeader(tribeName.c_str())) {
-				ImGui::Indent();
 
 				// Group by type + level
 				std::map<std::pair<int, int>, std::vector<const WadLevel *>> levelMap;
@@ -160,17 +160,28 @@ void RenderLevelSelect() {
 					WadFileType type = static_cast<WadFileType>(typeAndLevel.first);
 					int levelNum = typeAndLevel.second;
 					std::string levelHeader = std::string(wadFileTypeNames[type + 1]) + " " + std::to_string(levelNum);
-					if (ImGui::TreeNode(levelHeader.c_str())) {
-						for (const auto *wadLevel : levelMaps) {
-							std::string buttonLabel = "Map " + std::to_string(wadLevel->map) + " (" + wadLevel->filename + ")";
-							if (ImGui::Button(buttonLabel.c_str())) {
-								api->GotoLevel(wadLevel->tribe, wadLevel->level, wadLevel->map, wadLevel->type);
-							}
+
+					ImGui::Separator();
+					ImGui::Text("%s", levelHeader.c_str());
+					ImGui::Spacing();
+
+					for (const auto *wadLevel : levelMaps) {
+						std::string lookupKey = "wads/" + wadLevel->filename;
+						std::string wadName = wadNames.count(lookupKey) ? wadNames[lookupKey] : "";
+						if (!wadName.empty()) {
+							ImGui::Text("%s", wadName.c_str());
+						} else {
+							ImGui::Text("%s", wadLevel->filename.c_str());
 						}
-						ImGui::TreePop();
+						std::string buttonLabel = "Map " + std::to_string(wadLevel->map) + " (" + wadLevel->filename + ")";
+						if (ImGui::Button(buttonLabel.c_str())) {
+							api->GotoLevel(wadLevel->tribe, wadLevel->level, wadLevel->map, wadLevel->type);
+						}
+						ImGui::Spacing();
 					}
+
+					ImGui::Spacing();
 				}
-				ImGui::Unindent();
 			}
 			ImGui::PopID();
 		}

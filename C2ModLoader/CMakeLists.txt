@@ -98,6 +98,7 @@ set(SOURCES
     Utils/Sha256.cpp
     Utils/Style.cpp
     Utils/UiScale.cpp
+    WadNames.cpp
 )
 
 # ImGui Core + Backends
