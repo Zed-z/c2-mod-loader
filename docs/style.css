@@ -20,7 +20,7 @@ body {
 	flex-direction: column;
 }
 
-img {
+img, video {
 	max-width: 100%;
 	transition: transform 0.2s ease-in-out;
 	user-select: none;

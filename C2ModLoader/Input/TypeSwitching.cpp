@@ -95,7 +95,7 @@ void __stdcall ManualModeSwitch() {
 }
 
 void Setup() {
-	typeSwitchMode = (TypeSwitchMode)api->SetupIniInt(L"Input", L"TypeSwitchMode", TypeSwitchMode::None);
+	typeSwitchMode = (TypeSwitchMode)api->SetupIniInt(L"Input", L"TypeSwitchMode", TypeSwitchMode::Automatic);
 
 	PatchKeyboardPressed();
 	api->HookGame(GAME_HOOK_PRE_INPUT, &ManualModeSwitch);

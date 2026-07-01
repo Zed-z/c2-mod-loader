@@ -35,37 +35,44 @@
 			<p>Below are the main features built into Croc 2 Mod Loader.</p>
 		</section>
 		<section>
-			<h2>Game launcher</h2>
+			<h2>Game launcher and mod loader</h2>
 			<p>Shows a launcher before starting the game. There, you can enable and disable your mods and change their settings!</p>
+			<p>Croc 2 Mod Loader can load <code>.asi</code> mod files that are able to change the game's behavior and even override some assets. Mods can also add options to the menu bar for easy access to different features!<br>
+			Mods are written in C++ with the help of the provided modding API.</p>
 			<img src="img/launcher.png" alt="Launcher Screenshot">
 		</section>
 		<section>
 			<h2>Mouse uncapture</h2>
-			<p>Optionally, the loader can overwrite some game code responsible for capturing the mouse in the game window and making it visible. When enabled, the game never captures your mouse and acts like any other window. Cursor freedom at last!</p>
-			<div class="note">Big thanks to hdc0 for the game insight that made this possible!</div>
-			<img src="img/mouseuncapture.png" alt="Mouse Uncapture Screenshot">
+			<p>The loader can overwrite some game code responsible for capturing the mouse in the game window and making it visible. When enabled, the game never captures your mouse and acts like any other window. Cursor freedom at last!</p>
+			<p>Big thanks to hdc0 for the game insight that made this possible!</p>
+			<video src="img/Features/mouseuncapture.mp4" autoplay muted loop></video>
 		</section>
 		<section>
 			<h2>Custom UI overlay</h2>
-			<p>With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings.</p>
-			<img src="img/customui.png" alt="Custom UI Screenshot">
-		</section>
-		<section>
-			<h2>Mod loading</h2>
-			<p>Croc 2 Mod Loader can load <code>.asi</code> mod files that are able to change the game's behavior and even override some assets. Mods can also add options to the menu bar for easy access to different features!<br>
-			Mods are written in C++ with the help of the provided modding API.</p>
-			<img src="img/modoptions.png" alt="Mod Options Screenshot">
+			<p>With the help of ocornut's Dear ImGui, the game can display custom UI elements, providing a look into the game's inner workings. It even includes a real-time in-game minimap!</p>
+			<video src="img/Features/overlay.mp4" autoplay muted loop></video>
 		</section>
 		<section>
 			<h2>Cheat code management</h2>
-			<p>Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game.<br>
-			With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!</p>
-			<img src="img/cheatcodes.png" alt="Cheat Codes Screenshot">
+			<p>Did you know that Croc 2 has cheat codes you can type in on the main menu? They're neat, but pretty tedious to have to type out every time you launch the game.</p>
+			<p>With Croc 2 Mod Loader, you can manage them with UI options. They also get saved across play sessions!</p>
+			<video src="img/Features/cheatcodes.mp4" autoplay muted loop></video>
+		</section>
+		<section>
+			<h2>Modern controls and vibration</h2>
+			<p>The loader utilizes modern input APIs for better compatibility with game controllers.</p>
+			<p>With this, you can choose which input device to control with, and tweak its deadzone.</p>
+			<p>It also brings back the ability to control Croc with the DPAD and includes an option to automatically use type 2 controls when doing so, to mimic how the Croc 1 Remaster controls. Also, brings back using the sidestep buttons to turn mid-air!</p>
+			<video src="img/Features/moderncontrols.mp4" autoplay muted loop></video>
+		</section>
+		<section>
+			<h2>Registry bypass</h2>
+			<p>The original game makes heavy use of the registry for storing game settings. Not only does it make it difficult to modify and restore these settings, it also causes issues when having multiple copies of the game installed (especially when using the EU version with non-English language). The loader can bypass registry calls and store game settings in a local ini file.</p>
 		</section>
 	</main>
 	<footer>
 		<div class="content">
-			<span>&copy; 2026 Croc 2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed&#8209;z&nbsp;and&nbsp;contributors</a></span>
+			<span>&copy; 2026 C2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed&#8209;z&nbsp;and&nbsp;contributors</a></span>
 		</div>
 	</footer>
 </body>

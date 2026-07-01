@@ -36,57 +36,69 @@
 		</section>
 		<section id="camera-plus">
 			<h3>Camera+</h3>
-			<p>Adds extra camera modes, such as a modern Orbit camera and a Free camera that allows you to freely look around the world!<br>
-			Toggle with <code>STEP-LEFT + STEP-RIGHT + CAMERA/180</code> or the dedicated menu bar options!</p>
-			<img src="img/CameraPlus/orbitcamera.png" alt="Orbit Camera">
-			<img src="img/CameraPlus/freecamera.png" alt="Free Camera">
+			<p>Adds extra camera modes to improve general gameplay and allow for easier exploration.</p>
+			<p>Orbit Camera:</p>
+			<p>A manually controllable orbiting camera. Use side step controls to tilt left/right and inventory controls to tilt up/down. Optionally turns as you move.</p>
+			<p>Freecam:</p>
+			<p>A camera detached from the player character that can pass through objects. Move around with movement controls. Use side step controls to tilt left/right and inventory controls to tilt up/down. Jump to raise and attack to lower the camera.</p>
+			<p>Change camera modes with [step left + step right + camera center / 180] or via the menu bar.</p>
+			<video src="img/CameraPlus/orbitcamera.mp4" autoplay muted loop></video>
+			<video src="img/CameraPlus/freecamera.mp4" autoplay muted loop></video>
 		</section>
 		<section id="coord-recall">
 			<h3>Coord Recall</h3>
-			<p>Allows you to save and teleport to up to 10 locations! Use either via the menu bar options or the following hotkeys:</p>
-			<ul>
-				<li><code>F5 + [0-9]</code> to save</li>
-				<li><code>[0-9]</code> to recall</li>
-			</ul>
-			<img src="img/CoordRecall/coordrecall.png" alt="Coord Recall">
+			<p>Allows you to save and recall coordinates using hotkeys.</p>
+			<p>[F5 + 0-9] - Save your current position and rotation.</p>
+			<p>[0-9] - Recall a previously set position.</p>
+			<p>Additionally, allows you to manage saved positions via the menu bar.</p>
+			<video src="img/CoordRecall/coordrecall.mp4" autoplay muted loop></video>
 		</section>
 		<section id="health-tweaks">
 			<h3>Health Tweaks</h3>
-			<p>Annoyed at the game's strict health mechanics? Wish the challenge was a bit easier? You can configure the game to:</p>
-			<ul>
-				<li>Regain all your health on a game over</li>
-				<li>Regain all your health when entering a level</li>
-			</ul>
+			<p>Provides some quality of life health mechanics tweaks to attempt to make the game's infamously unforgiving health system easier to deal with.</p>
+			<p>Full Health On Retry:</p>
+			<p>Fully replenish health when retrying after a game over.</p>
+			<p>Full Health On Level Entry:</p>
+			<p>Fully replenish health when entering a level.</p>
+			<p>Restore Health:</p>
+			<p>Instantly replenish your health via a button available on the menu bar.</p>
+			<p>Infinite Hazard Bounce:</p>
+			<p>Bounce on hazards indefinitely without respawning. It still gradually depletes your health, but makes escaping from lava pits more forgiving.</p>
+			<video src="img/HealthTweaks/healthtweaks.mp4" autoplay muted loop></video>
 		</section>
 		<section id="hello-world">
 			<h3>Hello World</h3>
-			<p>A dummy mod that logs a simple message. Good to test if the loader is working and not much else.</p>
+			<p>A dummy mod, useful for testing the mod loader and not much else.</p>
+			<p>Prints out a message to the log once loaded.</p>
+			<p>Additionally, can summon toast notifications via the menu bar.</p>
 		</section>
-		<section id="improved-controls">
-			<h3>Improved Controls</h3>
-			<p>Provides a couple of little improvements to the control scheme! You can configure:</p>
-			<ul>
-				<li><b>Type 1 Flip</b> to be able to do a 180 on Type 1 controls with a double press of the camera reset button!</li>
-				<li><b>Type Switch Mode</b> to manually or automatically switch between Type 1 and 2 controls in real time!</li>
-			</ul>
+		<section id="hover-redux">
+			<h3>Hover Redux</h3>
+			<p>Brings back the hover glitch, just like in the first game.</p>
+			<p>Jump, then attack mid air and jump again to start a hover.</p>
+			<p>The distance travelled will depend on the timing: frame 11 is the sweet spot, frame 10 and 9 will grant you a smaller hover.</p>
+			<p>Enable Easy Mode in the config to always execute a perfect hover regardless of timing.</p>
+			<video src="img/HoverRedux/hoverredux.mp4" autoplay muted loop></video>
 		</section>
 		<section id="music-restorer">
 			<h3>Music Restorer</h3>
-			<p>Restores missing/changed tracks from the PS1 release of the game, notably the alternative Ice Cave theme from "Save the Ice Trapped Gobbos"!</p>
-			<div class="note"><b>IMPORTANT:</b> Requires <code>JHub34.asf</code> and <code>JIceCave1.asf</code> files in the <code>MusicRestorer/music/</code> folder right next to the mod <code>.asi</code> file!</div>
+			<p>Restores missing music from the console version of the game.</p>
+			<p>Requires providing your own JIceCave1.asf and JHub34.asf file.</p>
+			<video src="img/MusicRestorer/musicrestorer.mp4" controls></video>
 		</section>
 		<section id="noclip-toggler">
 			<h3>NoClip Toggler</h3>
-			<p>Allows you to toggle a NoClip state, where you can freely fly and pass through walls. Toggle with <code>STEP-LEFT + STEP-RIGHT + ATTACK</code> or the dedicated menu bar option!</p>
-			<img src="img/NoClipToggler/nocliptoggler1.png" alt="NoClip 1">
-			<img src="img/NoClipToggler/nocliptoggler2.png" alt="NoClip 2">
+			<p>Allows you to noclip and fly around on demand.</p>
+			<p>Toggle with [step left + step right + attack] or via the menu bar.</p>
+			<p>Move around with directional keys, ascend with [jump], descend with [attack].</p>
+			<video src="img/NoClipToggler/nocliptoggler.mp4" autoplay muted loop></video>
 		</section>
 		<section id="render-extender">
 			<h3>Render Extender</h3>
-			<p>Allows you to increase the game's render distance greatly. Change between 1-10x render distance on the fly!<br>
-			Toggle with <code>F1</code> and alter with <code>-</code>/<code>+</code> or the dedicated menu bar options!</p>
-			<img src="img/RenderExtender/noextender.png" alt="No Extender">
-			<img src="img/RenderExtender/extender.png" alt="Extender">
+			<p>Allows you to increase the game's render distance past its limits.</p>
+			<p>Toggle with [F1]. Decrease and increase the render multiplier with [-] / [+].</p>
+			<p>Additionally, these can be configured via the menu bar.</p>
+			<video src="img/RenderExtender/renderextender.mp4" autoplay muted loop></video>
 		</section>
 		<section>
 			<h1>Recommended mods</h1>
@@ -100,7 +112,7 @@
 	</main>
 	<footer>
 		<div class="content">
-			<span>&copy; 2026 Croc 2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed&#8209;z&nbsp;and&nbsp;contributors</a></span>
+			<span>&copy; 2026 C2 Mod Loader | <a href="https://github.com/Zed-z/c2-mod-loader/graphs/contributors">Zed&#8209;z&nbsp;and&nbsp;contributors</a></span>
 		</div>
 	</footer>
 </body>
