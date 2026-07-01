@@ -66,14 +66,14 @@ void __stdcall Step() {
 	}
 
 	if (startedJump) {
-		api->LogDebug("Jump started");
+		// api->LogDebug("Jump started");
 		inAirCurrently = true;
 		inAirAttacked = false;
 		inAirFrames = 0;
 		return;
 	}
 	if (endedJump) {
-		api->LogDebug("Jump ended");
+		// api->LogDebug("Jump ended");
 		inAirCurrently = false;
 		return;
 	}
@@ -83,7 +83,7 @@ void __stdcall Step() {
 
 		if (croc->localVars[CROC_VAR_STATE] == CROC_STATE_ATTACKING && !inAirAttacked) {
 			inAirAttacked = true;
-			api->LogDebug(("Attack started in air on frame " + std::to_string(inAirFrames)).c_str());
+			// api->LogDebug(("Attack started in air on frame " + std::to_string(inAirFrames)).c_str());
 		}
 
 		if (inAirAttacked && inputsPressed.jump) {

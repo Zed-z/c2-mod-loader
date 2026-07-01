@@ -3,8 +3,8 @@
 #define LOADER_NAME "Croc 2 Mod Loader"
 #define LOADER_NAME_L L"Croc 2 Mod Loader"
 
-#define LOADER_VERSION "1.1.0"
-#define LOADER_VERSION_L L"1.1.0"
+#define LOADER_VERSION "2.0.0"
+#define LOADER_VERSION_L L"2.0.0"
 
 #define LOG_FILE "C2ModLoader.log"
 #define LOG_FILE_L L"C2ModLoader.log"

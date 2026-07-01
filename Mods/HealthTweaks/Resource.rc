@@ -30,7 +30,7 @@ BEGIN
                 "\n"
                 "Infinite Hazard Bounce:\n"
                 "Bounce on hazards indefinitely without respawning. It still gradually depletes your health, but makes escaping from lava pits more forgiving.\n"
-            VALUE "Version", "1.0.0"
+            VALUE "Version", "1.1.0"
             VALUE "Hyperlink", "https://zed-z.github.io/c2-mod-loader/mods#health-tweaks"
             VALUE "ApiVersion", API_VERSION_STR
             VALUE "ConfigTypes",
