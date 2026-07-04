@@ -82,6 +82,10 @@ static DWORD WINAPI vibrationThread(LPVOID param) {
 }
 
 void vibrateImpl(int strength, int durationMs) {
+	if (strength < 0)
+		strength = 0;
+	if (strength > 65535)
+		strength = 65535;
 	VibrationParams *params = new VibrationParams{strength, durationMs};
 	HANDLE threadHandle = CreateThread(nullptr, 0, vibrationThread, params, 0, nullptr);
 	if (threadHandle != nullptr) {

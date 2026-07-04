@@ -6,6 +6,7 @@
 #include "Input/TypeSwitching.h"
 #include "Input/Vibration.h"
 
+#include "Input/Backends/SDL3.h"
 #include "Input/Backends/Xinput.h"
 
 #include "ModApi.h"
@@ -39,6 +40,10 @@ void Setup() {
 	case 0: // XInput
 		inputBackend = new Input::Backends::Xinput::Backend();
 		api->LogInfo("Using XInput backend for input.");
+		break;
+	case 1: // SDL3
+		inputBackend = new Input::Backends::SDL3::Backend();
+		api->LogInfo("Using SDL3 backend for input.");
 		break;
 	default:
 		inputBackend = new Input::Backends::Xinput::Backend();

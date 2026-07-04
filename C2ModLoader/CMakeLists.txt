@@ -58,6 +58,7 @@ set(SOURCES
     FileOverrides.cpp
     GameHooks.cpp
     Input/AnalogInput.cpp
+    Input/Backends/SDL3.cpp
     Input/Backends/Xinput.cpp
     Input/DpadMovement.cpp
     Input/Input.cpp
@@ -128,6 +129,20 @@ else()
     list(APPEND MINHOOK_SOURCES libs/minhook/src/hde/hde32.c)
 endif()
 
+# SDL3
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/CMakeLists.txt")
+    set(SDL_SHARED ON CACHE BOOL "Build shared SDL library" FORCE)
+    set(SDL_STATIC OFF CACHE BOOL "Build static SDL library" FORCE)
+    
+    set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+    set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
+    set(SDL_RENDER OFF CACHE BOOL "" FORCE)
+    set(SDL_AUDIO OFF CACHE BOOL "" FORCE)
+    set(SDL_VIDEO OFF CACHE BOOL "" FORCE)
+
+    add_subdirectory(libs/sdl3 EXCLUDE_FROM_ALL)
+endif()
+
 # Create DLL
 add_library(C2ModLoader SHARED
     ${SOURCES}
@@ -149,6 +164,7 @@ target_include_directories(C2ModLoader PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/src
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/src/hde
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/include
 )
 
 # Windows resource compiler
@@ -221,6 +237,17 @@ target_link_libraries(C2ModLoader PRIVATE
     winmm
     winspool
     ws2_32
+)
+
+# SDL3 configuration and packaging
+target_compile_definitions(C2ModLoader PRIVATE SDL_MAIN_HANDLED)
+target_link_libraries(C2ModLoader PRIVATE SDL3::SDL3)
+
+add_custom_command(TARGET C2ModLoader POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL3::SDL3>
+        ${CMAKE_BINARY_DIR}/Release/$<TARGET_FILE_NAME:SDL3::SDL3>
+    COMMENT "Copying SDL3 runtime to Release folder"
 )
 
 # Copy to Release folder

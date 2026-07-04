@@ -76,7 +76,7 @@ BEGIN
                 "Cheats/MusicSelect[Music Select|Enable music selection cheat]:bool=0;"
                 "@Input[Modern Input|Enable and configure input enhancements];"
                 "Input/Enabled[Enabled|Enable input enhancements]:bool=1;"
-                "Input/Backends[Backend|Select the input backend to use]:enum[XInput]=0;"
+                "Input/Backend[Backend|The input backend to use]:enum[XInput|SDL3]=0;"
                 "Input/DeviceIndex[Device Index|Index of the input device to use]:int=0;"
                 "Input/StickDeadzone[Stick Deadzone|Deadzone for analog sticks]:int=25;"
                 "Input/StickOuterDeadzone[Stick Outer Deadzone|Outer deadzone for analog sticks]:int=75;"
