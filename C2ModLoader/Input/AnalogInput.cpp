@@ -1,5 +1,6 @@
 #include "AnalogInput.h"
 
+#include "Input/Controls.h"
 #include "Input/Input.h"
 #include "ModApi.h"
 
@@ -8,8 +9,18 @@ extern ModApi *api;
 namespace {
 
 void PatchAnalogInput() {
-	uintptr_t ptrX = (uintptr_t)&(Input::inputBackend->input.leftStick.x);
-	uintptr_t ptrY = (uintptr_t)&(Input::inputBackend->input.leftStick.y);
+	uintptr_t ptrX, ptrY;
+	switch (Input::Controls::movement) {
+	case Input::Controls::ControlAnalog::LeftStick:
+		ptrX = (uintptr_t)&(Input::inputBackend->input.leftStick.x);
+		ptrY = (uintptr_t)&(Input::inputBackend->input.leftStick.y);
+		break;
+	case Input::Controls::ControlAnalog::RightStick:
+		ptrX = (uintptr_t)&(Input::inputBackend->input.rightStick.x);
+		ptrY = (uintptr_t)&(Input::inputBackend->input.rightStick.y);
+		break;
+	}
+
 	uint8_t hookCode[12];
 	int p = 0;
 

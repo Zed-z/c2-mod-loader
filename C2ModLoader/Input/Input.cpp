@@ -1,6 +1,7 @@
 #include "Input.h"
 
 #include "Input/AnalogInput.h"
+#include "Input/Controls.h"
 #include "Input/DpadMovement.h"
 #include "Input/MidAirTurning.h"
 #include "Input/TypeSwitching.h"
@@ -35,6 +36,8 @@ void Setup() {
 
 	if (!enabled)
 		return;
+
+	Controls::Setup();
 
 	switch (backend) {
 	case 0: // XInput

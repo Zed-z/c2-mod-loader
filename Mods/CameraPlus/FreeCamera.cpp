@@ -97,8 +97,8 @@ void Step() {
 		input_x = -((float)modernInput.leftStick.x / stickScale);
 		input_z = ((float)modernInput.leftStick.y / stickScale);
 		input_y = ((float)modernInput.rightTrigger / triggerScale) - ((float)modernInput.leftTrigger / triggerScale);
-		input_rot_yaw = ((float)modernInput.rightStick.x / stickScale) * (invertX ? -1 : 1);
-		input_rot_pitch = ((float)modernInput.rightStick.y / stickScale) * (invertY ? -1 : 1);
+		input_rot_yaw = -((float)modernInput.rightStick.x / stickScale) * (invertX ? -1 : 1);
+		input_rot_pitch = -((float)modernInput.rightStick.y / stickScale) * (invertY ? -1 : 1);
 	} else {
 		input_x = inputs.right - inputs.left;
 		input_z = -(inputs.down - inputs.up);

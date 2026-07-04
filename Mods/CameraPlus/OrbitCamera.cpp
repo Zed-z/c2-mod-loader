@@ -371,8 +371,8 @@ void Step() {
 	// Camera rotation
 	float input_rot_yaw, input_rot_pitch;
 	if (modernInputEnabled) {
-		input_rot_yaw = ((float)modernInput.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
-		input_rot_pitch = ((float)modernInput.rightStick.y / stickScale) * (orbitInvertY ? -1 : 1);
+		input_rot_yaw = -((float)modernInput.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
+		input_rot_pitch = -((float)modernInput.rightStick.y / stickScale) * (orbitInvertY ? -1 : 1);
 	} else {
 		input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
 		input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);

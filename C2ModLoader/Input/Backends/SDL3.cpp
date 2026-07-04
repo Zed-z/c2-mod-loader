@@ -120,8 +120,8 @@ void Backend::PollInput() {
 		input.leftStick.y = applyStickDeadzone(leftY, stickDeadzone, stickOuterDeadzone) * stickScale;
 		input.leftStick.click = SDL_GetGamepadButton(activeGamepad, SDL_GAMEPAD_BUTTON_LEFT_STICK);
 
-		input.rightStick.x = applyStickDeadzone(rightX, stickDeadzone, stickOuterDeadzone) * stickScale;
-		input.rightStick.y = -applyStickDeadzone(rightY, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.rightStick.x = -applyStickDeadzone(rightX, stickDeadzone, stickOuterDeadzone) * stickScale;
+		input.rightStick.y = applyStickDeadzone(rightY, stickDeadzone, stickOuterDeadzone) * stickScale;
 		input.rightStick.click = SDL_GetGamepadButton(activeGamepad, SDL_GAMEPAD_BUTTON_RIGHT_STICK);
 
 		input.leftTrigger = applyTriggerDeadzone(leftTrigger, triggerDeadzone, triggerOuterDeadzone) * triggerScale;

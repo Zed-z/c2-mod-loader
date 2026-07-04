@@ -60,6 +60,7 @@ set(SOURCES
     Input/AnalogInput.cpp
     Input/Backends/SDL3.cpp
     Input/Backends/Xinput.cpp
+    Input/Controls.cpp
     Input/DpadMovement.cpp
     Input/Input.cpp
     Input/MidAirTurning.cpp
