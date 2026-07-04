@@ -14,6 +14,7 @@ extern ModApi *api;
 namespace {
 
 SDL_Gamepad *activeGamepad = nullptr;
+SDL_Gamepad *lastActiveGamepad = nullptr;
 int deviceIndex;
 
 float stickDeadzone;
@@ -92,6 +93,17 @@ bool enabled;
 void Backend::PollInput() {
 	SDL_UpdateGamepads();
 	RefreshGamepadConnection();
+
+	if (activeGamepad != lastActiveGamepad) {
+		if (activeGamepad != nullptr) {
+			const char *name = SDL_GetGamepadName(activeGamepad);
+			std::string msg = "Controller Connected: " + std::string(name ? name : "Unknown Controller");
+			api->ShowInfoToast(msg.c_str());
+		} else if (lastActiveGamepad != nullptr) {
+			api->ShowInfoToast("Controller Disconnected");
+		}
+		lastActiveGamepad = activeGamepad;
+	}
 
 	input = {};
 
