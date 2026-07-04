@@ -58,6 +58,7 @@ set(SOURCES
     FileOverrides.cpp
     GameHooks.cpp
     Input/AnalogInput.cpp
+    Input/Backends/Xinput.cpp
     Input/DpadMovement.cpp
     Input/Input.cpp
     Input/MidAirTurning.cpp
@@ -194,28 +195,32 @@ endif()
 
 # Windows libraries
 target_link_libraries(C2ModLoader PRIVATE
-    d3d11
-    dxgi
-    d3dcompiler
-    gdiplus
-    kernel32
-    user32
-    gdi32
-    winspool
-    comdlg32
     advapi32
-    shell32
-    ole32
-    oleaut32
-    uuid
+    bcrypt
+    cfgmgr32
+    comctl32
+    comdlg32
+    d3d11
+    d3dcompiler
+    dwmapi
+    dxgi
+    gdi32
+    gdiplus
+    imm32
+    kernel32
     odbc32
     odbccp32
-    ws2_32
-    comctl32
+    ole32
+    oleaut32
+    setupapi
+    shell32
     shlwapi
-    dwmapi
+    user32
+    uuid
     version
-    xinput
+    winmm
+    winspool
+    ws2_32
 )
 
 # Copy to Release folder

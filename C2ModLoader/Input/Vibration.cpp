@@ -12,46 +12,6 @@ extern ModApi *api;
 
 using std::min, std::max;
 
-namespace {
-
-struct VibrationParams {
-	int strength;
-	int durationMs;
-};
-
-static DWORD WINAPI vibrationThread(LPVOID param) {
-	VibrationParams *vibParams = (VibrationParams *)param;
-	int strength = vibParams->strength;
-	int durationMs = vibParams->durationMs;
-	delete vibParams;
-
-	XINPUT_VIBRATION vibrationEnable{};
-	vibrationEnable.wLeftMotorSpeed = strength;
-	vibrationEnable.wRightMotorSpeed = strength;
-	XInputSetState(Input::deviceIndex, &vibrationEnable);
-
-	Sleep(durationMs);
-
-	XINPUT_VIBRATION vibrationDisable{};
-	vibrationDisable.wLeftMotorSpeed = 0;
-	vibrationDisable.wRightMotorSpeed = 0;
-	XInputSetState(Input::deviceIndex, &vibrationDisable);
-
-	return 0;
-}
-
-void vibrate(int strength, int durationMs) {
-	VibrationParams *params = new VibrationParams{strength, durationMs};
-	HANDLE threadHandle = CreateThread(nullptr, 0, vibrationThread, params, 0, nullptr);
-	if (threadHandle != nullptr) {
-		CloseHandle(threadHandle);
-	} else {
-		delete params;
-	}
-}
-
-} // namespace
-
 namespace Input::Vibration {
 
 bool vibrationEnabled;
@@ -60,7 +20,7 @@ float vibrationStrength;
 void __stdcall PreDamage() {
 	if (vibrationEnabled) {
 		int strength = (int)(vibrationStrength * 65535);
-		vibrate(strength, 200);
+		Input::inputBackend->vibrate(strength, 200);
 	}
 }
 

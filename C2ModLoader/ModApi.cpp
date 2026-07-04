@@ -341,16 +341,15 @@ bool HookFunction(uintptr_t target, size_t length, void(__stdcall *func)(), int 
 	memcpy(p + 1, &rel_jumpback, 4);
 
 	// Prepare patch (NOPs + JMP to trampoline)
-	BYTE patch[16];
-	memset(patch, 0x90, length); // NOPs
+	std::vector<BYTE> patch(length, 0x90);
 	patch[0] = 0xE9;
 	int32_t rel_trampoline = (int32_t)((uintptr_t)trampoline - (target + JMP_SIZE));
-	memcpy(patch + 1, &rel_trampoline, 4);
+	memcpy(patch.data() + 1, &rel_trampoline, 4);
 
 	// Apply patch
 	DWORD old;
 	VirtualProtect((void *)target, length, PAGE_EXECUTE_READWRITE, &old);
-	memcpy((void *)target, patch, length);
+	memcpy((void *)target, patch.data(), length);
 	VirtualProtect((void *)target, length, old, &old);
 
 	return true;

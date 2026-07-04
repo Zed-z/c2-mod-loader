@@ -8,8 +8,8 @@ extern ModApi *api;
 namespace {
 
 void PatchAnalogInput() {
-	uintptr_t ptrX = (uintptr_t)&(Input::input.leftStick.x);
-	uintptr_t ptrY = (uintptr_t)&(Input::input.leftStick.y);
+	uintptr_t ptrX = (uintptr_t)&(Input::inputBackend->input.leftStick.x);
+	uintptr_t ptrY = (uintptr_t)&(Input::inputBackend->input.leftStick.y);
 	uint8_t hookCode[12];
 	int p = 0;
 

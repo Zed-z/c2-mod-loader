@@ -5,12 +5,18 @@
 namespace Input {
 
 extern bool enabled;
-extern int deviceIndex;
 
-extern ModernInput input;
+interface IInputBackend {
+	ModernInput input;
+	virtual void PollInput() = 0;
+	virtual ModernInput GetState() = 0;
+	virtual void Setup() = 0;
+	virtual void vibrate(int strength, int durationMs) = 0;
+};
+
+extern IInputBackend *inputBackend;
 
 ModernInput GetState();
-
 void Setup();
 
 } // namespace Input
