@@ -287,6 +287,33 @@ bool IsConfigValueDefault(const ConfigEntry &entry, const ConfigHint &hint) {
 	return currentValue == defaultValue;
 }
 
+void SortConfigEntriesByHints(std::vector<ConfigEntry> &entries, const std::vector<std::pair<std::string, ConfigHint>> &orderedHints) {
+	// Hint order map
+	std::map<std::string, size_t> hintOrderMap;
+	for (size_t i = 0; i < orderedHints.size(); ++i) {
+		std::string keyPath = orderedHints[i].first;
+		std::transform(keyPath.begin(), keyPath.end(), keyPath.begin(), [](unsigned char c) { return std::tolower(c); });
+		hintOrderMap[keyPath] = i;
+	}
+
+	// Stable sort
+	std::stable_sort(entries.begin(), entries.end(), [&hintOrderMap](const ConfigEntry &a, const ConfigEntry &b) {
+		std::string keyA = a.section + "/" + a.key;
+		std::string keyB = b.section + "/" + b.key;
+		std::transform(keyA.begin(), keyA.end(), keyA.begin(), [](unsigned char c) { return std::tolower(c); });
+		std::transform(keyB.begin(), keyB.end(), keyB.begin(), [](unsigned char c) { return std::tolower(c); });
+
+		auto itA = hintOrderMap.find(keyA);
+		auto itB = hintOrderMap.find(keyB);
+
+		// No hint - push to end
+		size_t indexA = (itA != hintOrderMap.end()) ? itA->second : static_cast<size_t>(-1);
+		size_t indexB = (itB != hintOrderMap.end()) ? itB->second : static_cast<size_t>(-1);
+
+		return indexA < indexB;
+	});
+}
+
 void LoadAllConfigs() {
 	const int count = 1 + (int)mods.size();
 	allParsedConfigs.resize(count);
@@ -298,6 +325,9 @@ void LoadAllConfigs() {
 		parsedConfig.configEntries = LauncherIni::ParseIniFile(configPath);
 
 		const bool defaultsAdded = EnsureConfigDefaults(parsedConfig.configEntries, parsedConfig.hints.ordered);
+
+		SortConfigEntriesByHints(parsedConfig.configEntries, parsedConfig.hints.ordered);
+
 		if (defaultsAdded) {
 			LauncherIni::WriteIniFile(configPath, parsedConfig.configEntries);
 		}
@@ -366,9 +396,9 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 				ImGui::Spacing();
 			}
 
-			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 3)) {
-				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, 180.0f * g_uiScale);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+			if (ImGui::BeginTable(("##sectionTable" + std::to_string(sectionIndex)).c_str(), 3, ImGuiTableFlags_SizingStretchProp)) {
+				ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 1.0f);
 				ImGui::TableSetupColumn("Reset", ImGuiTableColumnFlags_WidthFixed, 48.0f * g_uiScale);
 
 				for (size_t entryIndex : section.entryIndices) {
@@ -386,11 +416,20 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
+
 					ImGui::AlignTextToFramePadding();
 					ImGui::TextUnformatted(name.c_str());
-					if (ImGui::IsItemHovered() && !description.empty()) {
-						ImGui::SetTooltip("%s", description.c_str());
+
+					if (!description.empty()) {
+						ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+						ImGui::Indent();
+						ImGui::TextWrapped("%s", description.c_str());
+						ImGui::Unindent();
+						ImGui::PopStyleColor();
 					}
+
+					ImGui::Spacing();
+					ImGui::Spacing();
 
 					ImGui::TableSetColumnIndex(1);
 					char buffer[256];
@@ -399,6 +438,8 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 					ImGui::PushID(static_cast<int>(entryIndex));
 
 					ImGui::SetNextItemWidth(-FLT_MIN);
+
+					ImGui::Spacing();
 
 					if (type == "bool") {
 						bool val = (entry.value == "1" || _stricmp(entry.value.c_str(), "true") == 0);
@@ -467,6 +508,7 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 
 					ImGui::TableSetColumnIndex(2);
 					if (hintIt != parsedConfig.hints.lookup.end()) {
+						ImGui::Spacing();
 						ImGui::BeginDisabled(IsConfigValueDefault(entry, hintIt->second));
 						if (ImGui::Button("Reset##reset")) {
 							entry.value = hintIt->second.defaultValue;
@@ -533,12 +575,7 @@ void RenderSelectedItemDetails() {
 	ImGui::PopStyleColor();
 	ImGui::PopFont();
 
-	float descriptionHeight = ImGui::GetContentRegionAvail().y;
-	if (descriptionHeight < 100.0f) {
-		descriptionHeight = 100.0f;
-	}
-
-	ImGui::BeginChild("OverviewDescription", ImVec2(0.0f, descriptionHeight), true);
+	ImGui::BeginChild("OverviewDescription", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_NavFlattened);
 	if (!description.empty()) {
 		ImGui::TextWrapped("%s", description.c_str());
 	} else {
@@ -553,7 +590,10 @@ void RenderSelectedItemConfig() {
 	if (sections.empty()) {
 		ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No configuration available.");
 	} else {
-		RenderConfigSections(sections);
+		if (ImGui::BeginChild("SettingsScrollRegion", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_NavFlattened)) {
+			RenderConfigSections(sections);
+		}
+		ImGui::EndChild();
 	}
 }
 
@@ -576,32 +616,35 @@ void RenderSelectedItemFileOverrides() {
 
 		ImGui::Spacing();
 
-		if (ImGui::BeginTable("##fileoverridestable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-			ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-			ImGui::TableHeadersRow();
+		if (ImGui::BeginChild("OverridesScrollRegion", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_NavFlattened)) {
+			if (ImGui::BeginTable("##fileoverridestable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+				ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+				ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+				ImGui::TableHeadersRow();
 
-			for (const auto &override : mod.fileOverrides) {
-				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0);
-				std::string displayPath = WStringToString(override.relativePath) + (override.isDirectory ? "\\" : "");
-				ImGui::TextUnformatted(displayPath.c_str());
+				for (const auto &override : mod.fileOverrides) {
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0);
+					std::string displayPath = WStringToString(override.relativePath) + (override.isDirectory ? "\\" : "");
+					ImGui::TextUnformatted(displayPath.c_str());
 
-				ImGui::TableSetColumnIndex(1);
-				if (!override.isDirectory) {
-					if (override.fileSize < 1024) {
-						ImGui::Text("%u B", override.fileSize);
-					} else if (override.fileSize < 1024 * 1024) {
-						ImGui::Text("%.2f KB", override.fileSize / 1024.0f);
+					ImGui::TableSetColumnIndex(1);
+					if (!override.isDirectory) {
+						if (override.fileSize < 1024) {
+							ImGui::Text("%u B", override.fileSize);
+						} else if (override.fileSize < 1024 * 1024) {
+							ImGui::Text("%.2f KB", override.fileSize / 1024.0f);
+						} else {
+							ImGui::Text("%.2f MB", override.fileSize / (1024.0f * 1024.0f));
+						}
 					} else {
-						ImGui::Text("%.2f MB", override.fileSize / (1024.0f * 1024.0f));
+						ImGui::TextUnformatted("[DIR]");
 					}
-				} else {
-					ImGui::TextUnformatted("[DIR]");
 				}
+				ImGui::EndTable();
 			}
-			ImGui::EndTable();
 		}
+		ImGui::EndChild();
 	}
 }
 

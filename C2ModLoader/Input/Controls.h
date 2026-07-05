@@ -20,6 +20,10 @@ enum class ControlButton {
 	RT,
 	LS,
 	RS,
+	DpadUp,
+	DpadDown,
+	DpadLeft,
+	DpadRight,
 };
 
 extern ControlAnalog movement;

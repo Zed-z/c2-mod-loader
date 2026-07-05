@@ -5,6 +5,7 @@ set(EMBEDDED_LICENSE_FILES
     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/scabber_font/License.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/inter_font/OFL.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/roboto_mono_font/OFL.txt"
@@ -25,6 +26,7 @@ set(EMBEDDED_LICENSE_ENTRIES "")
 append_embedded_license("C2ModLoader" "${CMAKE_SOURCE_DIR}/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Dear ImGui" "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("MinHook" "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("SDL3" "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Scabber Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/scabber_font/License.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Inter Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/inter_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Roboto Mono Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/roboto_mono_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
