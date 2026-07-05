@@ -692,6 +692,16 @@ inline uint32_t *inputsRaw = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x52
 inline uint32_t *inputsPressedRaw = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
 inline uint32_t *inputsReleasedRaw = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
 
+inline uint32_t *realPad = (uint32_t *)_pointer({{0x52A588}, {0x531778}, {0x529580}});
+inline uint32_t *realPadOld = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}});
+inline uint32_t *realPadPush = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
+inline uint32_t *realPadPull = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
+
+inline uint32_t *playerPad = (uint32_t *)_pointer({{0x52A568}, {0x531758}, {0x529570}});
+inline uint32_t *playerPadOld = (uint32_t *)_pointer({{0x52A580}, {0x531770}, {0x529578}});
+inline uint32_t *playerPadPush = (uint32_t *)_pointer({{0x52A578}, {0x531768}, {0x529580}});
+inline uint32_t *playerPadPull = (uint32_t *)_pointer({{0x52A57C}, {0x53176C}, {0x529584}});
+
 inline uint32_t *analogX = (uint32_t *)_pointer({{0x52A564}, {0x531754}, {0x52955C}});
 inline uint32_t *analogY = (uint32_t *)_pointer({{0x52A574}, {0x531764}, {0x52956C}});
 inline uint32_t *inputDeviceType = (uint32_t *)_pointer({{0x52A560}, {0x531750}, {0x529558}});

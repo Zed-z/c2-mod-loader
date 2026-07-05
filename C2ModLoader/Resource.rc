@@ -2,6 +2,9 @@
 #include "Resource.h"
 #include "ModApi.h"
 
+#define INPUT_ANALOGS "enum[Left Analog|Right Analog]"
+#define INPUT_BUTTONS "enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]"
+
 // Version information
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     0,0,0,0
@@ -40,9 +43,11 @@ BEGIN
                 "Config/FreeMouse[Free Mouse|Allow mouse to move freely]:bool=1;"
                 "Config/DisplayScale[Display Scale|Launcher and UI display scale (0 = automatic)]:float=0;"
                 "_Config/DisabledMods[Disabled Mods|List of disabled mods]:string=;"
+
                 "@RegistryBypass[Registry Bypass|Bypass registry calls and store game settings in the mod loader configuration file];"
                 "RegistryBypass/Enabled[Enable Registry Bypass|Enable the registry bypass mechanism]:bool=1;"
                 "RegistryBypass/ManagedValues[Registry Values|Key-value map for game settings, reset to clear settings]:string=;"
+
                 "@GUI[GUI|Configure in-game GUI settings];"
                 "GUI/GuiEnabled[GUI Enabled|Enable the GUI]:bool=1;"
                 "GUI/ShowWindows[Show Windows|Show or hide windows]:bool=1;"
@@ -58,22 +63,26 @@ BEGIN
                 "GUI/MinimapZoom[Minimap Zoom|Zoom level for the minimap]:float=1;"
                 "GUI/MinimapAutoRotate[Minimap Auto Rotate|Rotate the minimap to match the camera]:bool=1;"
                 "GUI/MinimapStyle[Minimap Style|Shape of the minimap]:enum[Circle|Square]=0;"
+
                 "@Logging[Logging|Configure logging settings];"
                 "Logging/Info[Info Logging|Show info logs]:bool=1;"
                 "Logging/Debug[Debug Logging|Show debug logs]:bool=0;"
                 "Logging/Warning[Warning Logging|Show warning logs]:bool=1;"
                 "Logging/Error[Error Logging|Show error logs]:bool=1;"
+
                 "@Toasts[Toast Notifications|Configure toast notification settings];"
                 "Toasts/Info[Info Toasts|Enable info toasts]:bool=1;"
                 "Toasts/Debug[Debug Toasts|Enable debug toasts]:bool=0;"
                 "Toasts/Warning[Warning Toasts|Enable warning toasts]:bool=1;"
                 "Toasts/Error[Error Toasts|Enable error toasts]:bool=1;"
+
                 "@Cheats[Cheats|Enable or disable cheats];"
                 "Cheats/DebugMenu[Debug Menu|Enable debug menu]:bool=0;"
                 "Cheats/PositionBar[Position Bar|Enable position bar]:bool=0;"
                 "Cheats/Invulnerability[Invulnerability|Enable invulnerability cheat]:bool=0;"
                 "Cheats/BonusCrystals[Bonus Crystals|Enable bonus crystals cheat]:bool=0;"
                 "Cheats/MusicSelect[Music Select|Enable music selection cheat]:bool=0;"
+
                 "@Input[Modern Input|Enable and configure input enhancements];"
                 "Input/Enabled[Enabled|Enable input enhancements]:bool=1;"
                 "Input/Backend[Backend|The input backend to use]:enum[XInput|SDL3]=1;"
@@ -87,19 +96,20 @@ BEGIN
                 "Input/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=2;"
                 "Input/DpadMovement[Dpad Movement|Allow for player movement with the directional pad]:bool=1;"
                 "Input/MidAirTurning[Mid Air Turning|Turn mid air in Type 2 controls with the side step buttons, akin to Croc 1]:bool=1;"
+
                 "@InputControls[Input Controls|Configure action controls];"
                 "InputControls/RemapActionButtons[Remap Action Buttons|Remap game action controls]:bool=1;"
-                "InputControls/Movement[Movement|Movement controls]:enum[Left Analog|Right Analog]=0;"
-                "InputControls/Camera[Camera|Camera controls]:enum[Left Analog|Right Analog]=1;"
-                                        "InputControls/Jump[Jump|Jump controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=0;"
-                                  "InputControls/Attack[Attack|Attack controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=2;"
-                "InputControls/CameraFlip[Camera / Flip|Camera / flip controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=1;"
-                             "InputControls/ItemUse[Item Use|Item use controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=3;"
-                  "InputControls/ItemPrev[Item Previous|Previous item controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=8;"
-                          "InputControls/ItemNext[Item Next|Next item controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=9;"
-                          "InputControls/StepLeft[Step Left|Step left controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=6;"
-                       "InputControls/StepRight[Step Right|Step right controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=7;"
-                                     "InputControls/Pause[Pause|Pause controls]:enum[A / Cross|B / Circle|X / Square|Y / Triangle|Start|Select|LB / L1|RB / R1|LT / L2|RT / R2|LS / L3|RS / R3|Dpad Up|Dpad Down|Dpad Left|Dpad Right]=4"
+                "InputControls/Movement[Movement|Movement controls]:" INPUT_ANALOGS "=0;"
+                "InputControls/Camera[Camera|Camera controls]:" INPUT_ANALOGS "=1;"
+                "InputControls/Jump[Jump|Jump controls]:" INPUT_BUTTONS "=0;"
+                "InputControls/Attack[Attack|Attack controls]:" INPUT_BUTTONS "=2;"
+                "InputControls/CameraFlip[Camera / Flip|Camera / flip controls]:" INPUT_BUTTONS "=1;"
+                "InputControls/ItemUse[Item Use|Item use controls]:" INPUT_BUTTONS "=3;"
+                "InputControls/ItemPrev[Item Previous|Previous item controls]:" INPUT_BUTTONS "=8;"
+                "InputControls/ItemNext[Item Next|Next item controls]:" INPUT_BUTTONS "=9;"
+                "InputControls/StepLeft[Step Left|Step left controls]:" INPUT_BUTTONS "=6;"
+                "InputControls/StepRight[Step Right|Step right controls]:" INPUT_BUTTONS "=7;"
+                "InputControls/Pause[Pause|Pause controls]:" INPUT_BUTTONS "=4"
         END
     END
     BLOCK "VarFileInfo"

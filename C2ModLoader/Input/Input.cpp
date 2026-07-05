@@ -4,6 +4,7 @@
 #include "Input/Controls.h"
 #include "Input/DpadMovement.h"
 #include "Input/MidAirTurning.h"
+#include "Input/RemapActionButtons.h"
 #include "Input/TypeSwitching.h"
 #include "Input/Vibration.h"
 
@@ -62,6 +63,7 @@ void Setup() {
 	TypeSwitching::Setup();
 	DpadMovement::Setup();
 	MidAirTurning::Setup();
+	RemapActionButtons::Setup();
 }
 
 } // namespace Input

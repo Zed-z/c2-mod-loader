@@ -66,6 +66,7 @@ set(SOURCES
     Input/DpadMovement.cpp
     Input/Input.cpp
     Input/MidAirTurning.cpp
+    Input/RemapActionButtons.cpp
     Input/TypeSwitching.cpp
     Input/Vibration.cpp
     Launcher/Backend.cpp
