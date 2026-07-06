@@ -25,7 +25,7 @@ bool guiEnabled;
 bool showWindows;
 
 void Setup(HMODULE hModule) {
-	guiEnabled = api->SetupIniBool(L"GUI", L"GuiEnabled", true);
+	guiEnabled = api->SetupIniBool(L"Config", L"GuiEnabled", true);
 	showWindows = api->SetupIniBool(L"GUI", L"ShowWindows", true);
 
 	Overlay::Coords::Setup();
@@ -38,7 +38,7 @@ void Setup(HMODULE hModule) {
 	Overlay::Toast::Setup();
 	Overlay::CameraStack::Setup();
 	Overlay::Minimap::Setup();
-	
+
 	if (guiEnabled) {
 		CreateThread(nullptr, 0, Overlay::Backend::OverlayInitThread, hModule, 0, nullptr);
 	}

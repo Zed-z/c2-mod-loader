@@ -352,6 +352,12 @@ std::vector<ConfigSectionView> BuildConfigSections(const ParsedConfig &parsedCon
 			continue;
 		}
 
+		const std::string hintKey = entries[i].section + "/" + entries[i].key;
+		const auto hintIt = parsedConfig.hints.lookup.find(hintKey);
+		if (hintIt != parsedConfig.hints.lookup.end() && hintIt->second.hidden) {
+			continue;
+		}
+
 		ConfigSectionKey key = entries[i].section.empty() ? "Uncategorized" : entries[i].section;
 		ConfigSection sectionInfo;
 		const auto sectionIt = parsedConfig.sections.lookup.find(key);
@@ -439,7 +445,12 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 
 					ImGui::SetNextItemWidth(-FLT_MIN);
 
-					ImGui::Spacing();
+					if (!description.empty()) {
+						ImGui::Spacing();
+						ImGui::Spacing();
+						ImGui::Spacing();
+						ImGui::Spacing();
+					}
 
 					if (type == "bool") {
 						bool val = (entry.value == "1" || _stricmp(entry.value.c_str(), "true") == 0);
@@ -508,7 +519,14 @@ void RenderConfigSections(const std::vector<ConfigSectionView> &sections) {
 
 					ImGui::TableSetColumnIndex(2);
 					if (hintIt != parsedConfig.hints.lookup.end()) {
-						ImGui::Spacing();
+
+						if (!description.empty()) {
+							ImGui::Spacing();
+							ImGui::Spacing();
+							ImGui::Spacing();
+							ImGui::Spacing();
+						}
+
 						ImGui::BeginDisabled(IsConfigValueDefault(entry, hintIt->second));
 						if (ImGui::Button("Reset##reset")) {
 							entry.value = hintIt->second.defaultValue;
