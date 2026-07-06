@@ -20,7 +20,7 @@ float vibrationStrength;
 void __stdcall PreDamage() {
 	if (vibrationEnabled) {
 		int strength = (int)(vibrationStrength * 65535);
-		Input::inputBackend->vibrate(strength, 200);
+		Input::controllerBackend->vibrate(strength, 200);
 	}
 }
 

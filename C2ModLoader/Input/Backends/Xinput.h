@@ -4,7 +4,7 @@
 
 namespace Input::Backends::Xinput {
 
-class Backend : public IInputBackend {
+class Backend : public IControllerBackend {
   public:
 	void PollInput() override;
 	ModernInput GetState() override;

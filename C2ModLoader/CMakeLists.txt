@@ -61,6 +61,7 @@ set(SOURCES
     GameHooks.cpp
     Input/AnalogInput.cpp
     Input/Backends/SDL3.cpp
+    Input/Backends/Win32.cpp
     Input/Backends/Xinput.cpp
     Input/Controls.cpp
     Input/DpadMovement.cpp

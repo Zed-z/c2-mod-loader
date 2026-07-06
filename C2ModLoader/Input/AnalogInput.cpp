@@ -10,14 +10,14 @@ namespace {
 
 void PatchAnalogInput() {
 	uintptr_t ptrX, ptrY;
-	switch (Input::Controls::movement) {
+	switch (Input::Controls::config.movement) {
 	case Input::Controls::ControlAnalog::LeftStick:
-		ptrX = (uintptr_t)&(Input::inputBackend->input.leftStick.x);
-		ptrY = (uintptr_t)&(Input::inputBackend->input.leftStick.y);
+		ptrX = (uintptr_t)&(Input::controllerBackend->input.leftStick.x);
+		ptrY = (uintptr_t)&(Input::controllerBackend->input.leftStick.y);
 		break;
 	case Input::Controls::ControlAnalog::RightStick:
-		ptrX = (uintptr_t)&(Input::inputBackend->input.rightStick.x);
-		ptrY = (uintptr_t)&(Input::inputBackend->input.rightStick.y);
+		ptrX = (uintptr_t)&(Input::controllerBackend->input.rightStick.x);
+		ptrY = (uintptr_t)&(Input::controllerBackend->input.rightStick.y);
 		break;
 	}
 

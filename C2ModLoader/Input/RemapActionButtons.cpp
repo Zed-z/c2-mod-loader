@@ -69,59 +69,63 @@ bool getButtonPressed(const ModernInput &input, Input::Controls::ControlButton b
 	}
 }
 
+bool getKeyboardKeyPressed(const std::string &keyName) {
+	return Input::keyboardBackend->getKey(keyName);
+}
+
 void __stdcall remapMenuButtons() {
 	ModernInput input = Input::GetState();
 
-	if (input.dpad.up || getAnalogStickY(input, Input::Controls::movement) < 0) {
+	if (input.dpad.up || getAnalogStickY(input, Input::Controls::config.movement) < 0) {
 		*realPad |= 16;
 		*playerPad |= 16;
 	}
-	if (input.dpad.right || getAnalogStickX(input, Input::Controls::movement) > 0) {
+	if (input.dpad.right || getAnalogStickX(input, Input::Controls::config.movement) > 0) {
 		*realPad |= 32;
 		*playerPad |= 32;
 	}
-	if (input.dpad.down || getAnalogStickY(input, Input::Controls::movement) > 0) {
+	if (input.dpad.down || getAnalogStickY(input, Input::Controls::config.movement) > 0) {
 		*realPad |= 64;
 		*playerPad |= 64;
 	}
-	if (input.dpad.left || getAnalogStickX(input, Input::Controls::movement) < 0) {
+	if (input.dpad.left || getAnalogStickX(input, Input::Controls::config.movement) < 0) {
 		*realPad |= 128;
 		*playerPad |= 128;
 	}
 
-	if (getButtonPressed(input, Input::Controls::jump)) {
+	if (getButtonPressed(input, Input::Controls::config.jump)) {
 		*realPad |= 16384;
 		*playerPad |= 16384;
 	}
-	if (getButtonPressed(input, Input::Controls::attack)) {
+	if (getButtonPressed(input, Input::Controls::config.attack)) {
 		*realPad |= 32768;
 		*playerPad |= 32768;
 	}
-	if (getButtonPressed(input, Input::Controls::cameraFlip)) {
+	if (getButtonPressed(input, Input::Controls::config.cameraFlip)) {
 		*realPad |= 8192;
 		*playerPad |= 8192;
 	}
-	if (getButtonPressed(input, Input::Controls::itemUse)) {
+	if (getButtonPressed(input, Input::Controls::config.itemUse)) {
 		*realPad |= 4096;
 		*playerPad |= 4096;
 	}
-	if (getButtonPressed(input, Input::Controls::stepLeft)) {
+	if (getButtonPressed(input, Input::Controls::config.stepLeft)) {
 		*realPad |= 1024;
 		*playerPad |= 1024;
 	}
-	if (getButtonPressed(input, Input::Controls::stepRight)) {
+	if (getButtonPressed(input, Input::Controls::config.stepRight)) {
 		*realPad |= 2048;
 		*playerPad |= 2048;
 	}
-	if (getButtonPressed(input, Input::Controls::itemPrev)) {
+	if (getButtonPressed(input, Input::Controls::config.itemPrev)) {
 		*realPad |= 256;
 		*playerPad |= 256;
 	}
-	if (getButtonPressed(input, Input::Controls::itemNext)) {
+	if (getButtonPressed(input, Input::Controls::config.itemNext)) {
 		*realPad |= 512;
 		*playerPad |= 512;
 	}
-	if (getButtonPressed(input, Input::Controls::pause)) {
+	if (getButtonPressed(input, Input::Controls::config.pause)) {
 		*realPad |= 8;
 		*playerPad |= 8;
 	}
@@ -133,37 +137,27 @@ void __stdcall remapGameplayButtons() {
 
 	input_builder = 0;
 
-	if (getButtonPressed(input, Input::Controls::pause)) {
+	if (getButtonPressed(input, Input::Controls::config.pause) || getKeyboardKeyPressed(Input::Controls::config.keyPause))
 		input_builder |= 8;
-	}
 
-	if (getButtonPressed(input, Input::Controls::jump)) {
+	if (getButtonPressed(input, Input::Controls::config.jump) || getKeyboardKeyPressed(Input::Controls::config.keyJump))
 		input_builder |= 16384;
-	}
-	if (getButtonPressed(input, Input::Controls::attack)) {
+	if (getButtonPressed(input, Input::Controls::config.attack) || getKeyboardKeyPressed(Input::Controls::config.keyAttack))
 		input_builder |= 32768;
-	}
 
-	if (getButtonPressed(input, Input::Controls::stepLeft)) {
+	if (getButtonPressed(input, Input::Controls::config.stepLeft) || getKeyboardKeyPressed(Input::Controls::config.keyStepLeft))
 		input_builder |= 1024;
-	}
-	if (getButtonPressed(input, Input::Controls::stepRight)) {
+	if (getButtonPressed(input, Input::Controls::config.stepRight) || getKeyboardKeyPressed(Input::Controls::config.keyStepRight))
 		input_builder |= 2048;
-	}
-
-	if (getButtonPressed(input, Input::Controls::cameraFlip)) {
+	if (getButtonPressed(input, Input::Controls::config.cameraFlip) || getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip))
 		input_builder |= 8192;
-	}
 
-	if (getButtonPressed(input, Input::Controls::itemPrev)) {
+	if (getButtonPressed(input, Input::Controls::config.itemPrev) || getKeyboardKeyPressed(Input::Controls::config.keyItemPrev))
 		input_builder |= 256;
-	}
-	if (getButtonPressed(input, Input::Controls::itemNext)) {
+	if (getButtonPressed(input, Input::Controls::config.itemNext) || getKeyboardKeyPressed(Input::Controls::config.keyItemNext))
 		input_builder |= 512;
-	}
-	if (getButtonPressed(input, Input::Controls::itemUse)) {
+	if (getButtonPressed(input, Input::Controls::config.itemUse) || getKeyboardKeyPressed(Input::Controls::config.keyItemUse))
 		input_builder |= 4096;
-	}
 }
 
 void Patch() {
@@ -466,7 +460,7 @@ void Setup() {
 	if (!enabled)
 		return;
 
-		Patch();
+	Patch();
 }
 
 } // namespace Input::RemapActionButtons

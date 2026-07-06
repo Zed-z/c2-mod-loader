@@ -4,7 +4,7 @@
 
 namespace Input::Backends::SDL3 {
 
-class Backend : public IInputBackend {
+class Backend : public IControllerBackend {
   public:
 	void PollInput() override;
 	ModernInput GetState() override;

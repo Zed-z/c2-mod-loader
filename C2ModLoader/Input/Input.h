@@ -2,11 +2,13 @@
 
 #include "ModApi.h"
 
+#include <string>
+
 namespace Input {
 
 extern bool enabled;
 
-interface IInputBackend {
+interface IControllerBackend {
 	ModernInput input;
 	virtual void PollInput() = 0;
 	virtual ModernInput GetState() = 0;
@@ -14,7 +16,13 @@ interface IInputBackend {
 	virtual void vibrate(int strength, int durationMs) = 0;
 };
 
-extern IInputBackend *inputBackend;
+interface IKeyboardBackend {
+	virtual void Setup() = 0;
+	virtual bool getKey(const std::string &keyName) = 0;
+};
+
+extern IControllerBackend *controllerBackend;
+extern IKeyboardBackend *keyboardBackend;
 
 ModernInput GetState();
 void Setup();

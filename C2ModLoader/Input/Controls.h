@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace Input::Controls {
 
 enum class ControlAnalog {
@@ -26,17 +28,38 @@ enum class ControlButton {
 	DpadRight,
 };
 
-extern ControlAnalog movement;
-extern ControlAnalog camera;
-extern ControlButton jump;
-extern ControlButton attack;
-extern ControlButton cameraFlip;
-extern ControlButton itemUse;
-extern ControlButton itemPrev;
-extern ControlButton itemNext;
-extern ControlButton stepLeft;
-extern ControlButton stepRight;
-extern ControlButton pause;
+struct ControlsConfig {
+	ControlAnalog movement;
+	ControlAnalog camera;
+	ControlButton jump;
+	ControlButton attack;
+	ControlButton cameraFlip;
+	ControlButton itemUse;
+	ControlButton itemPrev;
+	ControlButton itemNext;
+	ControlButton stepLeft;
+	ControlButton stepRight;
+	ControlButton pause;
+	std::string keyMoveUp;
+	std::string keyMoveDown;
+	std::string keyMoveLeft;
+	std::string keyMoveRight;
+	std::string keyCameraUp;
+	std::string keyCameraDown;
+	std::string keyCameraLeft;
+	std::string keyCameraRight;
+	std::string keyJump;
+	std::string keyAttack;
+	std::string keyCameraFlip;
+	std::string keyItemUse;
+	std::string keyItemPrev;
+	std::string keyItemNext;
+	std::string keyStepLeft;
+	std::string keyStepRight;
+	std::string keyPause;
+};
+
+extern ControlsConfig config;
 
 void Setup();
 
