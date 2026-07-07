@@ -152,6 +152,12 @@ void Backend::PollInput() {
 	input.config.enabled = Input::enabled;
 	input.config.stickScale = stickScale;
 	input.config.triggerScale = triggerScale;
+
+	if (doorStruct && *doorStruct) {
+		ColorBGRA32 bg = (*doorStruct)->BackColor;
+		SDL_SetGamepadLED(activeGamepad, bg.r, bg.g, bg.b);
+		// api->LogDebug((std::string("Gamepad color: R=") + std::to_string(bg.r) + " G=" + std::to_string(bg.g) + " B=" + std::to_string(bg.b)).c_str());
+	}
 }
 
 ModernInput Backend::GetState() {
