@@ -8,156 +8,95 @@ extern ModApi *api;
 
 namespace {
 
-int getAnalogStickX(const ModernInput &input, Input::Controls::ControlAnalog analog) {
-	switch (analog) {
-	case Input::Controls::ControlAnalog::LeftStick:
-		return input.leftStick.x;
-	case Input::Controls::ControlAnalog::RightStick:
-		return input.rightStick.x;
-	default:
-		return 0;
-	}
-}
-
-int getAnalogStickY(const ModernInput &input, Input::Controls::ControlAnalog analog) {
-	switch (analog) {
-	case Input::Controls::ControlAnalog::LeftStick:
-		return input.leftStick.y;
-	case Input::Controls::ControlAnalog::RightStick:
-		return input.rightStick.y;
-	default:
-		return 0;
-	}
-}
-
-bool getButtonPressed(const ModernInput &input, Input::Controls::ControlButton button) {
-	switch (button) {
-	case Input::Controls::ControlButton::A:
-		return input.aButton;
-	case Input::Controls::ControlButton::B:
-		return input.bButton;
-	case Input::Controls::ControlButton::X:
-		return input.xButton;
-	case Input::Controls::ControlButton::Y:
-		return input.yButton;
-	case Input::Controls::ControlButton::LB:
-		return input.leftShoulder;
-	case Input::Controls::ControlButton::RB:
-		return input.rightShoulder;
-	case Input::Controls::ControlButton::LT:
-		return input.leftTrigger > 0.5f;
-	case Input::Controls::ControlButton::RT:
-		return input.rightTrigger > 0.5f;
-	case Input::Controls::ControlButton::Start:
-		return input.startButton;
-	case Input::Controls::ControlButton::Select:
-		return input.backButton;
-	case Input::Controls::ControlButton::DpadUp:
-		return input.dpad.up;
-	case Input::Controls::ControlButton::DpadDown:
-		return input.dpad.down;
-	case Input::Controls::ControlButton::DpadLeft:
-		return input.dpad.left;
-	case Input::Controls::ControlButton::DpadRight:
-		return input.dpad.right;
-	case Input::Controls::ControlButton::LS:
-		return input.leftStick.click;
-	case Input::Controls::ControlButton::RS:
-		return input.rightStick.click;
-	default:
-		return false;
-	}
-}
-
-bool getKeyboardKeyPressed(const std::string &keyName) {
-	return Input::keyboardBackend->getKey(keyName);
-}
-
 void __stdcall remapMenuButtons() {
 	ModernInput input = Input::GetState();
 
-	if (input.dpad.up || getAnalogStickY(input, Input::Controls::config.movement) < 0) {
-		*realPad |= 16;
-		*playerPad |= 16;
+	if (input.dpad.up || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
+		*realPad |= INPUT_UP;
+		*playerPad |= INPUT_UP;
 	}
-	if (input.dpad.right || getAnalogStickX(input, Input::Controls::config.movement) > 0) {
-		*realPad |= 32;
-		*playerPad |= 32;
+	if (input.dpad.right || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
+		*realPad |= INPUT_RIGHT;
+		*playerPad |= INPUT_RIGHT;
 	}
-	if (input.dpad.down || getAnalogStickY(input, Input::Controls::config.movement) > 0) {
-		*realPad |= 64;
-		*playerPad |= 64;
+	if (input.dpad.down || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
+		*realPad |= INPUT_DOWN;
+		*playerPad |= INPUT_DOWN;
 	}
-	if (input.dpad.left || getAnalogStickX(input, Input::Controls::config.movement) < 0) {
-		*realPad |= 128;
-		*playerPad |= 128;
+	if (input.dpad.left || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
+		*realPad |= INPUT_LEFT;
+		*playerPad |= INPUT_LEFT;
 	}
 
-	if (getButtonPressed(input, Input::Controls::config.jump)) {
-		*realPad |= 16384;
-		*playerPad |= 16384;
+	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump)) {
+		*realPad |= INPUT_JUMP;
+		*playerPad |= INPUT_JUMP;
 	}
-	if (getButtonPressed(input, Input::Controls::config.attack)) {
-		*realPad |= 32768;
-		*playerPad |= 32768;
+	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack)) {
+		*realPad |= INPUT_ATTACK;
+		*playerPad |= INPUT_ATTACK;
 	}
-	if (getButtonPressed(input, Input::Controls::config.cameraFlip)) {
-		*realPad |= 8192;
-		*playerPad |= 8192;
+	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip)) {
+		*realPad |= INPUT_FLIP;
+		*playerPad |= INPUT_FLIP;
 	}
-	if (getButtonPressed(input, Input::Controls::config.itemUse)) {
-		*realPad |= 4096;
-		*playerPad |= 4096;
+	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse)) {
+		*realPad |= INPUT_INV_USE;
+		*playerPad |= INPUT_INV_USE;
 	}
-	if (getButtonPressed(input, Input::Controls::config.stepLeft)) {
-		*realPad |= 1024;
-		*playerPad |= 1024;
+	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft)) {
+		*realPad |= INPUT_STEP_LEFT;
+		*playerPad |= INPUT_STEP_LEFT;
 	}
-	if (getButtonPressed(input, Input::Controls::config.stepRight)) {
-		*realPad |= 2048;
-		*playerPad |= 2048;
+	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight)) {
+		*realPad |= INPUT_STEP_RIGHT;
+		*playerPad |= INPUT_STEP_RIGHT;
 	}
-	if (getButtonPressed(input, Input::Controls::config.itemPrev)) {
-		*realPad |= 256;
-		*playerPad |= 256;
+	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev)) {
+		*realPad |= INPUT_INV_LEFT;
+		*playerPad |= INPUT_INV_LEFT;
 	}
-	if (getButtonPressed(input, Input::Controls::config.itemNext)) {
-		*realPad |= 512;
-		*playerPad |= 512;
+	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext)) {
+		*realPad |= INPUT_INV_RIGHT;
+		*playerPad |= INPUT_INV_RIGHT;
 	}
-	if (getButtonPressed(input, Input::Controls::config.pause)) {
-		*realPad |= 8;
-		*playerPad |= 8;
+	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause)) {
+		*realPad |= INPUT_PAUSE;
+		*playerPad |= INPUT_PAUSE;
 	}
+
+	*realPadPush = *realPad & ~*realPadOld;
+	*realPadOld = *realPad;
+
+	*playerPadPush = *playerPad & ~*playerPadOld;
+	*playerPadOld = *playerPad;
 }
 
 uint32_t input_builder = 0;
 void __stdcall remapGameplayButtons() {
-	ModernInput input = Input::GetState();
-
 	input_builder = 0;
 
-	if (getButtonPressed(input, Input::Controls::config.pause) || getKeyboardKeyPressed(Input::Controls::config.keyPause))
-		input_builder |= 8;
+	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause))
+		input_builder |= INPUT_PAUSE;
 
-	if (getButtonPressed(input, Input::Controls::config.jump) || getKeyboardKeyPressed(Input::Controls::config.keyJump))
-		input_builder |= 16384;
-	if (getButtonPressed(input, Input::Controls::config.attack) || getKeyboardKeyPressed(Input::Controls::config.keyAttack))
-		input_builder |= 32768;
+	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump))
+		input_builder |= INPUT_JUMP;
+	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack))
+		input_builder |= INPUT_ATTACK;
 
-	if (getButtonPressed(input, Input::Controls::config.stepLeft) || getKeyboardKeyPressed(Input::Controls::config.keyStepLeft))
-		input_builder |= 1024;
-	if (getButtonPressed(input, Input::Controls::config.stepRight) || getKeyboardKeyPressed(Input::Controls::config.keyStepRight))
-		input_builder |= 2048;
-	if (getButtonPressed(input, Input::Controls::config.cameraFlip) || getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip))
-		input_builder |= 8192;
+	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft))
+		input_builder |= INPUT_STEP_LEFT;
+	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight))
+		input_builder |= INPUT_STEP_RIGHT;
+	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip))
+		input_builder |= INPUT_FLIP;
 
-	if (getButtonPressed(input, Input::Controls::config.itemPrev) || getKeyboardKeyPressed(Input::Controls::config.keyItemPrev))
-		input_builder |= 256;
-	if (getButtonPressed(input, Input::Controls::config.itemNext) || getKeyboardKeyPressed(Input::Controls::config.keyItemNext))
-		input_builder |= 512;
-	if (getButtonPressed(input, Input::Controls::config.itemUse) || getKeyboardKeyPressed(Input::Controls::config.keyItemUse))
-		input_builder |= 4096;
+	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev))
+		input_builder |= INPUT_INV_LEFT;
+	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext))
+		input_builder |= INPUT_INV_RIGHT;
+	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse))
+		input_builder |= INPUT_INV_USE;
 }
 
 void Patch() {

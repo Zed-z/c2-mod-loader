@@ -346,6 +346,24 @@ constexpr const char *gameStateNames[] = {
 typedef void (*GotoLevelFunction)(int tribe, int level, int map, WadFileType type);
 typedef void (*GotoLevelSelectFunction)();
 
+#define INPUT_PAUSE 8
+#define INPUT_UP 16
+#define INPUT_RIGHT 32
+#define INPUT_DOWN 64
+#define INPUT_LEFT 128
+#define INPUT_INV_LEFT 256
+#define INPUT_INV_RIGHT 512
+#define INPUT_STEP_LEFT 1024
+#define INPUT_STEP_RIGHT 2048
+#define INPUT_INV_USE 4096
+#define INPUT_FLIP 8192
+#define INPUT_JUMP 16384
+#define INPUT_ATTACK 32768
+#define INPUT_EFFECTIVE_UP 65536
+#define INPUT_EFFECTIVE_DOWN 131072
+#define INPUT_EFFECTIVE_LEFT 262144
+#define INPUT_EFFECTIVE_RIGHT 524288
+
 struct Inputs {
 	uint32_t raw;
 

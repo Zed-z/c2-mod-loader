@@ -14,6 +14,7 @@ ControlsConfig config;
 void Setup() {
 	config.movement = (ControlAnalog)api->SetupIniInt(L"InputControls", L"Movement", static_cast<int>(ControlAnalog::LeftStick));
 	config.camera = (ControlAnalog)api->SetupIniInt(L"InputControls", L"Camera", static_cast<int>(ControlAnalog::RightStick));
+	config.cameraZoom = (ControlButton)api->SetupIniInt(L"InputControls", L"CameraZoom", static_cast<int>(ControlButton::RS));
 	config.jump = (ControlButton)api->SetupIniInt(L"InputControls", L"Jump", static_cast<int>(ControlButton::A));
 	config.attack = (ControlButton)api->SetupIniInt(L"InputControls", L"Attack", static_cast<int>(ControlButton::B));
 	config.cameraFlip = (ControlButton)api->SetupIniInt(L"InputControls", L"CameraFlip", static_cast<int>(ControlButton::X));
@@ -43,6 +44,8 @@ void Setup() {
 	config.keyCameraLeft = WStringToString(keyString);
 	api->SetupIniString(L"InputControls", L"KeyCameraRight", L"", keyString, keyLength);
 	config.keyCameraRight = WStringToString(keyString);
+	api->SetupIniString(L"InputControls", L"KeyCameraZoom", L"", keyString, keyLength);
+	config.keyCameraZoom = WStringToString(keyString);
 	api->SetupIniString(L"InputControls", L"KeyJump", L"", keyString, keyLength);
 	config.keyJump = WStringToString(keyString);
 	api->SetupIniString(L"InputControls", L"KeyAttack", L"", keyString, keyLength);

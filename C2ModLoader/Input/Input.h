@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Input/Controls.h"
 #include "ModApi.h"
 
 #include <string>
@@ -26,5 +27,10 @@ extern IKeyboardBackend *keyboardBackend;
 
 ModernInput GetState();
 void Setup();
+
+int getAnalogStickX(Input::Controls::ControlAnalog analog);
+int getAnalogStickY(Input::Controls::ControlAnalog analog);
+bool getButtonPressed(Input::Controls::ControlButton button);
+bool getKeyboardKeyPressed(const std::string &keyName);
 
 } // namespace Input

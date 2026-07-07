@@ -31,6 +31,7 @@ enum class ControlButton {
 struct ControlsConfig {
 	ControlAnalog movement;
 	ControlAnalog camera;
+	ControlButton cameraZoom;
 	ControlButton jump;
 	ControlButton attack;
 	ControlButton cameraFlip;
@@ -48,6 +49,7 @@ struct ControlsConfig {
 	std::string keyCameraDown;
 	std::string keyCameraLeft;
 	std::string keyCameraRight;
+	std::string keyCameraZoom;
 	std::string keyJump;
 	std::string keyAttack;
 	std::string keyCameraFlip;

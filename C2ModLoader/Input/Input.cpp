@@ -81,4 +81,72 @@ void Setup() {
 	RemapActionButtons::Setup();
 }
 
+int getAnalogStickX(Input::Controls::ControlAnalog analog) {
+	ModernInput input = Input::GetState();
+	switch (analog) {
+	case Input::Controls::ControlAnalog::LeftStick:
+		return input.leftStick.x;
+	case Input::Controls::ControlAnalog::RightStick:
+		return input.rightStick.x;
+	default:
+		return 0;
+	}
+}
+
+int getAnalogStickY(Input::Controls::ControlAnalog analog) {
+	ModernInput input = Input::GetState();
+	switch (analog) {
+	case Input::Controls::ControlAnalog::LeftStick:
+		return input.leftStick.y;
+	case Input::Controls::ControlAnalog::RightStick:
+		return input.rightStick.y;
+	default:
+		return 0;
+	}
+}
+
+bool getButtonPressed(Input::Controls::ControlButton button) {
+	ModernInput input = Input::GetState();
+	switch (button) {
+	case Input::Controls::ControlButton::A:
+		return input.aButton;
+	case Input::Controls::ControlButton::B:
+		return input.bButton;
+	case Input::Controls::ControlButton::X:
+		return input.xButton;
+	case Input::Controls::ControlButton::Y:
+		return input.yButton;
+	case Input::Controls::ControlButton::LB:
+		return input.leftShoulder;
+	case Input::Controls::ControlButton::RB:
+		return input.rightShoulder;
+	case Input::Controls::ControlButton::LT:
+		return input.leftTrigger > 0.5f;
+	case Input::Controls::ControlButton::RT:
+		return input.rightTrigger > 0.5f;
+	case Input::Controls::ControlButton::Start:
+		return input.startButton;
+	case Input::Controls::ControlButton::Select:
+		return input.backButton;
+	case Input::Controls::ControlButton::DpadUp:
+		return input.dpad.up;
+	case Input::Controls::ControlButton::DpadDown:
+		return input.dpad.down;
+	case Input::Controls::ControlButton::DpadLeft:
+		return input.dpad.left;
+	case Input::Controls::ControlButton::DpadRight:
+		return input.dpad.right;
+	case Input::Controls::ControlButton::LS:
+		return input.leftStick.click;
+	case Input::Controls::ControlButton::RS:
+		return input.rightStick.click;
+	default:
+		return false;
+	}
+}
+
+bool getKeyboardKeyPressed(const std::string &keyName) {
+	return Input::keyboardBackend->getKey(keyName);
+}
+
 } // namespace Input

@@ -539,29 +539,29 @@ Inputs GetInputsRaw(uintptr_t address) {
 	Inputs result;
 	result.raw = input;
 
-	result.pause = input & 8;
+	result.pause = input & INPUT_PAUSE;
 
-	result.up = input & 16;
-	result.right = input & 32;
-	result.down = input & 64;
-	result.left = input & 128;
+	result.up = input & INPUT_UP;
+	result.right = input & INPUT_RIGHT;
+	result.down = input & INPUT_DOWN;
+	result.left = input & INPUT_LEFT;
 
-	result.invLeft = input & 256;
-	result.invRight = input & 512;
+	result.invLeft = input & INPUT_INV_LEFT;
+	result.invRight = input & INPUT_INV_RIGHT;
 
-	result.stepLeft = input & 1024;
-	result.stepRight = input & 2048;
+	result.stepLeft = input & INPUT_STEP_LEFT;
+	result.stepRight = input & INPUT_STEP_RIGHT;
 
-	result.invUse = input & 4096;
-	result.flip = input & 8192;
+	result.invUse = input & INPUT_INV_USE;
+	result.flip = input & INPUT_FLIP;
 
-	result.jump = input & 16384;
-	result.attack = input & 32768;
+	result.jump = input & INPUT_JUMP;
+	result.attack = input & INPUT_ATTACK;
 
-	result.effectiveUp = input & 65536;
-	result.effectiveDown = input & 131072;
-	result.effectiveLeft = input & 262144;
-	result.effectiveRight = input & 524288;
+	result.effectiveUp = input & INPUT_EFFECTIVE_UP;
+	result.effectiveDown = input & INPUT_EFFECTIVE_DOWN;
+	result.effectiveLeft = input & INPUT_EFFECTIVE_LEFT;
+	result.effectiveRight = input & INPUT_EFFECTIVE_RIGHT;
 
 	return result;
 }
