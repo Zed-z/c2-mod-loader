@@ -1,10 +1,10 @@
 #pragma once
 
-namespace OrbitCamera {
+namespace Camera::OrbitCamera {
 
 void Setup();
 void SwitchIn();
 void SwitchOut();
 void Step();
 
-} // namespace OrbitCamera
+} // namespace Camera::OrbitCamera

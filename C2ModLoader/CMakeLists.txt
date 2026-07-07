@@ -54,6 +54,10 @@ file(WRITE "${GENERATED_EMBEDDED_LICENSES_HEADER}" "${GENERATED_EMBEDDED_LICENSE
 
 # Source files
 set(SOURCES
+    Camera/Camera.cpp
+    Camera/FreeCamera.cpp
+    Camera/OrbitCamera.cpp
+    Camera/Utils.cpp
     CheatsManager.cpp
     ConsoleLogging.cpp
     dllmain.cpp

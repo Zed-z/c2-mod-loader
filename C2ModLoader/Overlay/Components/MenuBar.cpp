@@ -1,5 +1,6 @@
 #include "MenuBar.h"
 
+#include "Camera/Camera.h"
 #include "CheatsManager.h"
 #include "Loader.h"
 #include "MenuActions.h"
@@ -144,6 +145,20 @@ void RenderMenuBar() {
 			}
 
 			ImGui::EndDisabled();
+
+			ImGui::EndMenu();
+		}
+
+		if (Camera::cameraEnabled && ImGui::BeginMenu("Camera")) {
+			anyMenuOpenThisFrame = true;
+
+			if (ImGui::MenuItem("Orbit Camera", nullptr, Camera::orbitCamera)) {
+				Camera::toggleOrbitCamera();
+			}
+
+			if (ImGui::MenuItem("Free Camera", nullptr, Camera::cameraMode == Camera::CameraMode::Freecam)) {
+				Camera::toggleFreecam();
+			}
 
 			ImGui::EndMenu();
 		}

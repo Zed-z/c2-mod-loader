@@ -1,5 +1,7 @@
 #pragma once
 
+namespace Camera::Utils {
+
 constexpr double PI = 3.14159265358979323846;
 
 double LerpAngle(double a, double b, double t);
@@ -7,3 +9,5 @@ double LerpAngle(double a, double b, double t);
 int RadiansToGameRotation(double radians_input);
 
 double GameRotationToRadians(int game_rotation);
+
+} // namespace Camera::Utils

@@ -1,10 +1,10 @@
 #pragma once
 
-namespace FreeCamera {
+namespace Camera::FreeCamera {
 
 void Setup();
 void SwitchIn();
 void SwitchOut();
 void Step();
 
-} // namespace FreeCamera
+} // namespace Camera::FreeCamera

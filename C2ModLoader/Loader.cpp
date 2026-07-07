@@ -1,5 +1,6 @@
 #include "Loader.h"
 
+#include "Camera/Camera.h"
 #include "GameHooks.h"
 #include "Input/Input.h"
 #include "Overlay/Overlay.h"
@@ -259,5 +260,6 @@ void LoadMods(std::vector<Mod> &mods) {
 void ApiSetup(HMODULE hModule) {
 	GameHooks::ApplyHooks();
 	Input::Setup();
+	Camera::Setup();
 	Overlay::Setup(hModule);
 }

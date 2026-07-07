@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include "Utils.h"
+#include "Camera/Utils.h"
+#include "Input/Controls.h"
+#include "Input/Input.h"
 
 #include "ModApi.h"
 extern ModApi *api;
@@ -26,7 +28,9 @@ double cameraPitch = 0;
 
 } // namespace
 
-namespace FreeCamera {
+namespace Camera::FreeCamera {
+
+using namespace Camera::Utils;
 
 void Setup() {
 	invertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
@@ -77,8 +81,6 @@ void SwitchOut() {
 void Step() {
 	// Inputs
 	Inputs inputs = api->GetInputs();
-	Inputs inputsPressed = api->GetInputsPressed();
-
 	ModernInput modernInput = api->GetModernInputState();
 	const bool modernInputEnabled = modernInput.config.enabled;
 	const float stickScale = modernInput.config.stickScale;
@@ -94,11 +96,26 @@ void Step() {
 	float input_x, input_y, input_z;
 	float input_rot_yaw, input_rot_pitch;
 	if (modernInputEnabled) {
-		input_x = -((float)modernInput.leftStick.x / stickScale);
-		input_z = ((float)modernInput.leftStick.y / stickScale);
-		input_y = ((float)modernInput.rightTrigger / triggerScale) - ((float)modernInput.leftTrigger / triggerScale);
-		input_rot_yaw = -((float)modernInput.rightStick.x / stickScale) * (invertX ? -1 : 1);
-		input_rot_pitch = -((float)modernInput.rightStick.y / stickScale) * (invertY ? -1 : 1);
+		input_x = min(max(
+						  -(Input::getAnalogStickX(Input::Controls::config.movement) / stickScale) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)),
+						  -1.0f),
+			1.0f);
+		input_z = min(max(
+						  (Input::getAnalogStickY(Input::Controls::config.movement) / stickScale) - ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)),
+						  -1.0f),
+			1.0f);
+		input_y = min(max(
+						  ((float)Input::getButtonPressed(Input::Controls::config.jump)) - ((float)Input::getButtonPressed(Input::Controls::config.attack)) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyJump) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack)),
+						  -1.0f),
+			1.0f);
+		input_rot_yaw = min(max(
+								-(Input::getAnalogStickX(Input::Controls::config.camera) / stickScale) * (invertX ? -1 : 1) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraRight) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraLeft)) * (invertX ? -1 : 1),
+								-1.0f),
+			1.0f);
+		input_rot_pitch = min(max(
+								  -(Input::getAnalogStickY(Input::Controls::config.camera) / stickScale) * (invertY ? -1 : 1) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraDown) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraUp)) * (invertY ? -1 : 1),
+								  -1.0f),
+			1.0f);
 	} else {
 		input_x = inputs.right - inputs.left;
 		input_z = -(inputs.down - inputs.up);
@@ -140,4 +157,4 @@ void Step() {
 	cameraRot->y = RadiansToGameRotation(-cameraYaw);
 }
 
-} // namespace FreeCamera
+} // namespace Camera::FreeCamera

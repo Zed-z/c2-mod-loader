@@ -1,6 +1,8 @@
 #include "OrbitCamera.h"
 
-#include "Utils.h"
+#include "Camera/Utils.h"
+#include "Input/Controls.h"
+#include "Input/Input.h"
 
 #include <algorithm>
 #include <cmath>
@@ -16,28 +18,23 @@ using std::cos, std::sin, std::min, std::max, std::atan2;
 
 namespace {
 
-bool orbitInvertX;
-bool orbitInvertY;
+using namespace Camera::Utils;
 
-bool orbitAutoTurnSaved;
-bool orbitAutoTurn;
-int orbitAutoTurnStrength;
-int orbitAutoTurnMinSpeed;
+bool invertX;
+bool invertY;
 
-enum ZoomControls {
-	ZOOM_NONE = 0,
-	ZOOM_TRIGGERS = 1,
-	ZOOM_RIGHT_STICK_CLICK = 2
-};
-ZoomControls orbitZoomControls = ZOOM_TRIGGERS;
+bool autoTurnSaved;
+bool autoTurn;
+int autoTurnStrength;
+int autoTurnMinSpeed;
 
-bool orbitDisableRestrictions;
+bool disableRestrictions;
 bool centerOnType2;
 bool centerOnType2Current;
-bool orbitVehicleRearViewCamera;
-bool orbitImprovedBossCamera;
-bool orbitButtonResetPitch;
-bool orbitButtonResetZoom;
+bool vehicleRearViewCamera;
+bool improvedBossCamera;
+bool buttonResetPitch;
+bool buttonResetZoom;
 
 const double CAMERA_ORBIT_Y_OFFSET = 800.0;
 
@@ -91,9 +88,9 @@ void __stdcall orbitCameraResetTransitions() {
 
 void __stdcall orbitCameraResetButton() {
 	orbitCameraResetYaw();
-	if (orbitButtonResetPitch)
+	if (buttonResetPitch)
 		orbitCameraResetPitch();
-	if (orbitButtonResetZoom)
+	if (buttonResetZoom)
 		orbitCameraResetDistance();
 }
 
@@ -113,7 +110,7 @@ void __stdcall deathChangeOrbitCameraReset() {
 }
 
 bool orbitCameraDisabled() {
-	if (orbitDisableRestrictions)
+	if (disableRestrictions)
 		return false;
 
 	LevelInfo currentLevel = api->GetLevelInfo();
@@ -137,7 +134,7 @@ bool orbitCameraDisabled() {
 		return true;
 	if (strcmp(croc->name, "DPPlane") == 0)
 		return true;
-	if (orbitVehicleRearViewCamera ? !api->GetInputs().flip : true) {
+	if (vehicleRearViewCamera ? !api->GetInputs().flip : true) {
 		bool isVehicle = strcmp(croc->name, "Croc In a Boat") == 0 || strcmp(croc->name, "Croc In a Car") == 0;
 		if (isVehicle)
 			return true;
@@ -178,11 +175,11 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 	if (strcmp(croc->name, "FlavioCroc") == 0) {
 		cameraDistanceCurrent = 6000.0;
 		cameraPitch = min(max(cameraPitch, 0.75), 0.9);
-		orbitAutoTurn = false;
+		autoTurn = false;
 	}
 
 	// Boss Cameras
-	if (orbitImprovedBossCamera) {
+	if (improvedBossCamera) {
 		// Dante
 		if (levelInfo->tribe == 4 && levelInfo->level == 2 && levelInfo->map == 1 && levelInfo->type == WAD_TYPE_BOSS && dialog != nullptr) {
 			StratEntity *dante = api->FindEntity("DFDante");
@@ -193,7 +190,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 						dante->newPosition.y - croc->newPosition.y,
 						dante->newPosition.z - croc->newPosition.z};
 					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
-					orbitAutoTurn = false;
+					autoTurn = false;
 				}
 			}
 		}
@@ -208,7 +205,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 						gooManChu->newPosition.y - croc->newPosition.y,
 						gooManChu->newPosition.z - croc->newPosition.z};
 					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
-					orbitAutoTurn = false;
+					autoTurn = false;
 				}
 			}
 		}
@@ -223,13 +220,13 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 					flavio->newPosition.y - croc->newPosition.y,
 					flavio->newPosition.z - croc->newPosition.z};
 				cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
-				orbitAutoTurn = false;
+				autoTurn = false;
 			}
 		}
 	}
 
 	// Vehicle rear view camera
-	if (orbitVehicleRearViewCamera) {
+	if (vehicleRearViewCamera) {
 		bool isVehicle = strcmp(croc->name, "Croc In a Boat") == 0 || strcmp(croc->name, "Croc In a Car") == 0;
 		if (isVehicle && api->GetInputs().flip) {
 			orbitCameraResetYaw();
@@ -252,28 +249,27 @@ Vec3i orbitLastCrocPos;
 
 } // namespace
 
-namespace OrbitCamera {
+namespace Camera::OrbitCamera {
+
+using namespace Camera::Utils;
 
 void Setup() {
-	orbitDisableRestrictions = api->SetupIniBool(L"OrbitCamera", L"DisableRestrictions", false);
+	disableRestrictions = api->SetupIniBool(L"OrbitCamera", L"DisableRestrictions", false);
 
 	centerOnType2 = api->SetupIniBool(L"OrbitCamera", L"CenterOnType2", true);
 	centerOnType2Current = centerOnType2;
 
-	orbitVehicleRearViewCamera = api->SetupIniBool(L"OrbitCamera", L"VehicleRearViewCamera", true);
-	orbitImprovedBossCamera = api->SetupIniBool(L"OrbitCamera", L"ImprovedBossCamera", true);
+	vehicleRearViewCamera = api->SetupIniBool(L"OrbitCamera", L"VehicleRearViewCamera", true);
+	improvedBossCamera = api->SetupIniBool(L"OrbitCamera", L"ImprovedBossCamera", true);
 
-	orbitButtonResetPitch = api->SetupIniBool(L"OrbitCamera", L"ButtonResetPitch", true);
-	orbitButtonResetZoom = api->SetupIniBool(L"OrbitCamera", L"ButtonResetZoom", false);
+	buttonResetPitch = api->SetupIniBool(L"OrbitCamera", L"ButtonResetPitch", true);
+	buttonResetZoom = api->SetupIniBool(L"OrbitCamera", L"ButtonResetZoom", false);
 
-	orbitInvertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
-	orbitInvertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
-	orbitAutoTurnSaved = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
-	orbitAutoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
-	orbitAutoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 65), 0);
-
-	const int zoomControlsValue = min(max(api->SetupIniInt(L"OrbitCamera", L"ZoomControls", 1), static_cast<int>(ZOOM_NONE)), static_cast<int>(ZOOM_RIGHT_STICK_CLICK));
-	orbitZoomControls = static_cast<ZoomControls>(zoomControlsValue);
+	invertX = api->SetupIniBool(L"OrbitCamera", L"InvertX", false);
+	invertY = api->SetupIniBool(L"OrbitCamera", L"InvertY", false);
+	autoTurnSaved = api->SetupIniBool(L"OrbitCamera", L"AutoTurn", true);
+	autoTurnStrength = min(max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnStrength", 40), 0), 100);
+	autoTurnMinSpeed = max(api->SetupIniInt(L"OrbitCamera", L"AutoTurnMinSpeed", 65), 0);
 
 	api->HookGame(GAME_HOOK_MAP_CHANGE, mapDoorChangeOrbitCameraReset);
 	api->HookGame(GAME_HOOK_DOOR_CHANGE, mapDoorChangeOrbitCameraReset);
@@ -298,8 +294,6 @@ void SwitchOut() {
 void Step() {
 	// Inputs
 	Inputs inputs = api->GetInputs();
-	Inputs inputsPressed = api->GetInputsPressed();
-	Inputs inputsReleased = api->GetInputsReleased();
 	uint32_t controlMethod = api->GetCurrentSaveSlot()->controlMethod;
 
 	ModernInput modernInput = api->GetModernInputState();
@@ -307,11 +301,26 @@ void Step() {
 	const float stickScale = modernInput.config.stickScale;
 	const float triggerScale = modernInput.config.triggerScale;
 
+	float input_rot_yaw, input_rot_pitch;
+	if (modernInputEnabled) {
+		input_rot_yaw = min(max(
+								-(Input::getAnalogStickX(Input::Controls::config.camera) / stickScale) * (invertX ? -1 : 1) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraRight) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraLeft)) * (invertX ? -1 : 1),
+								-1.0f),
+			1.0f);
+		input_rot_pitch = min(max(
+								  -(Input::getAnalogStickY(Input::Controls::config.camera) / stickScale) * (invertY ? -1 : 1) + ((float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraDown) - (float)Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraUp)) * (invertY ? -1 : 1),
+								  -1.0f),
+			1.0f);
+	} else {
+		input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (invertX ? -1 : 1);
+		input_rot_pitch = (inputs.invRight - inputs.invLeft) * (invertY ? -1 : 1);
+	}
+
 	// Entities
 	StratEntity *camera = api->GetEntity(cameraObjRef);
 	StratEntity *croc = api->GetEntity(crocObjRef);
 
-	orbitAutoTurn = orbitAutoTurnSaved;
+	autoTurn = autoTurnSaved;
 
 	if (camera == nullptr)
 		return;
@@ -323,12 +332,13 @@ void Step() {
 		orbitCameraResetButton();
 	}
 
+	// Type 2 camera behavior
 	if (controlMethod == CTRL_TYPE_2) {
 		if (inputs.effectiveDown || inputs.effectiveUp || inputs.effectiveLeft || inputs.effectiveRight) {
 			centerOnType2Current = centerOnType2;
 		}
 
-		if (modernInput.rightStick.x != 0 || modernInput.rightStick.y != 0) {
+		if (input_rot_yaw != 0 || input_rot_pitch != 0) {
 			centerOnType2Current = false;
 		}
 
@@ -339,45 +349,27 @@ void Step() {
 
 	// Zoom controls
 	if (modernInputEnabled) {
-		switch (orbitZoomControls) {
-		case ZOOM_TRIGGERS: {
-			cameraDistance += ((modernInput.leftTrigger - modernInput.rightTrigger) / triggerScale) * CAMERA_ZOOM_SPEED;
-			cameraDistance = min(max(cameraDistance, CAMERA_DISTANCE_MIN), CAMERA_DISTANCE_MAX);
-			break;
-		}
-		case ZOOM_RIGHT_STICK_CLICK: {
-			static bool wasRightStickClicked = false;
-			if (modernInput.rightStick.click && !wasRightStickClicked) {
-				wasRightStickClicked = true;
-				if (cameraDistance == CAMERA_DISTANCE_MAX) {
-					cameraDistance = CAMERA_DISTANCE_MIN;
-				} else if (cameraDistance == CAMERA_DISTANCE_MIN) {
-					cameraDistance = CAMERA_DISTANCE_DEFAULT;
-				} else if (cameraDistance == CAMERA_DISTANCE_DEFAULT) {
-					cameraDistance = CAMERA_DISTANCE_MAX;
-				} else {
-					cameraDistance = CAMERA_DISTANCE_DEFAULT;
-				}
-			} else if (!modernInput.rightStick.click) {
-				wasRightStickClicked = false;
+		static bool wasRightStickClicked = false;
+		bool cameraButton = (Input::getButtonPressed(Input::Controls::config.cameraZoom) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraZoom));
+		if (cameraButton && !wasRightStickClicked) {
+			wasRightStickClicked = true;
+			if (cameraDistance == CAMERA_DISTANCE_MAX) {
+				cameraDistance = CAMERA_DISTANCE_MIN;
+			} else if (cameraDistance == CAMERA_DISTANCE_MIN) {
+				cameraDistance = CAMERA_DISTANCE_DEFAULT;
+			} else if (cameraDistance == CAMERA_DISTANCE_DEFAULT) {
+				cameraDistance = CAMERA_DISTANCE_MAX;
+			} else {
+				cameraDistance = CAMERA_DISTANCE_DEFAULT;
 			}
-			break;
-		}
+		} else if (!cameraButton) {
+			wasRightStickClicked = false;
 		}
 	}
 
 	cameraDistanceCurrent = cameraDistance;
 
 	// Camera rotation
-	float input_rot_yaw, input_rot_pitch;
-	if (modernInputEnabled) {
-		input_rot_yaw = -((float)modernInput.rightStick.x / stickScale) * (orbitInvertX ? -1 : 1);
-		input_rot_pitch = -((float)modernInput.rightStick.y / stickScale) * (orbitInvertY ? -1 : 1);
-	} else {
-		input_rot_yaw = (inputs.stepRight - inputs.stepLeft) * (orbitInvertX ? -1 : 1);
-		input_rot_pitch = (inputs.invRight - inputs.invLeft) * (orbitInvertY ? -1 : 1);
-	}
-
 	cameraYaw += -input_rot_yaw * CAMERA_YAW_SPEED;
 	cameraPitch = walkingPitch;
 
@@ -405,12 +397,12 @@ void Step() {
 	const int moveX = croc->newRotPos.position.x - orbitLastCrocPos.x;
 	const int moveZ = croc->newRotPos.position.z - orbitLastCrocPos.z;
 	const double moveDistanceSq = (double)moveX * (double)moveX + (double)moveZ * (double)moveZ;
-	const double minMoveDistanceSq = (double)orbitAutoTurnMinSpeed * (double)orbitAutoTurnMinSpeed;
+	const double minMoveDistanceSq = (double)autoTurnMinSpeed * (double)autoTurnMinSpeed;
 
-	if (orbitAutoTurn && input_rot_yaw == 0 && moveDistanceSq >= minMoveDistanceSq) {
+	if (autoTurn && input_rot_yaw == 0 && moveDistanceSq >= minMoveDistanceSq) {
 		const double moveYaw = atan2((double)moveX, (double)moveZ);
 		const double targetYaw = moveYaw + PI;
-		const double yawLerpSpeed = ((double)orbitAutoTurnStrength / 100.0) * 0.08;
+		const double yawLerpSpeed = ((double)autoTurnStrength / 100.0) * 0.08;
 		cameraYaw = LerpAngle(cameraYaw, targetYaw, yawLerpSpeed);
 	}
 
@@ -437,4 +429,4 @@ void Step() {
 	cameraPos->z = _cameraRotPos.position.z;
 }
 
-} // namespace OrbitCamera
+} // namespace Camera::OrbitCamera

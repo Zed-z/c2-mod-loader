@@ -1,3 +1,5 @@
+#include "Camera.h"
+
 #include "ModApi.h"
 
 #include <string>
@@ -7,24 +9,13 @@
 #include "OrbitCamera.h"
 #include "Utils.h"
 
-ModApi *api = nullptr;
+extern ModApi *api;
 
-enum class CameraMode {
-	None = -1,
-	Normal = 0,
-	Orbit = 1,
-	Freecam = 2
-};
-const char *CameraModeNames[] = {"None", "Normal", "Orbit", "Freecam"};
+namespace Camera {
+
+bool cameraEnabled = true;
+bool orbitCamera = true;
 CameraMode cameraMode = CameraMode::Normal;
-
-void saveCameraMode() {
-	api->WriteIniInt(L"Config", L"CameraMode", static_cast<int>(cameraMode));
-}
-
-CameraMode loadCameraMode() {
-	return static_cast<CameraMode>(api->SetupIniInt(L"Config", L"CameraMode", static_cast<int>(CameraMode::Normal)));
-}
 
 void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	CameraMode nextCameraMode = CameraMode::None;
@@ -51,14 +42,11 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 
 	cameraMode = nextCameraMode;
 
-	saveCameraMode();
-
 	StratEntity *camera = api->GetEntity(cameraObjRef);
 	StratEntity *croc = api->GetEntity(crocObjRef);
 
 	if (camera == nullptr) {
 		cameraMode = CameraMode::Normal;
-		saveCameraMode();
 		api->LogError("Camera not found!");
 		api->ShowErrorToast("No camera found!");
 		return;
@@ -66,7 +54,6 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 
 	if (croc == nullptr) {
 		cameraMode = CameraMode::Normal;
-		saveCameraMode();
 		api->LogError("Croc not found!");
 		api->ShowErrorToast("Croc not found!");
 		return;
@@ -82,18 +69,6 @@ void __stdcall cameraSet(CameraMode mode = CameraMode::None) {
 	api->ShowInfoToast(modeString.c_str());
 }
 
-void __stdcall cameraSetNormal() {
-	cameraSet(CameraMode::Normal);
-}
-
-void __stdcall cameraSetOrbit() {
-	cameraSet(CameraMode::Orbit);
-}
-
-void __stdcall cameraSetFreecam() {
-	cameraSet(CameraMode::Freecam);
-}
-
 void __stdcall Step() {
 
 	// Don't touch the camera on the main menu
@@ -106,7 +81,7 @@ void __stdcall Step() {
 
 	// Toggle
 	if (inputs.stepLeft && inputs.stepRight && inputsPressed.flip) {
-		cameraSet();
+		toggleFreecam();
 	}
 
 	// Camera
@@ -125,37 +100,45 @@ void __stdcall Step() {
 	}
 }
 
-MenuActionRegistration __stdcall cameraNormalRegistration() {
-	return {"Normal Camera", "The standard camera mode.", cameraSetNormal, cameraMode != CameraMode::Normal};
-}
+void toggleOrbitCamera() {
+	orbitCamera = !orbitCamera;
+	api->WriteIniBool(L"Camera", L"OrbitCamera", orbitCamera);
 
-MenuActionRegistration __stdcall cameraOrbitRegistration() {
-	return {"Orbit Camera", "A modern manual camera mode.", cameraSetOrbit, cameraMode != CameraMode::Orbit};
-}
+	if (cameraMode == CameraMode::Freecam)
+		return;
 
-MenuActionRegistration __stdcall cameraFreeRegistration() {
-	return {"Free Camera", "Move the camera anywhere you want.", cameraSetFreecam, cameraMode != CameraMode::Freecam};
-}
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
-	if (reason == DLL_PROCESS_ATTACH) {
-		api = LoadModApi();
-		if (!api)
-			return FALSE;
-
-		FreeCamera::Setup();
-		OrbitCamera::Setup();
-
-		CameraMode _camMode = loadCameraMode();
-		cameraMode = _camMode;
-		// cameraSet(_camMode);
-
-		api->HookGame(GAME_HOOK_POST_STEP, Step);
-		api->RegisterMenuAction(hModule, cameraNormalRegistration);
-		api->RegisterMenuAction(hModule, cameraOrbitRegistration);
-		api->RegisterMenuAction(hModule, cameraFreeRegistration);
-
-		DisableThreadLibraryCalls(hModule);
+	if (orbitCamera) {
+		cameraSet(CameraMode::Orbit);
+	} else {
+		cameraSet(CameraMode::Normal);
 	}
-	return TRUE;
 }
+
+void toggleFreecam() {
+	if (cameraMode == CameraMode::Freecam) {
+		if (orbitCamera) {
+			cameraSet(CameraMode::Orbit);
+		} else {
+			cameraSet(CameraMode::Normal);
+		}
+	} else {
+		cameraSet(CameraMode::Freecam);
+	}
+}
+
+void Setup() {
+	cameraEnabled = api->SetupIniBool(L"Camera", L"Enabled", true);
+	orbitCamera = api->SetupIniBool(L"Camera", L"OrbitCamera", true);
+
+	if (!cameraEnabled)
+		return;
+
+	FreeCamera::Setup();
+	OrbitCamera::Setup();
+
+	cameraMode = orbitCamera ? CameraMode::Orbit : CameraMode::Normal;
+
+	api->HookGame(GAME_HOOK_POST_STEP, Step);
+}
+
+} // namespace Camera

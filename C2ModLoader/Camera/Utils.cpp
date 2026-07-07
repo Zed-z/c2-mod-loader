@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+namespace Camera::Utils {
+
 using std::sin, std::cos, std::min, std::max;
 
 double LerpAngle(double a, double b, double t) {
@@ -42,3 +44,5 @@ int RadiansToGameRotation(double radians_input) {
 double GameRotationToRadians(int game_rotation) {
 	return (game_rotation * PI) / 2048.0;
 }
+
+} // namespace Camera::Utils
