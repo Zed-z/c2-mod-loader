@@ -42,8 +42,10 @@ Feature overview and install instructions are available on [the official website
 
 This project uses the following third party assets:
 
+-   [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) - Copyright (c) 2023 ThirteenAG
 -   [Dear ImGui](https://github.com/ocornut/imgui) - Copyright (c) 2014-2025 Omar Cornut
 -   [MinHook](https://github.com/TsudaKageyu/minhook) - Copyright (c) 2009-2017 Tsuda Kageyu
+-   [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL) - Copyright (c) 1997-2026 Sam Lantinga
 -   [Scabber Font](https://ggbot.itch.io/scabber-font) by GGBotNet, licensed under the Creative Commons Zero v1.0 Universal license.
 -   [Inter Font](https://rsms.me/inter/) by Rasmus Andersson, licensed under the SIL Open Font License 1.1.
 -   [Roboto Mono Font](https://fonts.google.com/specimen/Roboto+Mono) by Christian Robertson, licensed under the SIL Open Font License 1.1.

@@ -227,6 +227,8 @@ add_custom_target(Deploy
     VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/Release/SDL3.dll" "$<SHELL_PATH:${CROC2_GAME_DIR}/SDL3.dll>"
     VERBATIM
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Shared/Ultimate-ASI-Loader/dinput.dll" "$<SHELL_PATH:${CROC2_GAME_DIR}/dinput.dll>"
+    VERBATIM
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/Shared/global.ini" "$<SHELL_PATH:${CROC2_GAME_DIR}/global.ini>"
     VERBATIM
     DEPENDS C2ModLoader ${MOD_LIST} ${C2ML_PIPELINE_EXTRA_DEPENDS}
@@ -265,6 +267,7 @@ add_custom_target(Package
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_MODS_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/C2ModLoader.asi ${PACKAGE_DIR}/C2ModLoader.asi
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/SDL3.dll ${PACKAGE_DIR}/SDL3.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/Release/dinput.dll ${PACKAGE_DIR}/dinput.dll
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/Shared/global.ini ${PACKAGE_DIR}/global.ini
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR} ${CMAKE_COMMAND} -E rm -f ${PACKAGE_ZIP_NAME}
     DEPENDS C2ModLoader ${MOD_LIST} ${C2ML_PIPELINE_EXTRA_DEPENDS}
@@ -293,7 +296,7 @@ foreach(MOD_NAME ${MODS_WITH_OVERRIDES})
 endforeach()
 
 add_custom_command(TARGET Package POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E chdir ${PACKAGE_DIR} ${CMAKE_COMMAND} -E tar cf ../${PACKAGE_ZIP_NAME} --format=zip C2ModLoader.asi SDL3.dll global.ini mods
+    COMMAND ${CMAKE_COMMAND} -E chdir ${PACKAGE_DIR} ${CMAKE_COMMAND} -E tar cf ../${PACKAGE_ZIP_NAME} --format=zip C2ModLoader.asi SDL3.dll dinput.dll global.ini mods
     COMMENT "Creating package zip archive"
 )
 

@@ -676,7 +676,7 @@ void RenderLicensesSection(bool fullHeight = false) {
 	}
 
 	ImGui::BeginChild("LicensePanel", ImVec2(0.0f, panelHeight), false);
-	if (ImGui::BeginTabBar("LicenseTabs")) {
+	if (ImGui::BeginTabBar("LicenseTabs", ImGuiTabBarFlags_FittingPolicyScroll)) {
 		for (size_t i = 0; i < licenses.size(); ++i) {
 			if (ImGui::BeginTabItem(licenses[i].displayName)) {
 				ImGui::BeginChild("LicenseContent", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_HorizontalScrollbar);

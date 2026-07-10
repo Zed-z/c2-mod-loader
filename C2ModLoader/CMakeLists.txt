@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 # Generate license header
 set(EMBEDDED_LICENSE_FILES
     "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../Shared/Ultimate-ASI-Loader/license.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/LICENSE.txt"
@@ -24,9 +25,10 @@ endfunction()
 
 set(EMBEDDED_LICENSE_ENTRIES "")
 append_embedded_license("C2ModLoader" "${CMAKE_SOURCE_DIR}/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("Ultimate ASI Loader" "${CMAKE_CURRENT_SOURCE_DIR}/../Shared/Ultimate-ASI-Loader/license.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Dear ImGui" "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("MinHook" "${CMAKE_CURRENT_SOURCE_DIR}/libs/minhook/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
-append_embedded_license("SDL3" "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
+append_embedded_license("Simple DirectMedia Layer" "${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl3/LICENSE.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Scabber Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/scabber_font/License.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Inter Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/inter_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
 append_embedded_license("Roboto Mono Font" "${CMAKE_CURRENT_SOURCE_DIR}/libs/roboto_mono_font/OFL.txt" EMBEDDED_LICENSE_ENTRIES)
@@ -257,6 +259,13 @@ add_custom_command(TARGET C2ModLoader POST_BUILD
         $<TARGET_FILE:SDL3::SDL3>
         ${CMAKE_BINARY_DIR}/Release/$<TARGET_FILE_NAME:SDL3::SDL3>
     COMMENT "Copying SDL3 runtime to Release folder"
+)
+
+add_custom_command(TARGET C2ModLoader POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/Shared/Ultimate-ASI-Loader/dinput.dll
+        ${CMAKE_BINARY_DIR}/Release/dinput.dll
+    COMMENT "Copying dinput.dll runtime to Release folder"
 )
 
 # Copy to Release folder
