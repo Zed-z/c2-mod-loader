@@ -395,10 +395,6 @@ void Patch() {
 namespace Input::RemapActionButtons {
 
 void Setup() {
-	bool enabled = api->SetupIniBool(L"InputControls", L"RemapActionButtons", true);
-	if (!enabled)
-		return;
-
 	Patch();
 }
 

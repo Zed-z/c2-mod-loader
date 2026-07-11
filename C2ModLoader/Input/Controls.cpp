@@ -13,6 +13,10 @@ ControlsConfig config;
 
 void Setup() {
 	config.movement = (ControlAnalog)api->SetupIniInt(L"InputControls", L"Movement", static_cast<int>(ControlAnalog::LeftStick));
+	config.moveUp = (ControlButton)api->SetupIniInt(L"InputControls", L"MoveUp", static_cast<int>(ControlButton::DpadUp));
+	config.moveDown = (ControlButton)api->SetupIniInt(L"InputControls", L"MoveDown", static_cast<int>(ControlButton::DpadDown));
+	config.moveLeft = (ControlButton)api->SetupIniInt(L"InputControls", L"MoveLeft", static_cast<int>(ControlButton::DpadLeft));
+	config.moveRight = (ControlButton)api->SetupIniInt(L"InputControls", L"MoveRight", static_cast<int>(ControlButton::DpadRight));
 	config.camera = (ControlAnalog)api->SetupIniInt(L"InputControls", L"Camera", static_cast<int>(ControlAnalog::RightStick));
 	config.cameraZoom = (ControlButton)api->SetupIniInt(L"InputControls", L"CameraZoom", static_cast<int>(ControlButton::RS));
 	config.jump = (ControlButton)api->SetupIniInt(L"InputControls", L"Jump", static_cast<int>(ControlButton::A));

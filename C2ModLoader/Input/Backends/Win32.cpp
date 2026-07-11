@@ -12,6 +12,9 @@ extern ModApi *api;
 namespace Input::Backends::Win32 {
 
 bool Backend::getKey(const std::string &keyName) {
+	if (keyName == "UNBOUND")
+		return false;
+
 	if (keyName == "SPACE")
 		return (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
 	if (keyName == "CONTROL")

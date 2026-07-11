@@ -5,11 +5,13 @@
 namespace Input::Controls {
 
 enum class ControlAnalog {
+	Unbound,
 	LeftStick,
 	RightStick,
 };
 
 enum class ControlButton {
+	Unbound,
 	A,
 	B,
 	X,
@@ -30,6 +32,10 @@ enum class ControlButton {
 
 struct ControlsConfig {
 	ControlAnalog movement;
+	ControlButton moveUp;
+	ControlButton moveDown;
+	ControlButton moveLeft;
+	ControlButton moveRight;
 	ControlAnalog camera;
 	ControlButton cameraZoom;
 	ControlButton jump;
