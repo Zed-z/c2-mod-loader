@@ -92,7 +92,8 @@ BEGIN
                 "Input/VibrationEnabled[Vibration Enabled|Enable vibration]:bool=1;"
                 "Input/VibrationStrength[Vibration Strength|Strength of vibration effects]:int=100;"
                 "Input/TypeSwitchMode[Type Switch Mode|Enable manual (caps lock) or automatic control type switching]:enum[None|Manual|Automatic]=2;"
-                "Input/MidAirTurning[Mid Air Turning|Turn mid air in Type 2 controls with the side step buttons, akin to Croc 1]:bool=1;"
+                "Input/AirTurning[Air Turning|Automatically turn in mid air in Type 1 controls, akin to Croc Remaster]:bool=0;"
+                "Input/AirStrafing[Air Strafing|Turn mid air in Type 2 controls with the side step buttons, akin to Croc 1]:bool=1;"
 
                 "@InputControls[Input Controls|Configure action controls];"
                 "InputControls/Movement[Movement]:" INPUT_ANALOGS "=1;"

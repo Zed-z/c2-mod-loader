@@ -1,9 +1,9 @@
 #include "Input.h"
 
+#include "Input/AirTurning.h"
 #include "Input/AnalogInput.h"
 #include "Input/Controls.h"
 #include "Input/DpadMovement.h"
-#include "Input/MidAirTurning.h"
 #include "Input/RemapActionButtons.h"
 #include "Input/TypeSwitching.h"
 #include "Input/Vibration.h"
@@ -77,7 +77,7 @@ void Setup() {
 	Vibration::Setup();
 	TypeSwitching::Setup();
 	DpadMovement::Setup();
-	MidAirTurning::Setup();
+	AirTurning::Setup();
 	RemapActionButtons::Setup();
 }
 

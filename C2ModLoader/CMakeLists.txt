@@ -59,12 +59,12 @@ set(SOURCES
     Camera/Camera.cpp
     Camera/FreeCamera.cpp
     Camera/OrbitCamera.cpp
-    Camera/Utils.cpp
     CheatsManager.cpp
     ConsoleLogging.cpp
     dllmain.cpp
     FileOverrides.cpp
     GameHooks.cpp
+    Input/AirTurning.cpp
     Input/AnalogInput.cpp
     Input/Backends/SDL3.cpp
     Input/Backends/Win32.cpp
@@ -72,7 +72,6 @@ set(SOURCES
     Input/Controls.cpp
     Input/DpadMovement.cpp
     Input/Input.cpp
-    Input/MidAirTurning.cpp
     Input/RemapActionButtons.cpp
     Input/TypeSwitching.cpp
     Input/Vibration.cpp
@@ -106,6 +105,7 @@ set(SOURCES
     Registry/ValueMapParser.cpp
     Resource.rc
     Toasts.cpp
+    Utils/Angle.cpp
     Utils/Fonts.cpp
     Utils/ResourceLoader.cpp
     Utils/Sha256.cpp

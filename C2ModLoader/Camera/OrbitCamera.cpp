@@ -1,8 +1,8 @@
 #include "OrbitCamera.h"
 
-#include "Camera/Utils.h"
 #include "Input/Controls.h"
 #include "Input/Input.h"
+#include "Utils/Angle.h"
 
 #include <algorithm>
 #include <cmath>
@@ -17,9 +17,6 @@ extern ModApi *api;
 using std::cos, std::sin, std::min, std::max, std::atan2;
 
 namespace {
-
-using namespace Camera::Utils;
-
 bool invertX;
 bool invertY;
 
@@ -69,7 +66,7 @@ void __stdcall orbitCameraResetYaw() {
 		api->LogDebug("[orbitCameraReset] Croc not found!");
 		return;
 	}
-	cameraYaw = GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - PI;
+	cameraYaw = Angle::GameRotationToRadians(croc->newRotPos.rotation.y >> 0xc) - Angle::PI;
 }
 
 void __stdcall orbitCameraResetDistance() {
@@ -189,7 +186,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 						dante->newPosition.x - croc->newPosition.x,
 						dante->newPosition.y - croc->newPosition.y,
 						dante->newPosition.z - croc->newPosition.z};
-					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+					cameraYaw = atan2(positionDiff.x, positionDiff.z) + Angle::PI;
 					autoTurn = false;
 				}
 			}
@@ -204,7 +201,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 						gooManChu->newPosition.x - croc->newPosition.x,
 						gooManChu->newPosition.y - croc->newPosition.y,
 						gooManChu->newPosition.z - croc->newPosition.z};
-					cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+					cameraYaw = atan2(positionDiff.x, positionDiff.z) + Angle::PI;
 					autoTurn = false;
 				}
 			}
@@ -219,7 +216,7 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 					flavio->newPosition.x - croc->newPosition.x,
 					flavio->newPosition.y - croc->newPosition.y,
 					flavio->newPosition.z - croc->newPosition.z};
-				cameraYaw = atan2(positionDiff.x, positionDiff.z) + PI;
+				cameraYaw = atan2(positionDiff.x, positionDiff.z) + Angle::PI;
 				autoTurn = false;
 			}
 		}
@@ -231,13 +228,12 @@ void orbitCameraOverridesPreAutoTurn(int input_rot_yaw, int input_rot_pitch) {
 		if (isVehicle && api->GetInputs().flip) {
 			orbitCameraResetYaw();
 			orbitCameraResetPitch();
-			cameraYaw += PI;
+			cameraYaw += Angle::PI;
 		}
 	}
 
 	if (croc != nullptr && strcmp(croc->name, "WalkingCroc") == 0) {
 		if (croc->localVars[CROC_VAR_STATE] == CROC_STATE_CLIMBING_WALL) {
-			api->LogDebug("Climbing wall");
 			orbitCameraResetYaw();
 			orbitCameraResetPitch();
 		}
@@ -250,8 +246,6 @@ Vec3i orbitLastCrocPos;
 } // namespace
 
 namespace Camera::OrbitCamera {
-
-using namespace Camera::Utils;
 
 void Setup() {
 	disableRestrictions = api->SetupIniBool(L"OrbitCamera", L"DisableRestrictions", false);
@@ -284,8 +278,8 @@ void SwitchIn() {
 	orbitHasLastCrocPos = false;
 
 	// Get rotation from lookat
-	cameraYaw = -(double)(cameraRot->y) / 2048.0 * PI;
-	cameraPitch = (double)(cameraRot->x) / 2048.0 * PI;
+	cameraYaw = -(double)(cameraRot->y) / 2048.0 * Angle::PI;
+	cameraPitch = (double)(cameraRot->x) / 2048.0 * Angle::PI;
 }
 
 void SwitchOut() {
@@ -401,9 +395,9 @@ void Step() {
 
 	if (autoTurn && input_rot_yaw == 0 && moveDistanceSq >= minMoveDistanceSq) {
 		const double moveYaw = atan2((double)moveX, (double)moveZ);
-		const double targetYaw = moveYaw + PI;
+		const double targetYaw = moveYaw + Angle::PI;
 		const double yawLerpSpeed = ((double)autoTurnStrength / 100.0) * 0.08;
-		cameraYaw = LerpAngle(cameraYaw, targetYaw, yawLerpSpeed);
+		cameraYaw = Angle::LerpAngle(cameraYaw, targetYaw, yawLerpSpeed);
 	}
 
 	orbitLastCrocPos = croc->newRotPos.position;

@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include "Camera/Utils.h"
 #include "Input/Controls.h"
 #include "Input/Input.h"
+#include "Utils/Angle.h"
 
 #include "ModApi.h"
 extern ModApi *api;
@@ -30,8 +30,6 @@ double cameraPitch = 0;
 
 namespace Camera::FreeCamera {
 
-using namespace Camera::Utils;
-
 void Setup() {
 	invertX = api->SetupIniBool(L"Freecam", L"InvertX", false);
 	invertY = api->SetupIniBool(L"Freecam", L"InvertY", false);
@@ -48,8 +46,8 @@ void SwitchIn() {
 	_cameraLookAt.z = cameraLookAt->z;
 
 	// Get rotation from lookat
-	cameraYaw = -(double)(cameraRot->y) / 2048.0 * PI;
-	cameraPitch = (double)(cameraRot->x) / 2048.0 * PI;
+	cameraYaw = -(double)(cameraRot->y) / 2048.0 * Angle::PI;
+	cameraPitch = (double)(cameraRot->x) / 2048.0 * Angle::PI;
 
 	// Change camera flag
 	noclipCameraFlag = camera->flags1 & (1 << 23);
@@ -134,8 +132,8 @@ void Step() {
 	_cameraRotPos.position.x += static_cast<int>(forwards_x * input_x * 100);
 	_cameraRotPos.position.z += static_cast<int>(forwards_z * input_x * 100);
 
-	double sidewards_x = cos(cameraYaw + PI / 2);
-	double sidewards_z = sin(cameraYaw + PI / 2);
+	double sidewards_x = cos(cameraYaw + Angle::PI / 2);
+	double sidewards_z = sin(cameraYaw + Angle::PI / 2);
 
 	_cameraRotPos.position.x += static_cast<int>(sidewards_x * input_z * 100);
 	_cameraRotPos.position.y += static_cast<int>(input_y * 100);
@@ -153,8 +151,8 @@ void Step() {
 	cameraLookAt->x = _cameraLookAt.x;
 	cameraLookAt->y = _cameraLookAt.y;
 	cameraLookAt->z = _cameraLookAt.z;
-	cameraRot->x = RadiansToGameRotation(-cameraPitch);
-	cameraRot->y = RadiansToGameRotation(-cameraYaw);
+	cameraRot->x = Angle::RadiansToGameRotation(-cameraPitch);
+	cameraRot->y = Angle::RadiansToGameRotation(-cameraYaw);
 }
 
 } // namespace Camera::FreeCamera

@@ -3,11 +3,9 @@
 #include "ModApi.h"
 
 #include <string>
-#include <vector>
 
 #include "FreeCamera.h"
 #include "OrbitCamera.h"
-#include "Utils.h"
 
 extern ModApi *api;
 

@@ -1,4 +1,4 @@
-#include "Utils.h"
+#include "Angle.h"
 
 #include <algorithm>
 #include <cmath>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace Camera::Utils {
+namespace Angle {
 
 using std::sin, std::cos, std::min, std::max;
 
