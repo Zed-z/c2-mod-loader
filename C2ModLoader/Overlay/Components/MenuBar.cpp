@@ -242,6 +242,22 @@ void RenderMenuBar() {
 			ImGui::EndMenu();
 		}
 
+		{
+			const char *exitLabel = " X ";
+
+			float rightAlignOffset = ImGui::GetWindowWidth() - ImGui::CalcTextSize(exitLabel).x - (ImGui::GetStyle().ItemSpacing.x * 2.0f);
+
+			ImGui::SetCursorPosX(rightAlignOffset);
+
+			if (ImGui::MenuItem(exitLabel)) {
+				TerminateProcess(GetCurrentProcess(), 0);
+			}
+
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Exit the game");
+			}
+		}
+
 		ImGui::EndMainMenuBar();
 	}
 
