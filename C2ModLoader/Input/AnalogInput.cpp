@@ -9,6 +9,10 @@ extern ModApi *api;
 namespace {
 
 void PatchAnalogInput() {
+
+	// TODO: doesn't work if controller not connected on setup
+	// Not due to this patch, likely due to some game logic avoiding this code path when a controller is not connected
+
 	uintptr_t ptrX, ptrY;
 	switch (Input::Controls::config.movement) {
 	case Input::Controls::ControlAnalog::LeftStick:
