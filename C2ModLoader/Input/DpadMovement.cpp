@@ -61,18 +61,48 @@ void PatchDpadMovement() {
 	}
 	case GAMEVER_EU: {
 		/*
-			TODO
+			Croc2.exe+2F806 - 83 3D 3C175300 2A     - cmp dword ptr [Croc2.exe+13173C],2A
+			Croc2.exe+2F80D - 0F83 D1010000         - jae Croc2.exe+2F9E4
+			Croc2.exe+2F813 - F6 C3 10              - test bl,10
+			Croc2.exe+2F816 - 74 0A                 - je Croc2.exe+2F822
+			Croc2.exe+2F818 - C7 05 64175300 C01F0000 - mov [Croc2.exe+131764],00001FC0
+			Croc2.exe+2F822 - F6 C3 40              - test bl,40
+			Croc2.exe+2F825 - 74 0A                 - je Croc2.exe+2F831
+			Croc2.exe+2F827 - C7 05 64175300 00E0FFFF - mov [Croc2.exe+131764],FFFFE000
+			Croc2.exe+2F831 - F6 C3 80              - test bl,-80
+			Croc2.exe+2F834 - 74 0B                 - je Croc2.exe+2F841
+			Croc2.exe+2F836 - BD C01F0000           - mov ebp,00001FC0
+			Croc2.exe+2F83B - 89 2D 54175300        - mov [Croc2.exe+131754],ebp
+			Croc2.exe+2F841 - F6 C3 20              - test bl,20
+			Croc2.exe+2F844 - 74 0B                 - je Croc2.exe+2F851
+			Croc2.exe+2F846 - BD 00E0FFFF           - mov ebp,FFFFE000
+			Croc2.exe+2F84B - 89 2D 54175300        - mov [Croc2.exe+131754],ebp
 			Croc2.exe+2F851 - DB 05 54175300        - fild dword ptr [Croc2.exe+131754]
 		*/
-		api->HookFunction(0x42F851, 6, &doDpadMovement, INJECT_BEFORE);
+		api->HookFunction(0x42F813, 62, &doDpadMovement, INJECT_REPLACE);
 		break;
 	}
 	case GAMEVER_DEMO: {
 		/*
-			TODO
+			Croc2.exe+2F4B6 - 83 3D 44955200 2A     - cmp dword ptr [Croc2.exe+129544],2A
+			Croc2.exe+2F4BD - 0F83 D1010000         - jae Croc2.exe+2F694
+			Croc2.exe+2F4C3 - F6 C3 10              - test bl,10
+			Croc2.exe+2F4C6 - 74 0A                 - je Croc2.exe+2F4D2
+			Croc2.exe+2F4C8 - C7 05 6C955200 C01F0000 - mov [Croc2.exe+12956C],00001FC0
+			Croc2.exe+2F4D2 - F6 C3 40              - test bl,40
+			Croc2.exe+2F4D5 - 74 0A                 - je Croc2.exe+2F4E1
+			Croc2.exe+2F4D7 - C7 05 6C955200 00E0FFFF - mov [Croc2.exe+12956C],FFFFE000
+			Croc2.exe+2F4E1 - F6 C3 80              - test bl,-80
+			Croc2.exe+2F4E4 - 74 0B                 - je Croc2.exe+2F4F1
+			Croc2.exe+2F4E6 - BD C01F0000           - mov ebp,00001FC0
+			Croc2.exe+2F4EB - 89 2D 5C955200        - mov [Croc2.exe+12955C],ebp
+			Croc2.exe+2F4F1 - F6 C3 20              - test bl,20
+			Croc2.exe+2F4F4 - 74 0B                 - je Croc2.exe+2F501
+			Croc2.exe+2F4F6 - BD 00E0FFFF           - mov ebp,FFFFE000
+			Croc2.exe+2F4FB - 89 2D 5C955200        - mov [Croc2.exe+12955C],ebp
 			Croc2.exe+2F501 - DB 05 5C955200        - fild dword ptr [Croc2.exe+12955C]
 		*/
-		api->HookFunction(0x42F501, 6, &doDpadMovement, INJECT_BEFORE);
+		api->HookFunction(0x42F4C3, 62, &doDpadMovement, INJECT_REPLACE);
 		break;
 	}
 	}
