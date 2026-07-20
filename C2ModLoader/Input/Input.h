@@ -25,6 +25,7 @@ interface IKeyboardBackend {
 extern IControllerBackend *controllerBackend;
 extern IKeyboardBackend *keyboardBackend;
 
+void __stdcall PollInput();
 ModernInput GetState();
 void Setup();
 

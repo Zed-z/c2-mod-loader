@@ -8,73 +8,30 @@ extern ModApi *api;
 
 namespace {
 
-void __stdcall remapMenuButtons() {
-	ModernInput input = Input::GetState();
+uint32_t input_builder = 0;
+void __stdcall remapDecodePad() {
+	input_builder = 0;
 
-	if (input.dpad.up || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
 		*realPad |= INPUT_UP;
 		*playerPad |= INPUT_UP;
+		input_builder |= INPUT_UP;
 	}
-	if (input.dpad.right || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
 		*realPad |= INPUT_RIGHT;
 		*playerPad |= INPUT_RIGHT;
+		input_builder |= INPUT_RIGHT;
 	}
-	if (input.dpad.down || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
 		*realPad |= INPUT_DOWN;
 		*playerPad |= INPUT_DOWN;
+		input_builder |= INPUT_DOWN;
 	}
-	if (input.dpad.left || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
 		*realPad |= INPUT_LEFT;
 		*playerPad |= INPUT_LEFT;
+		input_builder |= INPUT_LEFT;
 	}
-
-	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump)) {
-		*realPad |= INPUT_JUMP;
-		*playerPad |= INPUT_JUMP;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack)) {
-		*realPad |= INPUT_ATTACK;
-		*playerPad |= INPUT_ATTACK;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip)) {
-		*realPad |= INPUT_FLIP;
-		*playerPad |= INPUT_FLIP;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse)) {
-		*realPad |= INPUT_INV_USE;
-		*playerPad |= INPUT_INV_USE;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft)) {
-		*realPad |= INPUT_STEP_LEFT;
-		*playerPad |= INPUT_STEP_LEFT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight)) {
-		*realPad |= INPUT_STEP_RIGHT;
-		*playerPad |= INPUT_STEP_RIGHT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev)) {
-		*realPad |= INPUT_INV_LEFT;
-		*playerPad |= INPUT_INV_LEFT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext)) {
-		*realPad |= INPUT_INV_RIGHT;
-		*playerPad |= INPUT_INV_RIGHT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause)) {
-		*realPad |= INPUT_PAUSE;
-		*playerPad |= INPUT_PAUSE;
-	}
-
-	*realPadPush = *realPad & ~*realPadOld;
-	*realPadOld = *realPad;
-
-	*playerPadPush = *playerPad & ~*playerPadOld;
-	*playerPadOld = *playerPad;
-}
-
-uint32_t input_builder = 0;
-void __stdcall remapGameplayButtons() {
-	input_builder = 0;
 
 	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause))
 		input_builder |= INPUT_PAUSE;
@@ -99,7 +56,7 @@ void __stdcall remapGameplayButtons() {
 		input_builder |= INPUT_INV_USE;
 }
 
-void Patch() {
+void patchDecodePad() {
 	uintptr_t inputPtr = (uintptr_t)&(input_builder);
 	uint8_t hookCode[16];
 
@@ -113,6 +70,228 @@ void Patch() {
 	switch (api->GetGameVersion()) {
 	case GAMEVER_US: {
 		/*
+			Croc2.exe+2F26B - F6 C1 02              - test cl,02
+			Croc2.exe+2F26E - 74 0A                 - je Croc2.exe+2F27A
+			Croc2.exe+2F270 - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F272 - 81 E2 00800000        - and edx,00008000
+			Croc2.exe+2F278 - 0B FA                 - or edi,edx
+			Croc2.exe+2F27A - F6 C1 04              - test cl,04
+			Croc2.exe+2F27D - 74 0A                 - je Croc2.exe+2F289
+			Croc2.exe+2F27F - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F281 - 81 E2 00400000        - and edx,00004000
+			Croc2.exe+2F287 - 0B FA                 - or edi,edx
+			Croc2.exe+2F289 - F6 C1 08              - test cl,08
+			Croc2.exe+2F28C - 74 0A                 - je Croc2.exe+2F298
+			Croc2.exe+2F28E - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F290 - 81 E2 000C0000        - and edx,00000C00
+			Croc2.exe+2F296 - 0B FA                 - or edi,edx
+			Croc2.exe+2F298 - F6 C1 10              - test cl,10
+			Croc2.exe+2F29B - 74 0A                 - je Croc2.exe+2F2A7
+			Croc2.exe+2F29D - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F29F - 81 E2 00200000        - and edx,00002000
+			Croc2.exe+2F2A5 - 0B FA                 - or edi,edx
+			Croc2.exe+2F2A7 - F6 C1 20              - test cl,20
+			Croc2.exe+2F2AA - 74 08                 - je Croc2.exe+2F2B4
+			Croc2.exe+2F2AC - 81 E3 00130000        - and ebx,00001300
+			Croc2.exe+2F2B2 - 0B FB                 - or edi,ebx
+		*/
+		api->HookFunction(0x42f26b, 60, &remapDecodePad, INJECT_REPLACE);
+		api->InjectCode(0x42f2a7, 13, hookCode, p, INJECT_REPLACE);
+		break;
+	}
+	case GAMEVER_EU: {
+		/*
+			Croc2.exe+2F9EB - F6 C1 02              - test cl,02
+			Croc2.exe+2F9EE - 74 0A                 - je Croc2.exe+2F9FA
+			Croc2.exe+2F9F0 - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F9F2 - 81 E2 00800000        - and edx,00008000
+			Croc2.exe+2F9F8 - 0B FA                 - or edi,edx
+			Croc2.exe+2F9FA - F6 C1 04              - test cl,04
+			Croc2.exe+2F9FD - 74 0A                 - je Croc2.exe+2FA09
+			Croc2.exe+2F9FF - 8B D3                 - mov edx,ebx
+			Croc2.exe+2FA01 - 81 E2 00400000        - and edx,00004000
+			Croc2.exe+2FA07 - 0B FA                 - or edi,edx
+			Croc2.exe+2FA09 - F6 C1 08              - test cl,08
+			Croc2.exe+2FA0C - 74 0A                 - je Croc2.exe+2FA18
+			Croc2.exe+2FA0E - 8B D3                 - mov edx,ebx
+			Croc2.exe+2FA10 - 81 E2 000C0000        - and edx,00000C00
+			Croc2.exe+2FA16 - 0B FA                 - or edi,edx
+			Croc2.exe+2FA18 - F6 C1 10              - test cl,10
+			Croc2.exe+2FA1B - 74 0A                 - je Croc2.exe+2FA27
+			Croc2.exe+2FA1D - 8B D3                 - mov edx,ebx
+			Croc2.exe+2FA1F - 81 E2 00200000        - and edx,00002000
+			Croc2.exe+2FA25 - 0B FA                 - or edi,edx
+			Croc2.exe+2FA27 - F6 C1 20              - test cl,20
+			Croc2.exe+2FA2A - 74 08                 - je Croc2.exe+2FA34
+			Croc2.exe+2FA2C - 81 E3 00130000        - and ebx,00001300
+			Croc2.exe+2FA32 - 0B FB                 - or edi,ebx
+		*/
+		api->HookFunction(0x42F9EB, 60, &remapDecodePad, INJECT_REPLACE);
+		api->InjectCode(0x42FA27, 13, hookCode, p, INJECT_REPLACE);
+		break;
+	}
+	case GAMEVER_DEMO: {
+		/*
+			Croc2.exe+2F69B - F6 C1 02              - test cl,02
+			Croc2.exe+2F69E - 74 0A                 - je Croc2.exe+2F6AA
+			Croc2.exe+2F6A0 - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F6A2 - 81 E2 00800000        - and edx,00008000
+			Croc2.exe+2F6A8 - 0B FA                 - or edi,edx
+			Croc2.exe+2F6AA - F6 C1 04              - test cl,04
+			Croc2.exe+2F6AD - 74 0A                 - je Croc2.exe+2F6B9
+			Croc2.exe+2F6AF - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F6B1 - 81 E2 00400000        - and edx,00004000
+			Croc2.exe+2F6B7 - 0B FA                 - or edi,edx
+			Croc2.exe+2F6B9 - F6 C1 08              - test cl,08
+			Croc2.exe+2F6BC - 74 0A                 - je Croc2.exe+2F6C8
+			Croc2.exe+2F6BE - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F6C0 - 81 E2 000C0000        - and edx,00000C00
+			Croc2.exe+2F6C6 - 0B FA                 - or edi,edx
+			Croc2.exe+2F6C8 - F6 C1 10              - test cl,10
+			Croc2.exe+2F6CB - 74 0A                 - je Croc2.exe+2F6D7
+			Croc2.exe+2F6CD - 8B D3                 - mov edx,ebx
+			Croc2.exe+2F6CF - 81 E2 00200000        - and edx,00002000
+			Croc2.exe+2F6D5 - 0B FA                 - or edi,edx
+			Croc2.exe+2F6D7 - F6 C1 20              - test cl,20
+			Croc2.exe+2F6DA - 74 08                 - je Croc2.exe+2F6E4
+			Croc2.exe+2F6DC - 81 E3 00130000        - and ebx,00001300
+			Croc2.exe+2F6E2 - 0B FB                 - or edi,ebx
+		*/
+		api->HookFunction(0x42F69B, 60, &remapDecodePad, INJECT_REPLACE);
+		api->InjectCode(0x42F6D7, 13, hookCode, p, INJECT_REPLACE);
+		break;
+	}
+	}
+}
+
+void __stdcall remapUpdatePadForMenu() {
+	uint32_t &_playerPad = *(uint32_t *)0x0052a568;
+	uint32_t &_realPad = *(uint32_t *)0x0052a588;
+	uint32_t &_playerPadPush = *(uint32_t *)0x0052a578;
+	uint32_t &_realPadPush = *(uint32_t *)0x0052a554;
+	uint32_t &_playerPadOld = *(uint32_t *)0x0052a580;
+	uint32_t &_inputsTracker = *(uint32_t *)0x0052a590;
+	uint32_t &_padRelease = *(uint32_t *)0x0052a57c;
+	uint32_t &_trackPad1 = *(uint32_t *)0x004b7ab4;
+	uint32_t &_trackPad2 = *(uint32_t *)0x004b7ab8;
+	uint32_t &_menuStateFlag = *(uint32_t *)0x004b793c;
+	int32_t &_invUseOverride = *(int32_t *)0x004b62f0;
+
+	typedef void(__cdecl * MenuCallback_t)(uint32_t param);
+	MenuCallback_t CallMenuFunc = (MenuCallback_t)0x0041ab70;
+
+	Input::PollInput();
+	ModernInput input = Input::GetState();
+
+	if (input.startButton) {
+		api->LogDebug("Start button pressed.");
+	} else {
+		api->LogDebug("Start button not pressed.");
+	}
+
+	// 1. Build this frame's input state from scratch
+	uint32_t current_pad = 0;
+
+	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
+		current_pad |= INPUT_UP;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
+		current_pad |= INPUT_RIGHT;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
+		current_pad |= INPUT_DOWN;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
+		current_pad |= INPUT_LEFT;
+	}
+
+	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump)) {
+		current_pad |= INPUT_JUMP;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack)) {
+		current_pad |= INPUT_ATTACK;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip)) {
+		current_pad |= INPUT_FLIP;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse)) {
+		current_pad |= INPUT_INV_USE;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft)) {
+		current_pad |= INPUT_STEP_LEFT;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight)) {
+		current_pad |= INPUT_STEP_RIGHT;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev)) {
+		current_pad |= INPUT_INV_LEFT;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext)) {
+		current_pad |= INPUT_INV_RIGHT;
+	}
+	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause)) {
+		current_pad |= INPUT_PAUSE;
+	}
+
+	// 2. Calculate Intermediate "Push" State (CRITICAL for Menu)
+	// The menu needs to know what was *just pressed* this exact frame.
+	uint32_t push_pad = ~_trackPad1 & current_pad;
+	_playerPadPush = push_pad;
+	_realPadPush = ~_trackPad2 & current_pad;
+
+	_trackPad1 = current_pad;
+	_trackPad2 = current_pad;
+
+	// 3. Menu logic
+	if (_menuStateFlag == 0x10) {
+		if ((current_pad & INPUT_INV_LEFT) != 0) {
+			_realPadPush &= ~INPUT_INV_LEFT;
+			if (_realPadPush != 0) {
+				CallMenuFunc(0);
+			}
+		}
+
+		if ((current_pad & INPUT_INV_RIGHT) != 0) {
+			_realPadPush &= ~INPUT_INV_RIGHT;
+			if (_realPadPush != 0) {
+				CallMenuFunc(1);
+			}
+		}
+	}
+
+	// 4. Finalizing the frame's pad state
+	uint32_t old_pad = _playerPadOld;
+
+	uint32_t final_pad = current_pad & ~INPUT_INV_USE;
+	if (_invUseOverride > 0) {
+		final_pad |= INPUT_INV_USE;
+	}
+
+	// 5. Final State Updates
+	_playerPadOld = final_pad;
+	_realPad = final_pad;
+
+	// Calculate Push (Just Pressed) - Bits in final_pad that weren't in old_pad
+	_playerPadPush = ~old_pad & final_pad;
+
+	// Calculate Release (Just Released) - Bits in old_pad that aren't in final_pad
+	_padRelease = ~final_pad & old_pad;
+
+	_realPadPush = ~_inputsTracker & final_pad;
+
+	// Store current state for the next frame
+	_inputsTracker = final_pad;
+	_playerPad = final_pad;
+}
+
+void patchUpdatePadForMenu() {
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		/*
+			Croc2.exe+1ACF0 - 8B 0D 0C664B00        - mov ecx,[Croc2.exe+B660C]
+			Croc2.exe+1ACF6 - 33 C0                 - xor eax,eax
+			Croc2.exe+1ACF8 - 85 C9                 - test ecx,ecx
+			Croc2.exe+1ACFA - A3 68A55200           - mov [Croc2.exe+12A568],eax
 			Croc2.exe+1ACFF - 7E 0A                 - jle Croc2.exe+1AD0B
 			Croc2.exe+1AD01 - B8 10000000           - mov eax,00000010
 			Croc2.exe+1AD06 - A3 68A55200           - mov [Croc2.exe+12A568],eax
@@ -171,40 +350,90 @@ void Patch() {
 			Croc2.exe+1ADC2 - 7E 08                 - jle Croc2.exe+1ADCC
 			Croc2.exe+1ADC4 - 80 CC 10              - or ah,10
 			Croc2.exe+1ADC7 - A3 68A55200           - mov [Croc2.exe+12A568],eax
+			Croc2.exe+1ADCC - 8B 0D B47A4B00        - mov ecx,[Croc2.exe+B7AB4]
+			Croc2.exe+1ADD2 - 8B 15 3C794B00        - mov edx,[Croc2.exe+B793C]
+			Croc2.exe+1ADD8 - F7 D1                 - not ecx
+			Croc2.exe+1ADDA - 23 C8                 - and ecx,eax
+			Croc2.exe+1ADDC - A3 B47A4B00           - mov [Croc2.exe+B7AB4],eax
+			Croc2.exe+1ADE1 - 89 0D 78A55200        - mov [Croc2.exe+12A578],ecx
+			Croc2.exe+1ADE7 - 8B 0D B87A4B00        - mov ecx,[Croc2.exe+B7AB8]
+			Croc2.exe+1ADED - F7 D1                 - not ecx
+			Croc2.exe+1ADEF - 23 C8                 - and ecx,eax
+			Croc2.exe+1ADF1 - 83 FA 10              - cmp edx,10
+			Croc2.exe+1ADF4 - A3 88A55200           - mov [Croc2.exe+12A588],eax
+			Croc2.exe+1ADF9 - A3 B87A4B00           - mov [Croc2.exe+B7AB8],eax
+			Croc2.exe+1ADFE - 75 50                 - jne Croc2.exe+1AE50
+			Croc2.exe+1AE00 - F6 C4 04              - test ah,04
+			Croc2.exe+1AE03 - 74 23                 - je Croc2.exe+1AE28
+			Croc2.exe+1AE05 - 81 E1 FFFBFFFF        - and ecx,FFFFFBFF
+			Croc2.exe+1AE0B - 89 0D 54A55200        - mov [Croc2.exe+12A554],ecx
+			Croc2.exe+1AE11 - 74 15                 - je Croc2.exe+1AE28
+			Croc2.exe+1AE13 - 6A 00                 - push 00
+			Croc2.exe+1AE15 - E8 56FDFFFF           - call Croc2.exe+1AB70
+			Croc2.exe+1AE1A - A1 68A55200           - mov eax,[Croc2.exe+12A568]
+			Croc2.exe+1AE1F - 8B 0D 54A55200        - mov ecx,[Croc2.exe+12A554]
+			Croc2.exe+1AE25 - 83 C4 04              - add esp,04
+			Croc2.exe+1AE28 - 8B 15 88A55200        - mov edx,[Croc2.exe+12A588]
+			Croc2.exe+1AE2E - F6 C6 08              - test dh,08
+			Croc2.exe+1AE31 - 74 1D                 - je Croc2.exe+1AE50
+			Croc2.exe+1AE33 - 81 E1 FFF7FFFF        - and ecx,FFFFF7FF
+			Croc2.exe+1AE39 - 89 0D 54A55200        - mov [Croc2.exe+12A554],ecx
+			Croc2.exe+1AE3F - 74 0F                 - je Croc2.exe+1AE50
+			Croc2.exe+1AE41 - 6A 01                 - push 01
+			Croc2.exe+1AE43 - E8 28FDFFFF           - call Croc2.exe+1AB70
+			Croc2.exe+1AE48 - A1 68A55200           - mov eax,[Croc2.exe+12A568]
+			Croc2.exe+1AE4D - 83 C4 04              - add esp,04
+			Croc2.exe+1AE50 - 8B 0D F0624B00        - mov ecx,[Croc2.exe+B62F0]
+			Croc2.exe+1AE56 - 80 E4 EF              - and ah,-11
+			Croc2.exe+1AE59 - 85 C9                 - test ecx,ecx
+			Croc2.exe+1AE5B - A3 68A55200           - mov [Croc2.exe+12A568],eax
+			Croc2.exe+1AE60 - 7E 08                 - jle Croc2.exe+1AE6A
+			Croc2.exe+1AE62 - 80 CC 10              - or ah,10
+			Croc2.exe+1AE65 - A3 68A55200           - mov [Croc2.exe+12A568],eax
+			Croc2.exe+1AE6A - 8B 0D 80A55200        - mov ecx,[Croc2.exe+12A580]
+			Croc2.exe+1AE70 - A3 80A55200           - mov [Croc2.exe+12A580],eax
+			Croc2.exe+1AE75 - 8B D1                 - mov edx,ecx
+			Croc2.exe+1AE77 - A3 88A55200           - mov [Croc2.exe+12A588],eax
+			Croc2.exe+1AE7C - F7 D2                 - not edx
+			Croc2.exe+1AE7E - 23 D0                 - and edx,eax
+			Croc2.exe+1AE80 - 89 15 78A55200        - mov [Croc2.exe+12A578],edx
+			Croc2.exe+1AE86 - 8B D0                 - mov edx,eax
+			Croc2.exe+1AE88 - F7 D2                 - not edx
+			Croc2.exe+1AE8A - 23 D1                 - and edx,ecx
+			Croc2.exe+1AE8C - 8B 0D 90A55200        - mov ecx,[Croc2.exe+12A590]
+			Croc2.exe+1AE92 - F7 D1                 - not ecx
+			Croc2.exe+1AE94 - 23 C8                 - and ecx,eax
+			Croc2.exe+1AE96 - 89 15 7CA55200        - mov [Croc2.exe+12A57C],edx
+			Croc2.exe+1AE9C - 89 0D 54A55200        - mov [Croc2.exe+12A554],ecx
+			Croc2.exe+1AEA2 - A3 90A55200           - mov [Croc2.exe+12A590],eax
+			Croc2.exe+1AEA7 - C3                    - ret
 		*/
-		api->HookFunction(0x41acff, 205, &remapMenuButtons, INJECT_REPLACE);
-		/*
-			Croc2.exe+2F26B - F6 C1 02              - test cl,02
-			Croc2.exe+2F26E - 74 0A                 - je Croc2.exe+2F27A
-			Croc2.exe+2F270 - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F272 - 81 E2 00800000        - and edx,00008000
-			Croc2.exe+2F278 - 0B FA                 - or edi,edx
-			Croc2.exe+2F27A - F6 C1 04              - test cl,04
-			Croc2.exe+2F27D - 74 0A                 - je Croc2.exe+2F289
-			Croc2.exe+2F27F - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F281 - 81 E2 00400000        - and edx,00004000
-			Croc2.exe+2F287 - 0B FA                 - or edi,edx
-			Croc2.exe+2F289 - F6 C1 08              - test cl,08
-			Croc2.exe+2F28C - 74 0A                 - je Croc2.exe+2F298
-			Croc2.exe+2F28E - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F290 - 81 E2 000C0000        - and edx,00000C00
-			Croc2.exe+2F296 - 0B FA                 - or edi,edx
-			Croc2.exe+2F298 - F6 C1 10              - test cl,10
-			Croc2.exe+2F29B - 74 0A                 - je Croc2.exe+2F2A7
-			Croc2.exe+2F29D - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F29F - 81 E2 00200000        - and edx,00002000
-			Croc2.exe+2F2A5 - 0B FA                 - or edi,edx
-			Croc2.exe+2F2A7 - F6 C1 20              - test cl,20
-			Croc2.exe+2F2AA - 74 08                 - je Croc2.exe+2F2B4
-			Croc2.exe+2F2AC - 81 E3 00130000        - and ebx,00001300
-			Croc2.exe+2F2B2 - 0B FB                 - or edi,ebx
-		*/
-		api->HookFunction(0x42f26b, 60, &remapGameplayButtons, INJECT_REPLACE);
-		api->InjectCode(0x42f2a7, 13, hookCode, p, INJECT_REPLACE);
+		api->HookFunction(0x41acf0, 440, &remapUpdatePadForMenu, INJECT_REPLACE);
 		break;
 	}
 	case GAMEVER_EU: {
 		/*
+			Croc2.exe+1B1EC - E7 B0                 - out -50,eax
+			Croc2.exe+1B1EE - 41                    - inc ecx
+			Croc2.exe+1B1EF - 00 EE                 - add dh,ch
+			Croc2.exe+1B1F1 - B0 41                 - mov al,41
+			Croc2.exe+1B1F3 - 00 F5                 - add ch,dh
+			Croc2.exe+1B1F5 - B0 41                 - mov al,41
+			Croc2.exe+1B1F7 - 00 FC                 - add ah,bh
+			Croc2.exe+1B1F9 - B0 41                 - mov al,41
+			Croc2.exe+1B1FB - 00 03                 - add [ebx],al
+			Croc2.exe+1B1FD - B1 41                 - mov cl,41
+			Croc2.exe+1B1FF - 00 0A                 - add [edx],cl
+			Croc2.exe+1B201 - B1 41                 - mov cl,41
+			Croc2.exe+1B203 - 00 11                 - add [ecx],dl
+			Croc2.exe+1B205 - B1 41                 - mov cl,41
+			Croc2.exe+1B207 - 00 18                 - add [eax],bl
+			Croc2.exe+1B209 - B1 41                 - mov cl,41
+			Croc2.exe+1B20B - 00 90 9090908B        - add [eax-746F6F70],dl
+			Croc2.exe+1B211 - 0D FCD74B00           - or eax,Croc2.exe+BD7FC
+			Croc2.exe+1B216 - 33 C0                 - xor eax,eax
+			Croc2.exe+1B218 - 85 C9                 - test ecx,ecx
+			Croc2.exe+1B21A - A3 58175300           - mov [Croc2.exe+131758],eax
 			Croc2.exe+1B21F - 7E 0A                 - jle Croc2.exe+1B22B
 			Croc2.exe+1B221 - B8 10000000           - mov eax,00000010
 			Croc2.exe+1B226 - A3 58175300           - mov [Croc2.exe+131758],eax
@@ -263,40 +492,73 @@ void Patch() {
 			Croc2.exe+1B2E2 - 7E 08                 - jle Croc2.exe+1B2EC
 			Croc2.exe+1B2E4 - 80 CC 10              - or ah,10
 			Croc2.exe+1B2E7 - A3 58175300           - mov [Croc2.exe+131758],eax
+			Croc2.exe+1B2EC - 8B 0D A4EC4B00        - mov ecx,[Croc2.exe+BECA4]
+			Croc2.exe+1B2F2 - 8B 15 2CEB4B00        - mov edx,[Croc2.exe+BEB2C]
+			Croc2.exe+1B2F8 - F7 D1                 - not ecx
+			Croc2.exe+1B2FA - 23 C8                 - and ecx,eax
+			Croc2.exe+1B2FC - A3 A4EC4B00           - mov [Croc2.exe+BECA4],eax
+			Croc2.exe+1B301 - 89 0D 68175300        - mov [Croc2.exe+131768],ecx
+			Croc2.exe+1B307 - 8B 0D A8EC4B00        - mov ecx,[Croc2.exe+BECA8]
+			Croc2.exe+1B30D - F7 D1                 - not ecx
+			Croc2.exe+1B30F - 23 C8                 - and ecx,eax
+			Croc2.exe+1B311 - 83 FA 10              - cmp edx,10
+			Croc2.exe+1B314 - A3 78175300           - mov [Croc2.exe+131778],eax
+			Croc2.exe+1B319 - A3 A8EC4B00           - mov [Croc2.exe+BECA8],eax
+			Croc2.exe+1B31E - 75 50                 - jne Croc2.exe+1B370
+			Croc2.exe+1B320 - F6 C4 04              - test ah,04
+			Croc2.exe+1B323 - 74 23                 - je Croc2.exe+1B348
+			Croc2.exe+1B325 - 81 E1 FFFBFFFF        - and ecx,FFFFFBFF
+			Croc2.exe+1B32B - 89 0D 44175300        - mov [Croc2.exe+131744],ecx
+			Croc2.exe+1B331 - 74 15                 - je Croc2.exe+1B348
+			Croc2.exe+1B333 - 6A 00                 - push 00
+			Croc2.exe+1B335 - E8 56FDFFFF           - call Croc2.exe+1B090
+			Croc2.exe+1B33A - A1 58175300           - mov eax,[Croc2.exe+131758]
+			Croc2.exe+1B33F - 8B 0D 44175300        - mov ecx,[Croc2.exe+131744]
+			Croc2.exe+1B345 - 83 C4 04              - add esp,04
+			Croc2.exe+1B348 - 8B 15 78175300        - mov edx,[Croc2.exe+131778]
+			Croc2.exe+1B34E - F6 C6 08              - test dh,08
+			Croc2.exe+1B351 - 74 1D                 - je Croc2.exe+1B370
+			Croc2.exe+1B353 - 81 E1 FFF7FFFF        - and ecx,FFFFF7FF
+			Croc2.exe+1B359 - 89 0D 44175300        - mov [Croc2.exe+131744],ecx
+			Croc2.exe+1B35F - 74 0F                 - je Croc2.exe+1B370
+			Croc2.exe+1B361 - 6A 01                 - push 01
+			Croc2.exe+1B363 - E8 28FDFFFF           - call Croc2.exe+1B090
+			Croc2.exe+1B368 - A1 58175300           - mov eax,[Croc2.exe+131758]
+			Croc2.exe+1B36D - 83 C4 04              - add esp,04
+			Croc2.exe+1B370 - 8B 0D E0D44B00        - mov ecx,[Croc2.exe+BD4E0]
+			Croc2.exe+1B376 - 80 E4 EF              - and ah,-11
+			Croc2.exe+1B379 - 85 C9                 - test ecx,ecx
+			Croc2.exe+1B37B - A3 58175300           - mov [Croc2.exe+131758],eax
+			Croc2.exe+1B380 - 7E 08                 - jle Croc2.exe+1B38A
+			Croc2.exe+1B382 - 80 CC 10              - or ah,10
+			Croc2.exe+1B385 - A3 58175300           - mov [Croc2.exe+131758],eax
+			Croc2.exe+1B38A - 8B 0D 70175300        - mov ecx,[Croc2.exe+131770]
+			Croc2.exe+1B390 - A3 70175300           - mov [Croc2.exe+131770],eax
+			Croc2.exe+1B395 - 8B D1                 - mov edx,ecx
+			Croc2.exe+1B397 - A3 78175300           - mov [Croc2.exe+131778],eax
+			Croc2.exe+1B39C - F7 D2                 - not edx
+			Croc2.exe+1B39E - 23 D0                 - and edx,eax
+			Croc2.exe+1B3A0 - 89 15 68175300        - mov [Croc2.exe+131768],edx
+			Croc2.exe+1B3A6 - 8B D0                 - mov edx,eax
+			Croc2.exe+1B3A8 - F7 D2                 - not edx
+			Croc2.exe+1B3AA - 23 D1                 - and edx,ecx
+			Croc2.exe+1B3AC - 8B 0D 80175300        - mov ecx,[Croc2.exe+131780]
+			Croc2.exe+1B3B2 - F7 D1                 - not ecx
+			Croc2.exe+1B3B4 - 23 C8                 - and ecx,eax
+			Croc2.exe+1B3B6 - 89 15 6C175300        - mov [Croc2.exe+13176C],edx
+			Croc2.exe+1B3BC - 89 0D 44175300        - mov [Croc2.exe+131744],ecx
+			Croc2.exe+1B3C2 - A3 80175300           - mov [Croc2.exe+131780],eax
+			Croc2.exe+1B3C7 - C3                    - ret
 		*/
-		api->HookFunction(0x41B21F, 205, &remapMenuButtons, INJECT_REPLACE);
-		/*
-			Croc2.exe+2F9EB - F6 C1 02              - test cl,02
-			Croc2.exe+2F9EE - 74 0A                 - je Croc2.exe+2F9FA
-			Croc2.exe+2F9F0 - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F9F2 - 81 E2 00800000        - and edx,00008000
-			Croc2.exe+2F9F8 - 0B FA                 - or edi,edx
-			Croc2.exe+2F9FA - F6 C1 04              - test cl,04
-			Croc2.exe+2F9FD - 74 0A                 - je Croc2.exe+2FA09
-			Croc2.exe+2F9FF - 8B D3                 - mov edx,ebx
-			Croc2.exe+2FA01 - 81 E2 00400000        - and edx,00004000
-			Croc2.exe+2FA07 - 0B FA                 - or edi,edx
-			Croc2.exe+2FA09 - F6 C1 08              - test cl,08
-			Croc2.exe+2FA0C - 74 0A                 - je Croc2.exe+2FA18
-			Croc2.exe+2FA0E - 8B D3                 - mov edx,ebx
-			Croc2.exe+2FA10 - 81 E2 000C0000        - and edx,00000C00
-			Croc2.exe+2FA16 - 0B FA                 - or edi,edx
-			Croc2.exe+2FA18 - F6 C1 10              - test cl,10
-			Croc2.exe+2FA1B - 74 0A                 - je Croc2.exe+2FA27
-			Croc2.exe+2FA1D - 8B D3                 - mov edx,ebx
-			Croc2.exe+2FA1F - 81 E2 00200000        - and edx,00002000
-			Croc2.exe+2FA25 - 0B FA                 - or edi,edx
-			Croc2.exe+2FA27 - F6 C1 20              - test cl,20
-			Croc2.exe+2FA2A - 74 08                 - je Croc2.exe+2FA34
-			Croc2.exe+2FA2C - 81 E3 00130000        - and ebx,00001300
-			Croc2.exe+2FA32 - 0B FB                 - or edi,ebx
-		*/
-		api->HookFunction(0x42F9EB, 60, &remapGameplayButtons, INJECT_REPLACE);
-		api->InjectCode(0x42FA27, 13, hookCode, p, INJECT_REPLACE);
+		api->HookFunction(0x41B1EC, 475, &remapUpdatePadForMenu, INJECT_REPLACE);
 		break;
 	}
 	case GAMEVER_DEMO: {
 		/*
+			Croc2.exe+1AC50 - 8B 0D 0C564B00        - mov ecx,[Croc2.exe+B560C]
+			Croc2.exe+1AC56 - 33 C0                 - xor eax,eax
+			Croc2.exe+1AC58 - 85 C9                 - test ecx,ecx
+			Croc2.exe+1AC5A - A3 60955200           - mov [Croc2.exe+129560],eax
 			Croc2.exe+1AC5F - 7E 0A                 - jle Croc2.exe+1AC6B
 			Croc2.exe+1AC61 - B8 10000000           - mov eax,00000010
 			Croc2.exe+1AC66 - A3 60955200           - mov [Croc2.exe+129560],eax
@@ -355,36 +617,42 @@ void Patch() {
 			Croc2.exe+1AD22 - 7E 08                 - jle Croc2.exe+1AD2C
 			Croc2.exe+1AD24 - 80 CC 10              - or ah,10
 			Croc2.exe+1AD27 - A3 60955200           - mov [Croc2.exe+129560],eax
+			Croc2.exe+1AD2C - 8B 0D 78955200        - mov ecx,[Croc2.exe+129578]
+			Croc2.exe+1AD32 - A3 78955200           - mov [Croc2.exe+129578],eax
+			Croc2.exe+1AD37 - 8B D1                 - mov edx,ecx
+			Croc2.exe+1AD39 - A3 80955200           - mov [Croc2.exe+129580],eax
+			Croc2.exe+1AD3E - F7 D2                 - not edx
+			Croc2.exe+1AD40 - 23 D0                 - and edx,eax
+			Croc2.exe+1AD42 - 89 15 70955200        - mov [Croc2.exe+129570],edx
+			Croc2.exe+1AD48 - 8B D0                 - mov edx,eax
+			Croc2.exe+1AD4A - F7 D2                 - not edx
+			Croc2.exe+1AD4C - 23 D1                 - and edx,ecx
+			Croc2.exe+1AD4E - 8B 0D 88955200        - mov ecx,[Croc2.exe+129588]
+			Croc2.exe+1AD54 - F7 D1                 - not ecx
+			Croc2.exe+1AD56 - 23 C8                 - and ecx,eax
+			Croc2.exe+1AD58 - 89 15 74955200        - mov [Croc2.exe+129574],edx
+			Croc2.exe+1AD5E - 89 0D 4C955200        - mov [Croc2.exe+12954C],ecx
+			Croc2.exe+1AD64 - A3 88955200           - mov [Croc2.exe+129588],eax
+			Croc2.exe+1AD69 - C3                    - ret
 		*/
-		api->HookFunction(0x41AC5F, 205, &remapMenuButtons, INJECT_REPLACE);
-		/*
-			Croc2.exe+2F69B - F6 C1 02              - test cl,02
-			Croc2.exe+2F69E - 74 0A                 - je Croc2.exe+2F6AA
-			Croc2.exe+2F6A0 - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F6A2 - 81 E2 00800000        - and edx,00008000
-			Croc2.exe+2F6A8 - 0B FA                 - or edi,edx
-			Croc2.exe+2F6AA - F6 C1 04              - test cl,04
-			Croc2.exe+2F6AD - 74 0A                 - je Croc2.exe+2F6B9
-			Croc2.exe+2F6AF - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F6B1 - 81 E2 00400000        - and edx,00004000
-			Croc2.exe+2F6B7 - 0B FA                 - or edi,edx
-			Croc2.exe+2F6B9 - F6 C1 08              - test cl,08
-			Croc2.exe+2F6BC - 74 0A                 - je Croc2.exe+2F6C8
-			Croc2.exe+2F6BE - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F6C0 - 81 E2 000C0000        - and edx,00000C00
-			Croc2.exe+2F6C6 - 0B FA                 - or edi,edx
-			Croc2.exe+2F6C8 - F6 C1 10              - test cl,10
-			Croc2.exe+2F6CB - 74 0A                 - je Croc2.exe+2F6D7
-			Croc2.exe+2F6CD - 8B D3                 - mov edx,ebx
-			Croc2.exe+2F6CF - 81 E2 00200000        - and edx,00002000
-			Croc2.exe+2F6D5 - 0B FA                 - or edi,edx
-			Croc2.exe+2F6D7 - F6 C1 20              - test cl,20
-			Croc2.exe+2F6DA - 74 08                 - je Croc2.exe+2F6E4
-			Croc2.exe+2F6DC - 81 E3 00130000        - and ebx,00001300
-			Croc2.exe+2F6E2 - 0B FB                 - or edi,ebx
-		*/
-		api->HookFunction(0x42F69B, 60, &remapGameplayButtons, INJECT_REPLACE);
-		api->InjectCode(0x42F6D7, 13, hookCode, p, INJECT_REPLACE);
+		api->HookFunction(0x41AC5F, 281, &remapUpdatePadForMenu, INJECT_REPLACE);
+		break;
+	}
+	}
+}
+
+void __stdcall remapUpdateMenuControls() {
+}
+
+void patchUpdateMenuControls() {
+	switch (api->GetGameVersion()) {
+	case GAMEVER_US: {
+		break;
+	}
+	case GAMEVER_EU: {
+		break;
+	}
+	case GAMEVER_DEMO: {
 		break;
 	}
 	}
@@ -395,7 +663,9 @@ void Patch() {
 namespace Input::RemapActionButtons {
 
 void Setup() {
-	Patch();
+	patchDecodePad();
+	patchUpdatePadForMenu();
+	// patchUpdateMenuControls();
 }
 
 } // namespace Input::RemapActionButtons
