@@ -8,12 +8,16 @@ extern ModApi *api;
 
 namespace {
 
+int unboundAnalogX = 0;
+int unboundAnalogY = 0;
+
 void PatchAnalogInput() {
 
 	// TODO: doesn't work if controller not connected on setup
 	// Not due to this patch, likely due to some game logic avoiding this code path when a controller is not connected
 
-	uintptr_t ptrX = 0, ptrY = 0;
+	uintptr_t ptrX = 0;
+	uintptr_t ptrY = 0;
 	switch (Input::Controls::config.movement) {
 	case Input::Controls::ControlAnalog::LeftStick:
 		ptrX = (uintptr_t)&(Input::controllerBackend->input.leftStick.x);
@@ -23,9 +27,10 @@ void PatchAnalogInput() {
 		ptrX = (uintptr_t)&(Input::controllerBackend->input.rightStick.x);
 		ptrY = (uintptr_t)&(Input::controllerBackend->input.rightStick.y);
 		break;
-	}
-	if (ptrX == 0 || ptrY == 0) {
-		return;
+	default:
+		ptrX = (uintptr_t)&unboundAnalogX;
+		ptrY = (uintptr_t)&unboundAnalogY;
+		break;
 	}
 
 	uint8_t hookCode[12];
