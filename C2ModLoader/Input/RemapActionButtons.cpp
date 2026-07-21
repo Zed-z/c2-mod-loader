@@ -6,28 +6,30 @@
 
 extern ModApi *api;
 
+#define DIRECTIONAL_ANALOG_THRESHOLD 64
+
 namespace {
 
 uint32_t input_builder = 0;
 void __stdcall remapDecodePad() {
 	input_builder = 0;
 
-	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) > DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
 		*realPad |= INPUT_UP;
 		*playerPad |= INPUT_UP;
 		input_builder |= INPUT_UP;
 	}
-	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) < -DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
 		*realPad |= INPUT_RIGHT;
 		*playerPad |= INPUT_RIGHT;
 		input_builder |= INPUT_RIGHT;
 	}
-	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) < -DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
 		*realPad |= INPUT_DOWN;
 		*playerPad |= INPUT_DOWN;
 		input_builder |= INPUT_DOWN;
 	}
-	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) > DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
 		*realPad |= INPUT_LEFT;
 		*playerPad |= INPUT_LEFT;
 		input_builder |= INPUT_LEFT;
@@ -165,123 +167,73 @@ void patchDecodePad() {
 }
 
 void __stdcall remapUpdatePadForMenu() {
-	uint32_t &_playerPad = *(uint32_t *)0x0052a568;
-	uint32_t &_realPad = *(uint32_t *)0x0052a588;
-	uint32_t &_playerPadPush = *(uint32_t *)0x0052a578;
-	uint32_t &_realPadPush = *(uint32_t *)0x0052a554;
-	uint32_t &_playerPadOld = *(uint32_t *)0x0052a580;
-	uint32_t &_inputsTracker = *(uint32_t *)0x0052a590;
-	uint32_t &_padRelease = *(uint32_t *)0x0052a57c;
-	uint32_t &_trackPad1 = *(uint32_t *)0x004b7ab4;
-	uint32_t &_trackPad2 = *(uint32_t *)0x004b7ab8;
-	uint32_t &_menuStateFlag = *(uint32_t *)0x004b793c;
-	int32_t &_invUseOverride = *(int32_t *)0x004b62f0;
-
-	typedef void(__cdecl * MenuCallback_t)(uint32_t param);
-	MenuCallback_t CallMenuFunc = (MenuCallback_t)0x0041ab70;
-
 	Input::PollInput();
 	ModernInput input = Input::GetState();
 
-	if (input.startButton) {
-		api->LogDebug("Start button pressed.");
-	} else {
-		api->LogDebug("Start button not pressed.");
-	}
-
-	// 1. Build this frame's input state from scratch
 	uint32_t current_pad = 0;
-
-	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveUp) || Input::getAnalogStickY(Input::Controls::config.movement) > DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveUp))
 		current_pad |= INPUT_UP;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveRight) || Input::getAnalogStickX(Input::Controls::config.movement) < -DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveRight))
 		current_pad |= INPUT_RIGHT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) > 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveDown) || Input::getAnalogStickY(Input::Controls::config.movement) < -DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveDown))
 		current_pad |= INPUT_DOWN;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) < 0 || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft)) {
+	if (Input::getButtonPressed(Input::Controls::config.moveLeft) || Input::getAnalogStickX(Input::Controls::config.movement) > DIRECTIONAL_ANALOG_THRESHOLD || Input::getKeyboardKeyPressed(Input::Controls::config.keyMoveLeft))
 		current_pad |= INPUT_LEFT;
-	}
-
-	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump)) {
+	if (Input::getButtonPressed(Input::Controls::config.jump) || Input::getKeyboardKeyPressed(Input::Controls::config.keyJump))
 		current_pad |= INPUT_JUMP;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack)) {
+	if (Input::getButtonPressed(Input::Controls::config.attack) || Input::getKeyboardKeyPressed(Input::Controls::config.keyAttack))
 		current_pad |= INPUT_ATTACK;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip)) {
+	if (Input::getButtonPressed(Input::Controls::config.cameraFlip) || Input::getKeyboardKeyPressed(Input::Controls::config.keyCameraFlip))
 		current_pad |= INPUT_FLIP;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse)) {
+	if (Input::getButtonPressed(Input::Controls::config.itemUse) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemUse))
 		current_pad |= INPUT_INV_USE;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft)) {
+	if (Input::getButtonPressed(Input::Controls::config.stepLeft) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepLeft))
 		current_pad |= INPUT_STEP_LEFT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight)) {
+	if (Input::getButtonPressed(Input::Controls::config.stepRight) || Input::getKeyboardKeyPressed(Input::Controls::config.keyStepRight))
 		current_pad |= INPUT_STEP_RIGHT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev)) {
+	if (Input::getButtonPressed(Input::Controls::config.itemPrev) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemPrev))
 		current_pad |= INPUT_INV_LEFT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext)) {
+	if (Input::getButtonPressed(Input::Controls::config.itemNext) || Input::getKeyboardKeyPressed(Input::Controls::config.keyItemNext))
 		current_pad |= INPUT_INV_RIGHT;
-	}
-	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause)) {
+	if (Input::getButtonPressed(Input::Controls::config.pause) || Input::getKeyboardKeyPressed(Input::Controls::config.keyPause))
 		current_pad |= INPUT_PAUSE;
-	}
 
-	// 2. Calculate Intermediate "Push" State (CRITICAL for Menu)
-	// The menu needs to know what was *just pressed* this exact frame.
-	uint32_t push_pad = ~_trackPad1 & current_pad;
-	_playerPadPush = push_pad;
-	_realPadPush = ~_trackPad2 & current_pad;
+	*playerPadPush = ~*_prevPlayerPadState & current_pad;
+	*realPadPush = ~*_prevRealPadState & current_pad;
 
-	_trackPad1 = current_pad;
-	_trackPad2 = current_pad;
+	*_prevPlayerPadState = current_pad;
+	*_prevRealPadState = current_pad;
 
-	// 3. Menu logic
-	if (_menuStateFlag == 0x10) {
+	// Menu specific logic
+	if (*gameState == GS_MAIN_MENU) {
 		if ((current_pad & INPUT_INV_LEFT) != 0) {
-			_realPadPush &= ~INPUT_INV_LEFT;
-			if (_realPadPush != 0) {
-				CallMenuFunc(0);
+			*realPadPush &= ~INPUT_INV_LEFT;
+			if (*realPadPush != 0) {
+				_InputMenuCallback(0);
 			}
 		}
-
 		if ((current_pad & INPUT_INV_RIGHT) != 0) {
-			_realPadPush &= ~INPUT_INV_RIGHT;
-			if (_realPadPush != 0) {
-				CallMenuFunc(1);
+			*realPadPush &= ~INPUT_INV_RIGHT;
+			if (*realPadPush != 0) {
+				_InputMenuCallback(1);
 			}
 		}
 	}
 
-	// 4. Finalizing the frame's pad state
-	uint32_t old_pad = _playerPadOld;
-
+	// Force use inventory
 	uint32_t final_pad = current_pad & ~INPUT_INV_USE;
-	if (_invUseOverride > 0) {
+	if (*_invUseOverride > 0) {
 		final_pad |= INPUT_INV_USE;
 	}
 
-	// 5. Final State Updates
-	_playerPadOld = final_pad;
-	_realPad = final_pad;
-
-	// Calculate Push (Just Pressed) - Bits in final_pad that weren't in old_pad
-	_playerPadPush = ~old_pad & final_pad;
-
-	// Calculate Release (Just Released) - Bits in old_pad that aren't in final_pad
-	_padRelease = ~final_pad & old_pad;
-
-	_realPadPush = ~_inputsTracker & final_pad;
-
-	// Store current state for the next frame
-	_inputsTracker = final_pad;
-	_playerPad = final_pad;
+	uint32_t old_pad = *playerPadOld;
+	*playerPadOld = final_pad;
+	*realPad = final_pad;
+	*playerPadPush = ~old_pad & final_pad;
+	*playerPadPull = ~final_pad & old_pad;
+	*realPadPush = ~*realPadOld & final_pad;
+	*realPadOld = final_pad;
+	*playerPad = final_pad;
 }
 
 void patchUpdatePadForMenu() {
@@ -635,7 +587,7 @@ void patchUpdatePadForMenu() {
 			Croc2.exe+1AD64 - A3 88955200           - mov [Croc2.exe+129588],eax
 			Croc2.exe+1AD69 - C3                    - ret
 		*/
-		api->HookFunction(0x41AC5F, 281, &remapUpdatePadForMenu, INJECT_REPLACE);
+		// TODO: api->HookFunction(0x41AC5F, 281, &remapUpdatePadForMenu, INJECT_REPLACE);
 		break;
 	}
 	}

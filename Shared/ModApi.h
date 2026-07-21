@@ -720,6 +720,13 @@ inline uint32_t *playerPadOld = (uint32_t *)_pointer({{0x52A580}, {0x531770}, {0
 inline uint32_t *playerPadPush = (uint32_t *)_pointer({{0x52A578}, {0x531768}, {0x529580}});
 inline uint32_t *playerPadPull = (uint32_t *)_pointer({{0x52A57C}, {0x53176C}, {0x529584}});
 
+inline uint32_t *_prevPlayerPadState = (uint32_t *)_pointer({{0x4B7AB4}, {0x4BECA4}, {/*TODO*/}});
+inline uint32_t *_prevRealPadState = (uint32_t *)_pointer({{0x4B7AB8}, {0x4BECA8}, {/*TODO*/}});
+inline uint32_t *_invUseOverride = (uint32_t *)_pointer({{0X4B62F0}, {0X4BD4E0}, {/*TODO*/}});
+
+typedef void(__cdecl *_InputMenuCallback_t)(uint32_t param);
+inline _InputMenuCallback_t _InputMenuCallback = (_InputMenuCallback_t)_pointer({{0X41AB70}, {0X41B090}, {/*TODO*/}});
+
 inline uint32_t *analogX = (uint32_t *)_pointer({{0x52A564}, {0x531754}, {0x52955C}});
 inline uint32_t *analogY = (uint32_t *)_pointer({{0x52A574}, {0x531764}, {0x52956C}});
 inline uint32_t *inputDeviceType = (uint32_t *)_pointer({{0x52A560}, {0x531750}, {0x529558}});
