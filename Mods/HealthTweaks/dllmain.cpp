@@ -92,6 +92,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 		if (!api)
 			return FALSE;
 
+		if (api->GetGameVersion() == GAMEVER_DEMO) {
+			api->LogWarning("HealthTweaks is not compatible with the Demo version of the game.");
+		}
+
 		fullHealthOnRetry = api->SetupIniInt(L"Config", L"FullHealthOnRetry", true);
 		fullHealthOnLevelEntry = api->SetupIniInt(L"Config", L"FullHealthOnLevelEntry", true);
 		infiniteHazardBounce = api->SetupIniInt(L"Config", L"InfiniteHazardBounce", false);
@@ -109,6 +113,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 			api->HookFunction(0x407EFC, 6, &onRetry, INJECT_AFTER);
 			// Croc2.exe+1929D - 89 2D 489C4A00 - mov [Croc2.exe+A9C48],ebp
 			api->HookFunction(0x41929D, 6, &onLevelEntry, INJECT_AFTER);
+			break;
+		}
+		case GAMEVER_CLASSIC: {
+			api->LogDebug("HealthTweaks::DllMain() not implemented");
 			break;
 		}
 		}

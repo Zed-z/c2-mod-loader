@@ -90,6 +90,28 @@
             "problemMatcher": []
         },
         {
+            "label": "Build and Deploy (Release - CLASSIC)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "CLASSIC",
+                "-Configuration",
+                "Release",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Build and Deploy (Debug - US)",
             "type": "shell",
             "command": "powershell",
@@ -144,6 +166,28 @@
                 "${workspaceFolder}/build.ps1",
                 "-Version",
                 "DEMO",
+                "-Configuration",
+                "Debug",
+                "-Deploy"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Deploy (Debug - CLASSIC)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Version",
+                "CLASSIC",
                 "-Configuration",
                 "Debug",
                 "-Deploy"

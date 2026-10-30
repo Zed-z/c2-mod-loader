@@ -182,6 +182,10 @@ void ApplyHooks() {
 		api->HookFunction(0x42F2F0, 9, RunPreInputHooks, INJECT_BEFORE);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("ApplyHooks() not implemented");
+		break;
+	}
 	}
 }
 

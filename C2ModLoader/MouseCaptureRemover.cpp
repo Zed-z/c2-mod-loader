@@ -96,8 +96,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 	case GAMEVER_DEMO:
 		ADDR_CALL_CREATEDEVICE_MOUSE = 0x400000 + 0x11482;
 		break;
+	case GAMEVER_CLASSIC:
+		api->LogDebug("MouseInitThread() not implemented");
+		break;
 	}
-	if (gameVersion != GAMEVER_UNKNOWN) {
+	if (ADDR_CALL_CREATEDEVICE_MOUSE != 0) {
 		BYTE patch1[] = {0x83, 0xC4, 0x10};
 		api->PatchBytes(ADDR_CALL_CREATEDEVICE_MOUSE, patch1, sizeof(patch1));
 		api->LogDebug("Patched CreateDevice!");
@@ -115,8 +118,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 	case GAMEVER_DEMO:
 		ADDR_CALL_SETCURSORPOS = 0x400000 + 0x21ACA;
 		break;
+	case GAMEVER_CLASSIC:
+		api->LogDebug("MouseInitThread() not implemented");
+		break;
 	}
-	if (gameVersion != GAMEVER_UNKNOWN) {
+	if (ADDR_CALL_SETCURSORPOS != 0) {
 		BYTE patch2[] = {0x83, 0xC4, 0x08, 0x90, 0x90, 0x90};
 		api->PatchBytes(ADDR_CALL_SETCURSORPOS, patch2, sizeof(patch2));
 		api->LogDebug("Patched SetCursorPos!");
@@ -140,8 +146,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SETCURSOR[1] = 0x400000 + 0x2502D;
 		ADDRS_CALL_SETCURSOR[2] = 0x400000 + 0x250D7;
 		break;
+	case GAMEVER_CLASSIC:
+		api->LogDebug("MouseInitThread() not implemented");
+		break;
 	}
-	if (gameVersion != GAMEVER_UNKNOWN) {
+	if (ADDRS_CALL_SETCURSOR[0] != 0) {
 		BYTE patch3[] = {0x58, 0x90, 0x90, 0x90, 0x90, 0x90};
 		for (int i = 0; i < (sizeof(ADDRS_CALL_SETCURSOR) / sizeof(uintptr_t)); i++) {
 			api->PatchBytes(ADDRS_CALL_SETCURSOR[i], patch3, sizeof(patch3));
@@ -170,8 +179,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SHOWCURSOR[2] = 0x400000 + 0x096B9;
 		ADDRS_CALL_SHOWCURSOR[3] = 0x400000 + 0x217D1;
 		break;
+	case GAMEVER_CLASSIC:
+		api->LogDebug("MouseInitThread() not implemented");
+		break;
 	}
-	if (gameVersion != GAMEVER_UNKNOWN) {
+	if (ADDRS_CALL_SHOWCURSOR[0] != 0) {
 		BYTE patch4[] = {0x58, 0x90};
 		for (int i = 0; i < (sizeof(ADDRS_CALL_SHOWCURSOR) / sizeof(uintptr_t)); i++) {
 			api->PatchBytes(ADDRS_CALL_SHOWCURSOR[i], patch4, sizeof(patch4));

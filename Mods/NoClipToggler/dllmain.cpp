@@ -42,6 +42,10 @@ void __stdcall toggleNoclip() {
 		api->PatchBytes(0x4890A5, noclip_enabled ? noclipEnabled : noclipDisabled, sizeof(noclipEnabled));
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("Noclip::toggleNoclip() not implemented");
+		break;
+	}
 	}
 
 	api->LogInfo((std::string("Noclip: ") + (noclip_enabled ? "Enabled" : "Disabled")).c_str());

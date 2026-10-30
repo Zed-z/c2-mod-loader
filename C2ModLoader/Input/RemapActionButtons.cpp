@@ -163,6 +163,10 @@ void patchDecodePad() {
 		api->InjectCode(0x42F6D7, 13, hookCode, p, INJECT_REPLACE);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("PatchDecodePad() not implemented");
+		break;
+	}
 	}
 }
 

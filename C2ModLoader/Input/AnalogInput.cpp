@@ -77,6 +77,10 @@ void PatchAnalogInput() {
 		api->InjectCode(0x42F5FA, 9, hookCode, p, INJECT_BEFORE);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("PatchAnalogInput() not implemented");
+		break;
+	}
 	}
 }
 

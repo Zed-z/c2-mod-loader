@@ -105,6 +105,10 @@ void PatchDpadMovement() {
 		api->HookFunction(0x42F4C3, 62, &doDpadMovement, INJECT_REPLACE);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("PatchDpadMovement() not implemented");
+		break;
+	}
 	}
 }
 

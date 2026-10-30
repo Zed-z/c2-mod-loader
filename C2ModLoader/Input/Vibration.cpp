@@ -41,6 +41,10 @@ void PatchPreDamage() {
 		api->HookFunction(0x481010, 7, &PreDamage, INJECT_BEFORE);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("PatchPreDamage() not implemented");
+		break;
+	}
 	}
 }
 

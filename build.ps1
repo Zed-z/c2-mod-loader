@@ -1,7 +1,7 @@
 param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
-    [ValidateSet("EU","US","DEMO")]
+    [ValidateSet("EU","US","DEMO","CLASSIC")]
     [string]$Version = "US",
     [switch]$Clean,
     [switch]$Deploy,
@@ -12,9 +12,9 @@ param(
 
 if ($Help) {
     Write-Host @"
-Arguments: [-Configuration <Debug|Release>] [-Version <EU|US|DEMO>] [-Clean] [-Deploy] [-Package] [-Launch]
+Arguments: [-Configuration <Debug|Release>] [-Version <EU|US|DEMO|CLASSIC>] [-Clean] [-Deploy] [-Package] [-Launch]
     -Configuration : Build configuration (Debug or Release). Default: Release
-    -Version      : Croc 2 game version to target (EU, US, DEMO). Default: US
+    -Version      : Croc 2 game version to target (EU, US, DEMO, CLASSIC). Default: US
     -Clean        : Clean the build directory before building
     -Deploy       : Copy mod files to Croc 2 directory
     -Package      : Create package folder + zip

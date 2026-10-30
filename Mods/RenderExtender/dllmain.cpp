@@ -139,6 +139,10 @@ void hookDistanceChanges() {
 		api->HookFunction(0x42413D, 5, &OnDistancesWritten, INJECT_AFTER);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("hookDistanceChanges() not implemented");
+		break;
+	}
 	}
 
 	// Commented out due to issues

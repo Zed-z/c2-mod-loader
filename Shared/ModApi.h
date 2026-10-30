@@ -34,6 +34,7 @@ typedef struct {
 	MemoryAddress us;
 	MemoryAddress eu;
 	MemoryAddress demo;
+	MemoryAddress classic;
 } VersionAddresses;
 
 typedef int32_t StratEntityFlags;
@@ -530,7 +531,8 @@ typedef bool (*WriteIniStringFunction)(const wchar_t *section, const wchar_t *ke
 #define GAMEVER_US 1
 #define GAMEVER_EU 2
 #define GAMEVER_DEMO 3
-constexpr const char *GameVersions[] = {"UNKNOWN", "US", "EU", "DEMO"};
+#define GAMEVER_CLASSIC 4
+constexpr const char *GameVersions[] = {"UNKNOWN", "US", "EU", "DEMO", "CLASSIC"};
 
 typedef int (*GetGameVersionFunction)();
 
@@ -683,6 +685,8 @@ static MemoryAddress _address(VersionAddresses address) {
 		return address.eu;
 	if (gameVersion == GAMEVER_DEMO)
 		return address.demo;
+	if (gameVersion == GAMEVER_CLASSIC)
+		return address.classic;
 	return address.us;
 }
 

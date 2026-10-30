@@ -525,6 +525,8 @@ int GetGameVersion() {
 		cachedVersion = GAMEVER_EU;
 	else if (hash == "074C0E4333C76635D3F214E6D89AB2F758FE233E6D4B718F7C5A7E0F11B7D24B")
 		cachedVersion = GAMEVER_DEMO;
+	else if (hash == "0F31C8B1E1C953B2F923B4570C296352FC3057A3C10F48AB56DB312A937830F0")
+		cachedVersion = GAMEVER_CLASSIC;
 	else
 		cachedVersion = GAMEVER_UNKNOWN;
 
@@ -676,6 +678,10 @@ void GotoLevelSelect() {
 	if (api->GetGameVersion() == GAMEVER_DEMO) {
 		api->LogWarning("Level select not available in the demo!");
 		api->ShowWarningToast("Level select not available in the demo!");
+		return;
+	}
+	if (api->GetGameVersion() == GAMEVER_CLASSIC) {
+		api->LogWarning("GotoLevelSelect() not implemented");
 		return;
 	}
 

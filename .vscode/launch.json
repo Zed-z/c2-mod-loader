@@ -5,7 +5,7 @@
             "id": "gameVersion",
             "type": "pickString",
             "description": "Select Croc2 version to launch",
-            "options": ["US", "EU", "DEMO"],
+            "options": ["US", "EU", "DEMO", "CLASSIC"],
             "default": "US"
         }
     ],

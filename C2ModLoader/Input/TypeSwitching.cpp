@@ -80,6 +80,10 @@ void PatchKeyboardPressed() {
 		api->HookFunction(0x42F532, 10, &setUsingKeyboard, INJECT_AFTER);
 		break;
 	}
+	case GAMEVER_CLASSIC: {
+		api->LogDebug("PatchKeyboardPressed() not implemented");
+		break;
+	}
 	}
 }
 
