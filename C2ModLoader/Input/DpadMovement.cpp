@@ -59,7 +59,8 @@ void PatchDpadMovement() {
 		api->HookFunction(0x42F093, 62, &doDpadMovement, INJECT_REPLACE);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+2F806 - 83 3D 3C175300 2A     - cmp dword ptr [Croc2.exe+13173C],2A
 			Croc2.exe+2F80D - 0F83 D1010000         - jae Croc2.exe+2F9E4
@@ -103,10 +104,6 @@ void PatchDpadMovement() {
 			Croc2.exe+2F501 - DB 05 5C955200        - fild dword ptr [Croc2.exe+12955C]
 		*/
 		api->HookFunction(0x42F4C3, 62, &doDpadMovement, INJECT_REPLACE);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("PatchDpadMovement() not implemented");
 		break;
 	}
 	}

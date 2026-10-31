@@ -31,7 +31,8 @@ void PatchPreDamage() {
 		api->HookFunction(0x481B80, 7, &PreDamage, INJECT_BEFORE);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		// Croc2.exe+826D0 - 83 3D 2CEB4B00 0B     - cmp dword ptr [Croc2.exe+BEB2C],0B
 		api->HookFunction(0x4826D0, 7, &PreDamage, INJECT_BEFORE);
 		break;
@@ -39,10 +40,6 @@ void PatchPreDamage() {
 	case GAMEVER_DEMO: {
 		// Croc2.exe+81010 - 83 3D 3C694B00 0B     - cmp dword ptr [Croc2.exe+B693C],0B
 		api->HookFunction(0x481010, 7, &PreDamage, INJECT_BEFORE);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("PatchPreDamage() not implemented");
 		break;
 	}
 	}

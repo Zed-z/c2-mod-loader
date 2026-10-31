@@ -101,7 +101,8 @@ void patchDecodePad() {
 		api->InjectCode(0x42f2a7, 13, hookCode, p, INJECT_REPLACE);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+2F9EB - F6 C1 02              - test cl,02
 			Croc2.exe+2F9EE - 74 0A                 - je Croc2.exe+2F9FA
@@ -161,10 +162,6 @@ void patchDecodePad() {
 		*/
 		api->HookFunction(0x42F69B, 60, &remapDecodePad, INJECT_REPLACE);
 		api->InjectCode(0x42F6D7, 13, hookCode, p, INJECT_REPLACE);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("PatchDecodePad() not implemented");
 		break;
 	}
 	}

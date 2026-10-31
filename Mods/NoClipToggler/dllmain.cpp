@@ -28,7 +28,8 @@ void __stdcall toggleNoclip() {
 		api->PatchBytes(0x489BE5, noclip_enabled ? noclipEnabled : noclipDisabled, sizeof(noclipEnabled));
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		// Croc2.exe+8A765 - E8 A699F7FF           - call Croc2.exe+4110
 		const BYTE noclipDisabled[5] = {0xE8, 0xA6, 0x99, 0xF7, 0xFF};
 		const BYTE noclipEnabled[5] = {0x90, 0x90, 0x90, 0x90, 0x90};
@@ -40,10 +41,6 @@ void __stdcall toggleNoclip() {
 		const BYTE noclipDisabled[5] = {0xE8, 0x66, 0xB0, 0xF7, 0xFF};
 		const BYTE noclipEnabled[5] = {0x90, 0x90, 0x90, 0x90, 0x90};
 		api->PatchBytes(0x4890A5, noclip_enabled ? noclipEnabled : noclipDisabled, sizeof(noclipEnabled));
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("Noclip::toggleNoclip() not implemented");
 		break;
 	}
 	}

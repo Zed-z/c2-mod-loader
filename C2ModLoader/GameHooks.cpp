@@ -116,7 +116,8 @@ void ApplyHooks() {
 		api->HookFunction(0x42EEC0, 9, RunPreInputHooks, INJECT_BEFORE);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+8A030 - 55                    - push ebp
 			Croc2.exe+8A031 - 8B EC                 - mov ebp,esp
@@ -180,10 +181,6 @@ void ApplyHooks() {
 			Croc2.exe+2F2F3 - 8B 0D A4955200        - mov ecx,[Croc2.exe+1295A4]
 		*/
 		api->HookFunction(0x42F2F0, 9, RunPreInputHooks, INJECT_BEFORE);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("ApplyHooks() not implemented");
 		break;
 	}
 	}

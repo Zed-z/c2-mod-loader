@@ -121,7 +121,8 @@ void hookDistanceChanges() {
 		api->HookFunction(0x423D0D, 5, &OnDistancesWritten, INJECT_AFTER);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+243A4 - 89 15 38ED4B00        - mov [Croc2.exe+BED38],edx
 			Croc2.exe+243AA - 8B 40 40              - mov eax,[eax+40]
@@ -137,10 +138,6 @@ void hookDistanceChanges() {
 			Croc2.exe+2413D - A3 186B4B00           - mov [Croc2.exe+B6B18],eax
 		*/
 		api->HookFunction(0x42413D, 5, &OnDistancesWritten, INJECT_AFTER);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("hookDistanceChanges() not implemented");
 		break;
 	}
 	}

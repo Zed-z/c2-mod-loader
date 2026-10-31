@@ -680,10 +680,6 @@ void GotoLevelSelect() {
 		api->ShowWarningToast("Level select not available in the demo!");
 		return;
 	}
-	if (api->GetGameVersion() == GAMEVER_CLASSIC) {
-		api->LogWarning("GotoLevelSelect() not implemented");
-		return;
-	}
 
 	*gameStateComingFrom = *gameState;
 	*gameStateGoingTo = GS_LEVEL_SELECT;

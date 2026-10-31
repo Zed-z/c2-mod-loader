@@ -58,7 +58,8 @@ void PatchKeyboardPressed() {
 		api->HookFunction(0x42f102, 10, &setUsingKeyboard, INJECT_AFTER);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+2F878 - 85 F6                 - test esi,esi
 			Croc2.exe+2F87A - 66 A3 7E175300        - mov [Croc2.exe+13177E],ax
@@ -78,10 +79,6 @@ void PatchKeyboardPressed() {
 			Croc2.exe+2F53C - C7 05 58955200 02000000 - mov [Croc2.exe+129558],00000002
 		*/
 		api->HookFunction(0x42F532, 10, &setUsingKeyboard, INJECT_AFTER);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("PatchKeyboardPressed() not implemented");
 		break;
 	}
 	}

@@ -696,68 +696,68 @@ static void *_pointer(VersionAddresses address) {
 
 // Addresses --------------------------------------------------------
 
-inline uint32_t *cheats = (uint32_t *)_pointer({{0x4B7964}, {0x4BEB54}, {0x4B6964}});
+inline uint32_t *cheats = (uint32_t *)_pointer({{0x4B7964}, {0x4BEB54}, {0x4B6964}, {0x4BEB54}});
 
-inline uint32_t *fogDistance = (uint32_t *)_pointer({{0x4B7B48}, {0x4BED38}, {0x4B6B48}});
-inline uint32_t *renderDistance = (uint32_t *)_pointer({{0x4B7B18}, {0x4BED08}, {0x4B6B18}});
+inline uint32_t *fogDistance = (uint32_t *)_pointer({{0x4B7B48}, {0x4BED38}, {0x4B6B48}, {0x4BED38}});
+inline uint32_t *renderDistance = (uint32_t *)_pointer({{0x4B7B18}, {0x4BED08}, {0x4B6B18}, {0x4BED08}});
 
-inline WadFile **currentWadFile = (WadFile **)_pointer({{0x4A8C3C}, {0x4A9C3C}, {0x4A7C3C}});
+inline WadFile **currentWadFile = (WadFile **)_pointer({{0x4A8C3C}, {0x4A9C3C}, {0x4A7C3C}, {0x4A9C3C}});
 
-inline MemoryAddress rootObjRef = _address({{0x4A8C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}, {0x4A7C3C, {0x14, 0x28, 0x00}}});
-inline MemoryAddress crocObjRef = _address({{0x4A8C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}, {0x4A7C3C, {0x14, 0x30, 0x00}}});
-inline MemoryAddress bossObjRef = _address({{0x4A8C3C, {0x14, 0x38, 0x00}}, {0x4A9C3C, {0x14, 0x38, 0x00}}, {0x4A7C3C, {0x14, 0x38, 0x00}}});
-inline MemoryAddress cameraObjRef = _address({{0x4A8C3C, {0x14, 0x3C, 0x00}}, {0x4A9C3C, {0x14, 0x3C, 0x00}}, {0x4A7C3C, {0x14, 0x3C, 0x00}}});
-inline MemoryAddress dialogObjRef = _address({{0x4A8C3C, {0x14, 0x40, 0x00}}, {0x4A9C3C, {0x14, 0x40, 0x00}}, {0x4A7C3C, {0x14, 0x40, 0x00}}});
-inline uint32_t *stratCount = (uint32_t *)_pointer({{0x636160}, {0x63D350}, {0x635158}});
+inline MemoryAddress rootObjRef = _address({{0x4A8C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}, {0x4A7C3C, {0x14, 0x28, 0x00}}, {0x4A9C3C, {0x14, 0x28, 0x00}}});
+inline MemoryAddress crocObjRef = _address({{0x4A8C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}, {0x4A7C3C, {0x14, 0x30, 0x00}}, {0x4A9C3C, {0x14, 0x30, 0x00}}});
+inline MemoryAddress bossObjRef = _address({{0x4A8C3C, {0x14, 0x38, 0x00}}, {0x4A9C3C, {0x14, 0x38, 0x00}}, {0x4A7C3C, {0x14, 0x38, 0x00}}, {0x4A9C3C, {0x14, 0x38, 0x00}}});
+inline MemoryAddress cameraObjRef = _address({{0x4A8C3C, {0x14, 0x3C, 0x00}}, {0x4A9C3C, {0x14, 0x3C, 0x00}}, {0x4A7C3C, {0x14, 0x3C, 0x00}}, {0x4A9C3C, {0x14, 0x3C, 0x00}}});
+inline MemoryAddress dialogObjRef = _address({{0x4A8C3C, {0x14, 0x40, 0x00}}, {0x4A9C3C, {0x14, 0x40, 0x00}}, {0x4A7C3C, {0x14, 0x40, 0x00}}, {0x4A9C3C, {0x14, 0x40, 0x00}}});
+inline uint32_t *stratCount = (uint32_t *)_pointer({{0x636160}, {0x63D350}, {0x635158}, {0x63D350}});
 
-inline uint32_t *inputsRaw = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}});
-inline uint32_t *inputsPressedRaw = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
-inline uint32_t *inputsReleasedRaw = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
+inline uint32_t *inputsRaw = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}, {0x531780}});
+inline uint32_t *inputsPressedRaw = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}, {0x531744}});
+inline uint32_t *inputsReleasedRaw = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}, {0x531748}});
 
-inline uint32_t *realPad = (uint32_t *)_pointer({{0x52A588}, {0x531778}, {0x529580}});
-inline uint32_t *realPadOld = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}});
-inline uint32_t *realPadPush = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}});
-inline uint32_t *realPadPull = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}});
+inline uint32_t *realPad = (uint32_t *)_pointer({{0x52A588}, {0x531778}, {0x529580}, {0x531778}});
+inline uint32_t *realPadOld = (uint32_t *)_pointer({{0x52A590}, {0x531780}, {0x529588}, {0x531780}});
+inline uint32_t *realPadPush = (uint32_t *)_pointer({{0x52A554}, {0x531744}, {0x52954C}, {0x531744}});
+inline uint32_t *realPadPull = (uint32_t *)_pointer({{0x52A558}, {0x531748}, {0x529550}, {0x531748}});
 
-inline uint32_t *playerPad = (uint32_t *)_pointer({{0x52A568}, {0x531758}, {0x529570}});
-inline uint32_t *playerPadOld = (uint32_t *)_pointer({{0x52A580}, {0x531770}, {0x529578}});
-inline uint32_t *playerPadPush = (uint32_t *)_pointer({{0x52A578}, {0x531768}, {0x529580}});
-inline uint32_t *playerPadPull = (uint32_t *)_pointer({{0x52A57C}, {0x53176C}, {0x529584}});
+inline uint32_t *playerPad = (uint32_t *)_pointer({{0x52A568}, {0x531758}, {0x529570}, {0x531758}});
+inline uint32_t *playerPadOld = (uint32_t *)_pointer({{0x52A580}, {0x531770}, {0x529578}, {0x531770}});
+inline uint32_t *playerPadPush = (uint32_t *)_pointer({{0x52A578}, {0x531768}, {0x529580}, {0x531768}});
+inline uint32_t *playerPadPull = (uint32_t *)_pointer({{0x52A57C}, {0x53176C}, {0x529584}, {0x53176C}});
 
-inline uint32_t *_prevPlayerPadState = (uint32_t *)_pointer({{0x4B7AB4}, {0x4BECA4}, {/*TODO*/}});
-inline uint32_t *_prevRealPadState = (uint32_t *)_pointer({{0x4B7AB8}, {0x4BECA8}, {/*TODO*/}});
-inline uint32_t *_invUseOverride = (uint32_t *)_pointer({{0X4B62F0}, {0X4BD4E0}, {/*TODO*/}});
+inline uint32_t *_prevPlayerPadState = (uint32_t *)_pointer({{0x4B7AB4}, {0x4BECA4}, {/*TODO*/}, {0x4BECA4}});
+inline uint32_t *_prevRealPadState = (uint32_t *)_pointer({{0x4B7AB8}, {0x4BECA8}, {/*TODO*/}, {0x4BECA8}});
+inline uint32_t *_invUseOverride = (uint32_t *)_pointer({{0X4B62F0}, {0X4BD4E0}, {/*TODO*/}, {0X4BD4E0}});
 
 typedef void(__cdecl *_InputMenuCallback_t)(uint32_t param);
-inline _InputMenuCallback_t _InputMenuCallback = (_InputMenuCallback_t)_pointer({{0X41AB70}, {0X41B090}, {/*TODO*/}});
+inline _InputMenuCallback_t _InputMenuCallback = (_InputMenuCallback_t)_pointer({{0X41AB70}, {0X41B090}, {/*TODO*/}, {0X41B090}});
 
-inline uint32_t *analogX = (uint32_t *)_pointer({{0x52A564}, {0x531754}, {0x52955C}});
-inline uint32_t *analogY = (uint32_t *)_pointer({{0x52A574}, {0x531764}, {0x52956C}});
-inline uint32_t *inputDeviceType = (uint32_t *)_pointer({{0x52A560}, {0x531750}, {0x529558}});
-inline uint32_t *analogStrength = (uint32_t *)_pointer({{0x52A54C}, {0x53173C}, {0x529544}});
+inline uint32_t *analogX = (uint32_t *)_pointer({{0x52A564}, {0x531754}, {0x52955C}, {0x531754}});
+inline uint32_t *analogY = (uint32_t *)_pointer({{0x52A574}, {0x531764}, {0x52956C}, {0x531764}});
+inline uint32_t *inputDeviceType = (uint32_t *)_pointer({{0x52A560}, {0x531750}, {0x529558}, {0x531750}});
+inline uint32_t *analogStrength = (uint32_t *)_pointer({{0x52A54C}, {0x53173C}, {0x529544}, {0x53173C}});
 
-inline Vec3i *cameraPos = (Vec3i *)_pointer({{0x622B38}, {0x629D28}, {0x621B30}});
-inline Vec3i *cameraRot = (Vec3i *)_pointer({{0x4AF328}, {0x4B0378}, {0x4AE3B0}});
-inline Vec3i *cameraLookAt = (Vec3i *)_pointer({{0x622B94}, {0x629D84}, {0x621B8C}});
+inline Vec3i *cameraPos = (Vec3i *)_pointer({{0x622B38}, {0x629D28}, {0x621B30}, {0x629D28}});
+inline Vec3i *cameraRot = (Vec3i *)_pointer({{0x4AF328}, {0x4B0378}, {0x4AE3B0}, {0x4B0378}});
+inline Vec3i *cameraLookAt = (Vec3i *)_pointer({{0x622B94}, {0x629D84}, {0x621B8C}, {0x629D84}});
 
-inline uint32_t *movementAllowedState = (uint32_t *)_pointer({{0x622C44}, {0x629E34}, {0x621C3C}});
+inline uint32_t *movementAllowedState = (uint32_t *)_pointer({{0x622C44}, {0x629E34}, {0x621C3C}, {0x629E34}});
 
-inline DoorStruct **doorStruct = (DoorStruct **)_pointer({{0x4B7888}, {0x4BEA78}, {0x4B6888}});
+inline DoorStruct **doorStruct = (DoorStruct **)_pointer({{0x4B7888}, {0x4BEA78}, {0x4B6888}, {0x4BEA78}});
 
-inline SaveSlot *saveSlots = (SaveSlot *)_pointer({{0x6040C0}, {0x60B2B0}, {0x6030B8}});
-inline uint32_t *currentSaveSlotIndex = (uint32_t *)_pointer({{0x6220FC}, {0x6292EC}, {0x6210F4}});
+inline SaveSlot *saveSlots = (SaveSlot *)_pointer({{0x6040C0}, {0x60B2B0}, {0x6030B8}, {0x60B2B0}});
+inline uint32_t *currentSaveSlotIndex = (uint32_t *)_pointer({{0x6220FC}, {0x6292EC}, {0x6210F4}, {0x6292EC}});
 
-inline GameState *gameState = (GameState *)_pointer({{0x4B793C}, {0x4BEB2C}, {0x4B693C}});
-inline GameState *gameStateComingFrom = (GameState *)_pointer({{0x4B7894}, {0x4BEA84}, {0x4B6894}});
-inline GameState *gameStateGoingTo = (GameState *)_pointer({{0x4B7930}, {0x4BEB20}, {0x4B6930}});
-inline bool32_t *gameStateTransitioning = (bool32_t *)_pointer({{0x4B7934}, {0x4BEB24}, {0x4B6934}});
+inline GameState *gameState = (GameState *)_pointer({{0x4B793C}, {0x4BEB2C}, {0x4B693C}, {0x4BEB2C}});
+inline GameState *gameStateComingFrom = (GameState *)_pointer({{0x4B7894}, {0x4BEA84}, {0x4B6894}, {0x4BEA84}});
+inline GameState *gameStateGoingTo = (GameState *)_pointer({{0x4B7930}, {0x4BEB20}, {0x4B6930}, {0x4BEB20}});
+inline bool32_t *gameStateTransitioning = (bool32_t *)_pointer({{0x4B7934}, {0x4BEB24}, {0x4B6934}, {0x4BEB24}});
 
-inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)_pointer({{0x4B776C}, {0x4BE95C}, {0x4B676C}});
-inline fnInitFade initFade = (fnInitFade)_pointer({{0x418240}, {0x4186F0}, {0x418240}});
+inline fnFadeRoutine *fadeRoutine = (fnFadeRoutine *)_pointer({{0x4B776C}, {0x4BE95C}, {0x4B676C}, {0x4BE95C}});
+inline fnInitFade initFade = (fnInitFade)_pointer({{0x418240}, {0x4186F0}, {0x418240}, {0x4186F0}});
 
-inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x4A7C44}});
+inline LevelInfo *levelInfo = (LevelInfo *)_pointer({{0x4A8C44}, {0x4A9C44}, {0x4A7C44}, {0x4A9C44}});
 
-inline bool16_t *binocsActive = (bool16_t *)_pointer({{0x52AEAC}, {0x53209C}, {0x529EA4}});
+inline bool16_t *binocsActive = (bool16_t *)_pointer({{0x52AEAC}, {0x53209C}, {0x529EA4}, {0x53209C}});
 
 #define CROC_VAR_HAZARD_BOUNCE_COUNT 19
 #define CROC_VAR_STATE 190

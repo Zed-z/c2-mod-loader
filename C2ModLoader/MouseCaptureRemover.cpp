@@ -91,13 +91,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDR_CALL_CREATEDEVICE_MOUSE = 0x400000 + 0x11482;
 		break;
 	case GAMEVER_EU:
+	case GAMEVER_CLASSIC:
 		ADDR_CALL_CREATEDEVICE_MOUSE = 0x400000 + 0x11562;
 		break;
 	case GAMEVER_DEMO:
 		ADDR_CALL_CREATEDEVICE_MOUSE = 0x400000 + 0x11482;
-		break;
-	case GAMEVER_CLASSIC:
-		api->LogDebug("MouseInitThread() not implemented");
 		break;
 	}
 	if (ADDR_CALL_CREATEDEVICE_MOUSE != 0) {
@@ -113,13 +111,11 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDR_CALL_SETCURSORPOS = 0x400000 + 0x2164A;
 		break;
 	case GAMEVER_EU:
+	case GAMEVER_CLASSIC:
 		ADDR_CALL_SETCURSORPOS = 0x400000 + 0x21CE4;
 		break;
 	case GAMEVER_DEMO:
 		ADDR_CALL_SETCURSORPOS = 0x400000 + 0x21ACA;
-		break;
-	case GAMEVER_CLASSIC:
-		api->LogDebug("MouseInitThread() not implemented");
 		break;
 	}
 	if (ADDR_CALL_SETCURSORPOS != 0) {
@@ -137,6 +133,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SETCURSOR[2] = 0x400000 + 0x24CA7;
 		break;
 	case GAMEVER_EU:
+	case GAMEVER_CLASSIC:
 		ADDRS_CALL_SETCURSOR[0] = 0x400000 + 0x098F9;
 		ADDRS_CALL_SETCURSOR[1] = 0x400000 + 0x2529D;
 		ADDRS_CALL_SETCURSOR[2] = 0x400000 + 0x25347;
@@ -145,9 +142,6 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SETCURSOR[0] = 0x400000 + 0x096C9;
 		ADDRS_CALL_SETCURSOR[1] = 0x400000 + 0x2502D;
 		ADDRS_CALL_SETCURSOR[2] = 0x400000 + 0x250D7;
-		break;
-	case GAMEVER_CLASSIC:
-		api->LogDebug("MouseInitThread() not implemented");
 		break;
 	}
 	if (ADDRS_CALL_SETCURSOR[0] != 0) {
@@ -168,6 +162,7 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SHOWCURSOR[3] = 0x400000 + 0x21351;
 		break;
 	case GAMEVER_EU:
+	case GAMEVER_CLASSIC:
 		ADDRS_CALL_SHOWCURSOR[0] = 0x400000 + 0x09838;
 		ADDRS_CALL_SHOWCURSOR[1] = 0x400000 + 0x09887;
 		ADDRS_CALL_SHOWCURSOR[2] = 0x400000 + 0x098E9;
@@ -178,9 +173,6 @@ DWORD WINAPI MouseInitThread(LPVOID lpParam) {
 		ADDRS_CALL_SHOWCURSOR[1] = 0x400000 + 0x09657;
 		ADDRS_CALL_SHOWCURSOR[2] = 0x400000 + 0x096B9;
 		ADDRS_CALL_SHOWCURSOR[3] = 0x400000 + 0x217D1;
-		break;
-	case GAMEVER_CLASSIC:
-		api->LogDebug("MouseInitThread() not implemented");
 		break;
 	}
 	if (ADDRS_CALL_SHOWCURSOR[0] != 0) {

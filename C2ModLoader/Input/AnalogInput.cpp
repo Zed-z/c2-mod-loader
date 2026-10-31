@@ -61,7 +61,8 @@ void PatchAnalogInput() {
 		api->InjectCode(0x42F1CA, 9, hookCode, p, INJECT_BEFORE);
 		break;
 	}
-	case GAMEVER_EU: {
+	case GAMEVER_EU:
+	case GAMEVER_CLASSIC: {
 		/*
 			Croc2.exe+2F94A - 83 FD 7F              - cmp ebp,7F
 			Croc2.exe+2F94D - 89 15 64175300        - mov [Croc2.exe+131764],edx
@@ -75,10 +76,6 @@ void PatchAnalogInput() {
 			Croc2.exe+2F5FD - 89 15 6C955200        - mov [Croc2.exe+12956C],edx
 		*/
 		api->InjectCode(0x42F5FA, 9, hookCode, p, INJECT_BEFORE);
-		break;
-	}
-	case GAMEVER_CLASSIC: {
-		api->LogDebug("PatchAnalogInput() not implemented");
 		break;
 	}
 	}

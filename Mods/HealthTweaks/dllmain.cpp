@@ -108,15 +108,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID) {
 			api->HookFunction(0x418DB5, 6, &onLevelEntry, INJECT_AFTER);
 			break;
 		}
-		case GAMEVER_EU: {
+		case GAMEVER_EU:
+		case GAMEVER_CLASSIC: {
 			// Croc2.exe+7EFC - 89 99 C0B46000 - mov [ecx+Croc2.exe+20B4C0],ebx
 			api->HookFunction(0x407EFC, 6, &onRetry, INJECT_AFTER);
 			// Croc2.exe+1929D - 89 2D 489C4A00 - mov [Croc2.exe+A9C48],ebp
 			api->HookFunction(0x41929D, 6, &onLevelEntry, INJECT_AFTER);
-			break;
-		}
-		case GAMEVER_CLASSIC: {
-			api->LogDebug("HealthTweaks::DllMain() not implemented");
 			break;
 		}
 		}
